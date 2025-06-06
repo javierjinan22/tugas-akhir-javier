@@ -1,0 +1,25 @@
+<div class="sidebar-container d-flex flex-column bg-light" [class.collapsed]="collapsed">
+  <button class="btn btn-outline-secondary toggle-btn" (click)="toggleSidebar()">
+    <!-- <i class="fa" [class.fa-chevron-left]="!collapsed" [class.fa-chevron-right]="collapsed"></i> -->
+     <i class="fa" [ngClass]="collapsed ? 'fa-bars' : 'fa-chevron-left'"></i>
+  </button>
+
+  <div class="sidebar-content mt-4" *ngIf="!collapsed">
+    <ng-container *ngIf="role === 'guru'; else studentMenu">
+      <ul class="nav flex-column px-3">
+        <li class="nav-item mb-2"><a routerLink="/dashboard" class="nav-link active">Dashboard</a></li>
+        <li class="nav-item mb-2"><a routerLink="/kelola-kelas" class="nav-link">Kelola Kelas</a></li>
+        <li class="nav-item mb-2"><a routerLink="/kelola-materi" class="nav-link">Kelola Materi</a></li>
+        <li class="nav-item"><a routerLink="/hasil-belajar" class="nav-link">Lihat hasil belajar</a></li>
+      </ul>
+    </ng-container>
+
+    <ng-template #studentMenu>
+      <ul class="nav flex-column px-3">
+        <li class="nav-item mb-2"><a routerLink="/dashboard" class="nav-link active">Dashboard</a></li>
+        <li class="nav-item mb-2"><a routerLink="/materi" class="nav-link">Daftar Materi</a></li>
+        <li class="nav-item"><a routerLink="/riwayat" class="nav-link">Riwayat Belajar</a></li>
+      </ul>
+    </ng-template>
+  </div>
+</div>

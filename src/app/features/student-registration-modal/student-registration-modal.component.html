@@ -1,0 +1,101 @@
+<div class="modal-header">
+  <h5 class="modal-title">Daftar sebagai siswa</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
+</div>
+
+<div class="modal-body">
+  <form (ngSubmit)="onSubmitStudentRegistration()">
+    <div class="mb-3">
+      <label>Nama Lengkap <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" required [(ngModel)]="fullName" name="fullName" />
+    </div>
+
+    <div class="mb-3">
+      <label>Username <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" required [(ngModel)]="username" name="username" />
+    </div>
+
+    <div class="mb-3 position-relative">
+      <label>Password <span class="text-danger">*</span></label>
+      <input
+        [type]="passwordVisible ? 'text' : 'password'"
+        class="form-control"
+        required
+        [(ngModel)]="password"
+        name="password"
+      />
+      <fa-icon
+        [icon]="passwordVisible ? faEyeSlash : faEye"
+        class="toggle-password-icon"
+        (click)="togglePasswordVisibility()"
+      ></fa-icon>
+    </div>
+
+    <div class="mb-3 position-relative">
+      <label>Konfirmasi password <span class="text-danger">*</span></label>
+      <input
+        [type]="confirmPasswordVisible ? 'text' : 'password'"
+        class="form-control"
+        required
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+      />
+      <fa-icon
+        [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
+        class="toggle-password-icon"
+        (click)="toggleConfirmPasswordVisibility()"
+      ></fa-icon>
+    </div>
+
+    <div class="d-flex gap-2">
+      <div class="mb-3 flex-fill">
+        <label>Sekolah <span class="text-danger">*</span></label>
+        <!-- <ng-select
+        name="school"
+        [items]="schools"
+        bindLabel="nama_sekolah"
+        bindValue="id"
+        placeholder="Pilih sekolah"
+        [(ngModel)]="selectedSchool"
+        [searchable]="true"
+        [clearable]="false">
+        </ng-select> -->
+
+        <ngx-select
+        [items]="schools"
+        placeholder="Pilih sekolah"
+        optionValueField="id"
+        optionTextField="nama_sekolah"
+        [allowClear]="false"
+        >
+        </ngx-select>
+
+      </div>
+      <div class="mb-3 flex-fill">
+        <label>Kelas <span class="text-danger">*</span></label>
+        <!-- <ng-select
+        class="custom-ng-select"
+        name="schoolClass"
+        [items]="classes"
+        bindLabel="nama_kelas"
+        bindValue="id"
+        placeholder="Pilih kelas"
+        [(ngModel)]="selectedClass"
+        [searchable]="true"
+        [clearable]="false">
+        </ng-select> -->
+
+        <ngx-select
+        [items]="classes"
+        placeholder="Pilih kelas"
+        optionValueField="id"
+        optionTextField="nama_kelas"
+        [allowClear]="false"
+        >
+        </ngx-select>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-primary-custom w-100">Daftar</button>
+  </form>
+</div>

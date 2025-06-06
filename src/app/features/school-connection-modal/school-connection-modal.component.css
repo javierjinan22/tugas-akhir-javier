@@ -1,0 +1,72 @@
+.modal-body {
+  font-family: 'Poppins', sans-serif;
+  padding: 2rem;
+  border-radius: 20px;
+  position: relative;
+}
+
+.icon-warning-wrapper {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #EFE51B;
+  border-radius: 50%;
+  padding: 1rem; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px; 
+  height: 70px;
+}
+
+.icon-warning-wrapper fa-icon {
+  color: #fff;
+  font-size: 2.3rem; /* Lebih besar dan tebal */
+  font-weight: 900;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 1rem;
+}
+
+.d-flex.justify-content-between.mt-4.px-3 > button {
+  width: 48%; 
+  height: 42px; 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 15px;
+  padding: 0; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-outline-primary {
+  color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  background-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}
+
+.btn-primary {
+  background-color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}

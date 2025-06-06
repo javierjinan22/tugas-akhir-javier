@@ -1,0 +1,32 @@
+.navbar {
+  border-bottom: 1px solid #f0f0f0;
+  z-index: 999;
+}
+
+.logo-literadoo {
+  margin-left: 40px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  color: #004F99;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.logo-literadoo:hover {
+  color: #004F99; 
+  text-shadow: 
+    0 0 8px rgba(93, 221, 249, 0.7),
+    0 0 15px rgba(60, 203, 205, 0.5),
+    0 0 20px rgba(81, 221, 237, 0.3);
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  min-width: 160px;
+  font-size: 14px;
+}
+
+.dropdown-item {
+  cursor: pointer;
+}

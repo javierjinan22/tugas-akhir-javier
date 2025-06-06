@@ -1,1 +1,11 @@
-/* You can add global styles to this file, and also import other style files */
+.ngx-select__item.active,
+.ngx-select__item:focus {
+  background-color: #FFAA00!important; /* Sesuai warna hover */
+  color: #fff !important;
+}
+
+.ngx-select__item:hover {
+  background-color: #FFAA00 !important; /* Warna latar belakang saat hover */
+  color: #fff !important; /* Warna teks saat hover */
+  cursor: pointer;
+}

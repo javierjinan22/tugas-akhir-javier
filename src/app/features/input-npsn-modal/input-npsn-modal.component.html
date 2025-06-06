@@ -1,0 +1,27 @@
+<div class="modal-body position-relative">
+  <!-- Icon Warning Overlapping -->
+  <div class="icon-warning-wrapper">
+    <div class="icon-warning">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
+  </div>
+
+  <h5 class="modal-title text-center mt-4">Anda belum terhubung ke sekolah</h5>
+
+  <form (ngSubmit)="onSearchSchool()">
+    <div class="form-group mt-3">
+      <label class="text-left">NPSN <span class="text-danger">*</span></label>
+      <input
+        type="text"
+        class="form-control input-rounded"
+        required
+        [(ngModel)]="npsn"
+        name="npsn"
+      />
+      <small class="text-danger mt-1" *ngIf="schoolNotFound">
+        Sekolah dengan NPSN di atas tidak ditemukan.
+      </small>
+    </div>
+    <button type="submit" class="btn btn-primary btn-rounded w-100 mt-3">Cari sekolah</button>
+  </form>
+</div>

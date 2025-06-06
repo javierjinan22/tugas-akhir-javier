@@ -1,0 +1,17 @@
+<nav class="navbar navbar-expand-lg bg-white navbar-light px-4 py-2 shadow-sm justify-content-between align-items-center">
+  <a class="navbar-brand logo-literadoo" routerLink="/">Literadoo</a>
+
+  <div class="dropdown">
+    <button class="btn btn-link p-0 border-0" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+      <fa-icon [icon]="faUserCircle" size="2x" class="text-warning"></fa-icon>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end mt-2" aria-labelledby="userMenu">
+      <li>
+        <a class="dropdown-item" (click)="goToProfile()">Lihat Profil</a>
+      </li>
+      <li>
+        <a class="dropdown-item text-danger" (click)="logout()">Logout</a>
+      </li>
+    </ul>
+  </div>
+</nav>

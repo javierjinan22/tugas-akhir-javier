@@ -1,0 +1,54 @@
+/* Pakai font Poppins untuk keseluruhan modal */
+.modal-header,
+.modal-body,
+.modal-title-custom,
+.form-label-custom,
+.btn-login,
+.link-daftar {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Ukuran teks title Login */
+.modal-title-custom {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* Ukuran label form */
+.form-label-custom {
+  font-size: 14px;
+}
+
+/* Button custom */
+.btn-login {
+  display: block;    
+  margin: 0 auto; 
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+  border-radius: 15px;
+  font-size: 16px;
+  font-weight: 500;
+  max-width: 200px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-login:hover {
+  background-color: #0891b2;
+  border-color: #0891b2;
+}
+
+/* Link Daftar */
+.link-daftar {
+  color: #1BB6C1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-daftar:hover {
+  text-decoration: underline;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #1BB6C1;
+}

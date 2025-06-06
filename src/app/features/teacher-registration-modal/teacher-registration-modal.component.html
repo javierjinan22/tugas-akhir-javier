@@ -1,0 +1,65 @@
+<div class="modal-header">
+  <h5 class="modal-title">Daftar sebagai guru</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
+</div>
+
+<div class="modal-body">
+  <form (ngSubmit)="onSubmitRegister()">
+    <div class="mb-3">
+      <label>Nama Lengkap <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" required [(ngModel)]="fullName" name="fullName" />
+    </div>
+
+    <div class="mb-3">
+      <label>Email <span class="text-danger">*</span></label>
+      <input type="email" class="form-control" required [(ngModel)]="email" name="email" />
+    </div>
+
+    <div class="mb-3 position-relative">
+    <label>Password <span class="text-danger">*</span></label>
+    <input
+        [type]="passwordVisible ? 'text' : 'password'"
+        class="form-control"
+        required
+        [(ngModel)]="password"
+        name="password"
+    />
+    <fa-icon
+        [icon]="passwordVisible ? faEyeSlash : faEye"
+        class="toggle-password-icon"
+        (click)="togglePasswordVisibility()"
+    ></fa-icon>
+    </div>
+
+    <div class="mb-3 position-relative">
+    <label>Konfirmasi password <span class="text-danger">*</span></label>
+    <input
+        [type]="confirmPasswordVisible ? 'text' : 'password'"
+        class="form-control"
+        required
+        [(ngModel)]="confirmPassword"
+        name="confirmPassword"
+    />
+    <fa-icon
+        [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
+        class="toggle-password-icon"
+        (click)="toggleConfirmPasswordVisibility()"
+    ></fa-icon>
+    </div>
+
+
+
+    <div class="mb-3 d-flex gap-2">
+      <div class="flex-fill">
+        <label>NUPTK <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" required [(ngModel)]="nuptk" name="nuptk" />
+      </div>
+      <div class="flex-fill">
+        <label>Instansi <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" required [(ngModel)]="instansi" name="instansi" />
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary-custom w-100">Daftar</button>
+  </form>
+</div>

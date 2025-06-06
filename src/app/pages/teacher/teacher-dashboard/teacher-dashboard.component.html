@@ -1,0 +1,18 @@
+<div class="container">
+  <h2>Selamat datang di Dashboard Guru</h2>
+
+  <p>
+    Berikut adalah contoh isi panjang untuk menguji scroll area pada layout. Konten ini mencakup paragraf berulang dan elemen tambahan.
+  </p>
+
+  <div *ngFor="let i of [].constructor(50); let idx = index">
+    <div class="card my-3 p-3 shadow-sm">
+      <h5>Materi {{ idx + 1 }}</h5>
+      <p>
+        Ini adalah deskripsi materi ke-{{ idx + 1 }}. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+    </div>
+  </div>
+</div>

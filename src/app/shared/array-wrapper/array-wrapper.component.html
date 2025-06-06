@@ -1,0 +1,25 @@
+
+<div class="wrapper-box mt-4" *ngFor="let item of counter; let i = index">
+  <div>
+    <ng-container *ngIf="contentTemplateRef" 
+                  [ngTemplateOutlet]="contentTemplateRef"
+                  [ngTemplateOutletContext]="{arrayIndex: i}">
+    </ng-container>
+  </div>
+
+  <div class="button-actions">
+    <button class="btn-control" 
+            style="background-color: #F44444;" 
+            (click)="onDeleteButtonClicked($event, i)"
+            *ngIf="counter.length > 1">
+      <i class="fa fa-minus"></i>
+    </button>
+    
+    <button class="btn-control" 
+            style="background-color: #4FBBBB;" 
+            (click)="onAddButtonClicked($event, i)"
+            *ngIf="i === counter.length - 1">
+      <i class="fa fa-plus"></i>
+    </button>
+  </div>
+</div>

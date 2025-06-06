@@ -1,0 +1,201 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand logo-literadoo" href="#">Literadoo</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#offcanvasNavbar"
+      aria-controls="offcanvasNavbar"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div
+      class="offcanvas offcanvas-end"
+      tabindex="-1"
+      id="offcanvasNavbar"
+      aria-labelledby="offcanvasNavbarLabel"
+    >
+      <div class="offcanvas-header">
+
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" (click)="scrollTo('sekolah-teraktif')">Sekolah teraktif</a></li>
+          <li class="nav-item"><a class="nav-link" (click)="scrollTo('panduan')">Panduan</a></li>
+          <li class="nav-item"><a class="nav-link" (click)="scrollTo('fitur')">Fitur</a></li>
+          <li class="nav-item"><a class="nav-link" (click)="scrollTo('tentang-kami')">Tentang kami</a></li>
+          <li class="nav-item"><a class="nav-link" (click)="onButtonLoginClicked()">Masuk</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<div class="container py-5">
+
+  <!-- Hero Section -->
+  <div class="row align-items-center mb-5">
+    <div class="col-md-6">
+
+      <h1 class="mb-3 mt-5">
+        <span class="highlight">Literadoo</span>, <span class="teman-pintar">Teman Pintar</span><br />
+        <span class="teman-pintar">Belajar Literasi Digital!</span>
+      </h1>
+
+      <p class="sub-title mb-4">
+        Platform interaktif untuk belajar literasi digital yang aman, menyenangkan dan mudah digunakan oleh siswa
+        sekolah dasar.
+      </p>
+
+
+      <button class="btn btn-primary btn-primary-custom me-2">Mulai sekarang</button>
+      <button class="btn btn-outline-primary btn-outline-primary-custom">Pelajari lebih lanjut</button>
+    </div>
+    <div class="col-md-6">
+      <img src="assets/img/landing-page-main-2.svg" alt="Illustration" class="img-fluid mt-5" />
+    </div>
+  </div>
+
+  <!-- Top Sekolah Teraktif -->
+  <div class="top-school-container p-4 mb-5" id="sekolah-teraktif">
+
+    <div class="section-title-top-school">
+     <span class="highlight-top-3">TOP 3</span> Sekolah Teraktif
+    </div>
+
+    <div class="card-progress" *ngFor="let sekolah of topSekolah; let i = index"
+     [ngClass]="{ 'highlight-card': i === 2 }">
+      <div class="d-flex align-items-center mb-2">
+        <div class="badge badge-custom" [ngClass]="{
+          'badge-1': i === 0,
+          'badge-2': i === 1,
+          'badge-3': i === 2
+        }">
+          {{ i + 1 }}
+        </div>
+        <div class="flex-grow-1">
+          <h6 class="school-name mb-0">{{ sekolah.nama }}</h6>
+          <small>{{ sekolah.progres }} %</small>
+        </div>
+        <button class="btn btn-warning btn-sm">Detail Sekolah</button>
+      </div>
+
+      <div class="progress progress-with-star" style="height: 8px; position: relative;">
+        <div
+          class="progress-bar progress-bar-custom"
+          role="progressbar"
+          [style.width.%]="sekolah.progres"
+        ></div>
+        <!-- Bintang di ujung progress -->
+         <fa-icon
+            [icon]="faStar"
+            class="star-icon"
+            [style.left.%]="sekolah.progres"
+          ></fa-icon>
+      </div>
+    </div>
+
+
+    <div class="top-school-footer">
+    <button class="btn btn-light btn-light-custom d-flex align-items-center gap-1">
+      Lihat lainnya <fa-icon [icon]="faAngleRight" class="my-fa-icon-custom"></fa-icon>
+    </button>
+  </div>
+
+  </div>
+
+  <!-- Panduan Section -->
+<section class="mb-5" id="panduan">
+  <h2 class="section-title text-center">
+    Panduan Penggunaan <span class="highlight">Literadoo</span>
+  </h2>
+
+  <div class="row">
+    <!-- Panduan Guru -->
+    <div class="col-md-6">
+      <h5 class="guide-title">Panduan Guru</h5>
+      <div *ngFor="let item of panduanGuru; let i = index" class="step-container">
+        <div class="step-number">{{ i + 1 }}</div>
+        <div class="step-content">
+          <div class="step-title">{{ item.judul }}</div>
+          <ul>
+            <li *ngFor="let detail of item.detail">{{ detail }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Panduan Siswa -->
+    <div class="col-md-6">
+      <h5 class="guide-title">Panduan Siswa</h5>
+      <div *ngFor="let item of panduanSiswa; let i = index" class="step-container">
+        <div class="step-number">{{ i + 1 }}</div>
+        <div class="step-content">
+          <div class="step-title">{{ item.judul }}</div>
+          <ul>
+            <li *ngFor="let detail of item.detail">{{ detail }}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Fitur Section -->
+
+  <section class="mb-5" id="fitur">
+  <h2 class="section-title text-center">Fitur - fitur <span class="highlight">Literadoo</span></h2>
+
+  <div class="row align-items-stretch">
+  <div class="col-md-4 mb-3" *ngFor="let fitur of fiturList">
+    <div class="feature-card h-100 d-flex align-items-start">
+      <fa-icon [icon]="fitur.icon" class="feature-icon me-3"></fa-icon>
+      <div class="feature-content">
+        <h5 class="feature-title">{{ fitur.judul }}</h5>
+        <p class="feature-desc">{{ fitur.deskripsi }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</section>
+
+  <!-- Tentang Section -->
+  <section class="mb-5 text-center" id="tentang-kami">
+    <h2 class="section-title">Tentang <span class="highlight">Literadoo</span></h2>
+    <p class="mx-auto about-desc" style="max-width: 600px;">
+      Literadoo adalah platform edukasi literasi digital yang dirancang untuk membantu siswa sekolah dasar memahami
+      dunia digital secara menyenangkan dan aman. Dengan materi yang interaktif, kuis yang menarik, dan monitoring
+      progres yang jelas, Literadoo bertujuan untuk menumbuhkan generasi muda yang cerdas digital sejak dini.
+    </p>
+  </section>
+
+  <!-- Footer -->
+
+</div>
+
+<footer class="footer-section text-white">
+  <div class="container py-4 d-flex flex-column flex-md-row justify-content-between align-items-start">
+    <div class="footer-text mb-3 mb-md-0">
+      <p class="text-saran mb-0 fw-bold">Kami senang mendengar pendapat dan saran dari kamu!<br />Jika ada pertanyaan atau ingin menghubungi kami, jangan ragu untuk mengirimkan pesan.</p>
+    </div>
+    <div class="footer-form">
+      <textarea class="form-control mb-2" placeholder="Tulis saran kamu disini"></textarea>
+      <button class="btn btn-outline-light">Kirim</button>
+    </div>
+  </div>
+  <div class="text-center py-2">
+    <small class="copyright">© 2025 Literadoo. All rights reserved.</small>
+  </div>
+</footer>

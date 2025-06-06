@@ -1,0 +1,74 @@
+<!-- 
+
+<div class="modal-body position-relative">
+  <div class="icon-warning-wrapper">
+    <div class="icon-warning">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
+  </div>
+
+  <h5 class="modal-title text-center mt-4">
+    Anda belum memiliki kelas, mohon membuat kelas terlebih dahulu
+  </h5>
+
+  <div class="school-details mt-3 px-3">
+    <app-array-wrapper (add)="onAdd()" (remove)="onRemove()">
+      <div class="form-row">
+        <div class="form-field">
+          <label>Nama kelas <span class="text-danger">*</span></label>
+          <input type="text" class="form-control input-rounded" formControlName="nama_kelas" />
+        </div>
+        <div class="form-field">
+          <label>Tahun ajaran <span class="text-danger">*</span></label>
+          <input type="text" class="form-control input-rounded" formControlName="tahun_ajaran" />
+        </div>
+      </div>
+    </app-array-wrapper>
+  </div>
+
+  <div class="d-flex justify-content-between mt-4 px-3">
+    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">Batal</button>
+    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">Buat Kelas</button>
+  </div>
+</div> -->
+
+<div class="modal-body position-relative">
+  <div class="icon-warning-wrapper">
+    <div class="icon-warning">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
+  </div>
+
+  <h5 class="modal-title text-center mt-4">
+    Anda belum memiliki kelas, mohon membuat kelas terlebih dahulu
+  </h5>
+
+  <div class="school-details mt-3 px-3">
+    <!-- Menggunakan array-wrapper untuk menangani form input dinamis -->
+    <app-array-wrapper [data]="classData" (addEvent)="onAdd()" (deleteEvent)="onRemove($event)">
+      <ng-template #content let-item="item" let-index="index">
+        
+      <div class="form-row">
+        <div class="form-field">
+          <label>Nama kelas <span class="text-danger">*</span></label>
+          <input type="text" class="form-control input-rounded" formControlName="nama_kelas"/>
+        </div>
+        <div class="form-field">
+          <label>Tahun ajaran <span class="text-danger">*</span></label>
+          <input type="text" class="form-control input-rounded" formControlName="tahun_ajaran"/>
+        </div>
+      </div>
+    </ng-template>
+
+    </app-array-wrapper>
+  </div>
+
+  <div class="d-flex justify-content-between mt-4 px-3">
+    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
+      Batal
+    </button>
+    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
+      Buat Kelas
+    </button>
+  </div>
+</div>
