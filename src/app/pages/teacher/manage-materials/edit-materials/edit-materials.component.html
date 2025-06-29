@@ -1,0 +1,79 @@
+<div class="form-container p-4 p-md-5">
+  <h2 class="fw-bold mb-4" style="font-size: 24px">Edit materi</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <!-- Judul materi -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Judul materi <span class="text-danger">*</span></label>
+      <input type="text" class="form-control custom-input" formControlName="judul" placeholder="Judul materi">
+      <div *ngIf="form.get('judul')?.invalid && form.get('judul')?.touched" class="text-danger small">
+        Judul materi wajib diisi
+      </div>
+    </div>
+
+    <!-- Deskripsi singkat -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Deskripsi singkat <span class="text-danger">*</span></label>
+      <input type="text" class="form-control custom-input" formControlName="deskripsi" placeholder="Deskripsi singkat">
+      <div *ngIf="form.get('deskripsi')?.invalid && form.get('deskripsi')?.touched" class="text-danger small">
+        Deskripsi singkat wajib diisi
+      </div>
+    </div>
+
+    <!-- Kelas yang ditautkan -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Kelas yang ditautkan <span class="text-danger">*</span></label>
+
+        <div class="kelas-checkbox-group mb-2">
+        <label *ngFor="let kelas of kelasList" class="kelas-checkbox">
+            <input
+            type="checkbox"
+            [checked]="form.value.kelas.includes(kelas)"
+            (change)="onKelasChange($event, kelas)"
+            />
+            <span class="custom-check"></span>
+            {{ kelas }}
+        </label>
+        </div>
+
+      <div *ngIf="form.get('kelas')?.invalid && form.get('kelas')?.touched" class="text-danger small">
+        Pilih minimal satu kelas
+      </div>
+    </div>
+
+    <!-- Lewati, langsung buat kuis -->
+    <div class="mb-3">
+      <button type="button" class="btn btn-warning" (click)="onSkipQuiz()">
+        Lewati, Langsung buat kuis
+      </button>
+    </div>
+
+    <!-- Isian BAB -->
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Isian BAB</label>
+      <ckeditor
+        formControlName="isiBab"
+        [editor]="Editor"
+        [config]="editorConfig"
+        class="custom-ckeditor"
+      ></ckeditor>
+    </div>
+
+    <!-- Izinkan unduh materi -->
+    <div class="mb-4 d-flex align-items-center">
+    <label class="toggle-switch mb-0">
+        <input type="checkbox" formControlName="izinkanUnduh">
+        <span class="toggle-slider"></span>
+    </label>
+    <span class="ms-2">Izinkan unduh materi</span>
+    </div>
+
+
+    <!-- Tombol aksi -->
+    <div class="d-flex gap-3 justify-content-center">
+      <button type="button" class="btn btn-outline-primary-custom px-5" (click)="onBatal()">Batal</button>
+      <button type="submit" class="btn btn-primary-custom px-5">Simpan</button>
+    </div>
+  </form>
+</div>

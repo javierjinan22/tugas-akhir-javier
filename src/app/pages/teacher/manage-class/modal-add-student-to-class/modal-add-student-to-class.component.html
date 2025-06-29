@@ -1,0 +1,20 @@
+<div class="modal-body position-relative">
+  <!-- Icon Warning Overlapping -->
+  <div class="icon-warning-wrapper">
+    <div class="icon-warning">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
+  </div>
+
+  <h5 class="modal-title text-center mt-4">Pindahkan siswa ke kelas ini</h5>
+
+  <div class="d-flex justify-content-between mt-4 px-3">
+    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
+      Batal
+    </button>
+    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
+      Pindahkan
+    </button>
+  </div>
+
+</div>

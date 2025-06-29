@@ -1,0 +1,89 @@
+.form-container {
+  background: #f7f7f7;
+  border-radius: 22px;
+  max-width: auto; /* lebar ditambah */
+  margin: 20px auto; /* margin atas, kanan, bawah, kiri */
+  box-shadow: 0 4px 12px rgba(36, 44, 54, 0.04);
+}
+
+label {
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* .btn-primary-custom {
+  background-color: #1BB6C1;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.btn-primary-custom:hover {
+  background-color: #17a2b8;
+} */
+
+.toggle-password-icon {
+  position: absolute;
+  margin-top: -20px;
+  right: 15px; 
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #1BB6C1;
+  font-size: 1rem;
+  z-index: 2;
+}
+
+a {
+  color: #1BB6C1;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #1BB6C1;
+}
+
+.btn-outline-primary,
+.btn-primary {
+  height: 52px;
+  width: 202px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 15px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-outline-primary {
+  color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}
+
+.btn-primary {
+  background-color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}

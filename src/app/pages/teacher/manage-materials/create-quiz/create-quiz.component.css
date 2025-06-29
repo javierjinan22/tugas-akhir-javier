@@ -1,0 +1,101 @@
+.form-container {
+  background: #f7f7f7;
+  border-radius: 22px;
+  max-width: 1050px;
+  margin: 40px auto;
+  box-shadow: 0 4px 12px rgba(36, 44, 54, 0.04);
+  font-family: Poppins, sans-serif;
+}
+
+.custom-input {
+  border: 1.5px solid #15b2c4;
+  border-radius: 12px;
+  min-height: 48px;
+  font-size: 1rem;
+  box-shadow: none;
+  padding-left: 18px;
+}
+
+.custom-ckeditor .ck-editor__editable {
+  min-height: 120px !important;
+}
+
+.number-badge {
+  display: inline-block;
+  background-color: #F9A826;
+  border-radius: 5px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.btn-primary-custom {
+  font-family: Poppins, sans-serif;
+  font-weight: 500;
+  color: white;
+  font-size: 16px;
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+  border-radius: 15px;
+  padding: 8px 16px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+  background-color: #0891b2;
+  border-color: #0891b2;
+}
+
+.btn-outline-primary-custom{
+  font-family: Poppins, sans-serif;
+  font-weight: 500;
+  color: #212121;
+  font-size: 16px;
+  border-color: #1BB6C1;
+  border-radius: 15px;
+  padding: 8px  16px;
+}
+
+.btn-outline-primary-custom:hover {
+  background-color: #0891b2;
+  color: white;
+  border-color: #0891b2;
+}
+
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #d9d9d9;
+  border-radius: 50%;
+  outline: none;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+input[type="radio"]:checked {
+  border-color: #1BB6C1;
+}
+
+input[type="radio"]:checked::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: #1BB6C1;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+input[type="radio"] + span {
+  vertical-align: middle;
+}

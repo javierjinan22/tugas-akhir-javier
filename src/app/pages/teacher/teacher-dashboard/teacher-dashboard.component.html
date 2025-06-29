@@ -1,18 +1,153 @@
-<div class="container">
-  <h2>Selamat datang di Dashboard Guru</h2>
 
-  <p>
-    Berikut adalah contoh isi panjang untuk menguji scroll area pada layout. Konten ini mencakup paragraf berulang dan elemen tambahan.
-  </p>
 
-  <div *ngFor="let i of [].constructor(50); let idx = index">
-    <div class="card my-3 p-3 shadow-sm">
-      <h5>Materi {{ idx + 1 }}</h5>
-      <p>
-        Ini adalah deskripsi materi ke-{{ idx + 1 }}. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-        Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
+<div class="container mt-4">
+  <!-- Banner -->
+  <div class="dashboard-banner text-white">
+    <h3>Selamat datang di <span>Literadoo</span></h3>
+    <p class="mb-1" style="font-size:1.18rem;font-weight:500;">
+      Semangat membimbing siswa belajar literasi digital!
+    </p>
+    <button class="btn btn-tambah mt-2" (click)="onTambahMateri()">
+      Tambah materi
+      <i class="fa-solid fa-angle-right"></i>
+    </button>
+  </div>
+
+
+
+  <div class="container mt-4">
+  <!-- Ringkasan Card -->
+  <div class="row g-4 mb-2">
+    <div class="col-md-3 col-12">
+      <div class="summary-card-custom summary-materi">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-bg me-3">
+            <i class="fa-solid fa-book-open"></i>
+          </div>
+          <div>
+            <div class="summary-value-custom">7</div>
+            <div class="summary-label-custom">Total Materi</div>
+          </div>
+        </div>
+        <hr class="divider-line">
+        <div class="d-flex justify-content-between align-items-center summary-footer-custom">
+          <span class="summary-detail-btn">Lihat detail</span>
+          <i class="fa-solid fa-angle-right"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-12">
+      <div class="summary-card-custom summary-kelas">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-bg me-3">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div>
+            <div class="summary-value-custom">3</div>
+            <div class="summary-label-custom">Total Kelas</div>
+          </div>
+        </div>
+        <hr class="divider-line">
+        <div class="d-flex justify-content-between align-items-center summary-footer-custom">
+          <span class="summary-detail-btn">Lihat detail</span>
+          <i class="fa-solid fa-angle-right"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-12">
+      <div class="summary-card-custom summary-aktif">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-bg me-3">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div>
+            <div class="summary-value-custom">2</div>
+            <div class="summary-label-custom">Materi Aktif</div>
+          </div>
+        </div>
+        <hr class="divider-line">
+        <div class="d-flex justify-content-between align-items-center summary-footer-custom">
+          <span class="summary-detail-btn">Lihat detail</span>
+          <i class="fa-solid fa-angle-right"></i>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-12">
+      <div class="summary-card-custom summary-selesai">
+        <div class="d-flex align-items-center mb-2">
+          <div class="icon-bg me-3">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <div class="summary-value-custom">7</div>
+            <div class="summary-label-custom">Materi Selesai</div>
+          </div>
+        </div>
+        <hr class="divider-line">
+        <div class="d-flex justify-content-between align-items-center summary-footer-custom">
+          <span class="summary-detail-btn">Lihat detail</span>
+          <i class="fa-solid fa-angle-right"></i>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+
+  <!-- Tabel Ringkasan Materi -->
+  <h4 class="fw-bold mb-3 mt-4">Ringkasan</h4>
+  <div class="table-responsive">
+    <table class="table align-middle table-bordered text-center">
+      <thead>
+        <tr>
+          <th>NO</th>
+          <th>Judul Materi</th>
+          <th>Kelas</th>
+          <th>Siswa Mengerjakan</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1.</td>
+          <td>Bab 2 Keamanan Internet</td>
+          <td>6 B</td>
+          <td>17 / 25</td>
+          <td><span class="badge badge-status badge-berlangsung">Berlangsung</span></td>
+        </tr>
+        <tr>
+          <td>2.</td>
+          <td>Bab 2 Keamanan Internet</td>
+          <td>6 A</td>
+          <td>19 / 25</td>
+          <td><span class="badge badge-status badge-berlangsung">Berlangsung</span></td>
+        </tr>
+        <tr>
+          <td>3.</td>
+          <td>Bab 2 Keamanan Internet</td>
+          <td>5 B</td>
+          <td>25 / 25</td>
+          <td><span class="badge badge-status badge-selesai">Selesai</span></td>
+        </tr>
+        <tr>
+          <td>4.</td>
+          <td>Bab 2 Keamanan Internet</td>
+          <td>5 A</td>
+          <td>25 / 25</td>
+          <td><span class="badge badge-status badge-selesai">Selesai</span></td>
+        </tr>
+        <tr>
+          <td>5.</td>
+          <td>Bab 2 Keamanan Internet</td>
+          <td>4 B</td>
+          <td>25 / 25</td>
+          <td><span class="badge badge-status badge-selesai">Selesai</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Optional: Bootstrap Icons -->
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> -->
+

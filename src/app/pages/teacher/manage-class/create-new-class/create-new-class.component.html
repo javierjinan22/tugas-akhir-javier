@@ -1,0 +1,39 @@
+<div class="container-fluid mt-4">
+
+    <h2 class="fw-bold mb-4" style="font-size: 24px; ">Tambah kelas</h2>
+
+    <div class="form-container p-4 p-md-5">
+        <form [formGroup]="classForm">
+
+            <div class="row">
+
+            <div class="col-md-8">
+                <label>Nama Kelas <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" formControlName="className" />
+            </div>
+
+            <div class="col-md-4">
+                <label>Tahun Ajaran <span class="text-danger">*</span></label>
+                <ngx-select
+                    [items]="academicYears"
+                    formControlName="academicYearId"
+                    placeholder="Pilih tahun ajaran"
+                    optionValueField="id"
+                    optionTextField="name">
+                </ngx-select>
+            </div>
+            </div>
+
+        </form>
+
+        <div class="d-flex justify-content-center mt-4 px-3 gap-3">
+            <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
+            Batal
+            </button>
+            <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
+            Buat kelas
+            </button>
+        </div>
+    </div>
+
+</div>

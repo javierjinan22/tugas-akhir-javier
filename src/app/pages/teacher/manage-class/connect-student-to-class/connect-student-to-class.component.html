@@ -1,0 +1,62 @@
+<div class="container-fluid mt-4">
+  <h2 class="fw-bold mb-4" style="font-size: 24px;">Tambah siswa</h2>
+
+  <!-- Search and button in one row -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="d-flex flex-column align-items-start"> 
+        <div class="search-bar d-flex align-items-center">
+          <input 
+            #searchInput
+            type="text"
+            class="form-control rounded-pill me-2"
+            placeholder="Cari"
+            [(ngModel)]="keyword"
+            (keydown.enter)="onSearch()"
+            style="width: 300px;" />
+          <span class="search-icon" (click)="onSearch()">
+            <i class="fa fa-search"></i>
+          </span>
+        </div>
+        <small class="text-info mt-1" style="font-style: italic;">Cari berdasarkan username atau nama lengkap</small>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-primary-custom" (click)="onTambah()">
+          Buatkan akun siswa
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Students table - conditionally shown based on search results -->
+  <div class="table-responsive" *ngIf="showResults && filteredStudents.length > 0">
+    <table class="table align-middle table-bordered text-center">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Nama Lengkap</th>
+          <th>Username</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of filteredStudents; let i = index">
+          <td>{{ i + 1 }}.</td>
+          <td>{{ student.fullName }}</td>
+          <td>{{ student.username }}</td>
+          <td class="aksi-cell">
+            <a href="#" (click)="addStudentToClass(student); $event.preventDefault()">Pindahkan</a> 
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- No results message -->
+  <div class="alert alert-info" *ngIf="showResults && filteredStudents.length === 0">
+    Tidak ada siswa yang cocok dengan pencarian Anda.
+  </div>
+</div>

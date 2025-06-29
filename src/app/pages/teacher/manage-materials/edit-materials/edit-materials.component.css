@@ -1,0 +1,174 @@
+.form-container {
+  background: #f7f7f7;
+  border-radius: 22px;
+  max-width: 980px; /* lebar ditambah */
+  margin: 40px auto;
+  box-shadow: 0 4px 12px rgba(36, 44, 54, 0.04);
+}
+
+.custom-input {
+  border: 1.5px solid #15b2c4;
+  border-radius: 12px;
+  min-height: 48px;
+  font-size: 1rem;
+  box-shadow: none;
+  padding-left: 18px;
+}
+
+.custom-input:focus {
+  border-color: #15b2c4;
+  outline: none;
+  box-shadow: none;
+}
+
+.kelas-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.kelas-checkbox {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer !important;
+  user-select: none;
+  margin-right: 12px;
+}
+
+.kelas-checkbox input[type="checkbox"] {
+  display: none;
+}
+
+.custom-check {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #15b2c4;
+  margin-right: 9px;
+  background: #fff;
+  position: relative;
+}
+
+.kelas-checkbox input[type="checkbox"]:checked + .custom-check {
+  background: #15b2c4;
+  border-color: #15b2c4;
+}
+
+.kelas-checkbox input[type="checkbox"]:checked + .custom-check::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 10px;
+  height: 17px;
+  border: solid #fff;
+  border-width: 0 4px 4px 0;
+  border-radius: 2px;
+  transform: translate(-50%, -50%) rotate(45deg); /* <--- KUNCI */
+}
+
+.kelas-checkbox:hover .custom-check,
+.kelas-checkbox input[type="checkbox"]:focus + .custom-check {
+  border-color: #0e8ba0;
+}
+
+
+.btn-warning {
+  background: #ffc107;
+  color: #232323;
+  font-size: 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  border: none;
+}
+
+.btn-primary-custom {
+  font-family: Poppins, sans-serif;
+  font-weight: 500;
+  color: white;
+  font-size: 16px;
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+  border-radius: 15px;
+  padding: 8px 16px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+  background-color: #0891b2;
+  border-color: #0891b2;
+}
+
+.btn-outline-primary-custom{
+  font-family: Poppins, sans-serif;
+  font-weight: 500;
+  color: #212121;
+  font-size: 16px;
+  border-color: #1BB6C1;
+  border-radius: 15px;
+  padding: 8px  16px;
+}
+
+.btn-outline-primary-custom:hover {
+  background-color: #0891b2;
+  color: white;
+  border-color: #0891b2;
+}
+
+.custom-ckeditor {
+  border-radius: 12px;
+  background: #fff;
+  margin-bottom: 12px;
+  width: 100%;
+  height: 400px;
+  box-sizing: border-box;
+}
+
+::ng-deep .ck-editor__editable[role="textbox"] {
+  min-height: 350px !important;
+  /* font-size: 1.05rem; */
+  padding-left: 8px;
+  resize: vertical;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #e0e0e0;
+  border-radius: 18px;
+  transition: .3s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px #bbb2;
+}
+.toggle-switch input:checked + .toggle-slider {
+  background: #15b2c4;
+}
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+}

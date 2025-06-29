@@ -1,0 +1,88 @@
+<div class="container-fluid mt-4 custom-materi-container">
+  <h2 class="fw-bold mb-4" style="font-size: 24px;">Daftar hasil belajar - siswa</h2>
+
+  <!-- Action buttons and search -->
+  <div class="row">
+
+    <div class="col-md-2 mb-3">
+      <label class="mb-2">Kelas</label>
+      <ngx-select
+        [items]="classes"
+        placeholder="Pilih kelas"
+        optionValueField="id"
+        optionTextField="nama_kelas"
+        [(ngModel)]="selectedClass"
+        (ngModelChange)="onClassChange()"
+        [allowClear]="false">
+      </ngx-select>
+    </div>
+
+    <div class="col-md-2 mb-3">
+      <label class="mb-2">Tahun Ajaran</label>
+      <ngx-select
+        [items]="academicYears"
+        placeholder="Pilih tahun ajaran"
+        optionValueField="id"
+        optionTextField="nama"
+        [(ngModel)]="selectedAcademicYear"
+        (ngModelChange)="onYearChange()"
+        [allowClear]="false">
+      </ngx-select>
+    </div>
+    
+    <div class="d-flex justify-content-end align-items-center mb-3">
+    <div class="search-bar d-flex align-items-center">
+      <input 
+        #searchInput
+        type="text"
+        class="form-control rounded-pill me-2"
+        placeholder="Cari"
+        [(ngModel)]="keyword"
+        (keydown.enter)="onSearch()"
+        style="width: 230px;" />
+
+      <span class="search-icon" (click)="onSearch()">
+        <i class="fa fa-search"></i>
+      </span>
+    </div>
+    </div>
+
+  </div>
+
+  <!-- Students table -->
+  <div class="table-responsive">
+    <table class="table align-middle table-bordered text-center">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Nama siswa</th>
+          <th>Status</th>
+          <th>Nilai</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let siswa of filteredSiswa; let i = index">
+          <td>{{ i + 1 }}.</td>
+          <td>{{ siswa.nama_siswa }}</td>
+          <td>
+            <span class="badge-status" [ngClass]="{'badge-selesai': siswa.status === 1, 'badge-berlangsung': siswa.status === 0}">
+                {{ getStatusText(siswa.status) }}
+            </span>
+          </td>
+          <td>{{ siswa.nilai }}</td>
+          <td class="aksi-cell">
+            <a [routerLink]="" (click)="koreksiJawaban(siswa); $event.preventDefault()">Koreksi</a>
+            <span class="aksi-separator"></span>
+            <a [routerLink]="" (click)="sendFeedback(siswa); $event.preventDefault()">Kirim feedback</a>
+          </td>
+        </tr>
+        <tr *ngIf="filteredSiswa.length === 0">
+          <td colspan="3" class="text-center text-secondary py-4">Data tidak ditemukan.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

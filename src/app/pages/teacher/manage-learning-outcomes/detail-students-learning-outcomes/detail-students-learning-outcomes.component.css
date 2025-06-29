@@ -1,0 +1,72 @@
+.table thead th {
+  font-weight: 700;
+  font-size: 1.08rem;
+  background: #fafbfc;
+  color: #212121;
+  vertical-align: middle;
+}
+.table td, .table th {
+  vertical-align: middle !important;
+}
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Tambahan style agar tombol/aksi tetap konsisten dengan desain sebelumnya */
+.aksi-cell a {
+  color: #242424;
+  text-decoration: underline;
+  margin: 0 4px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.aksi-separator {
+  display: inline-block;
+  margin: 0 2px;
+}
+
+.search-bar {
+  border: 2px solid #1cc4cc;
+  border-radius: 2rem;
+  padding: 2px 10px;
+  background: #fff;
+  height: 45px;
+}
+.search-bar input {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  font-size: 1rem;
+}
+.search-bar input::placeholder {
+  color: #cfcfcf;
+  font-weight: 300;
+}
+.search-icon {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin-left: -36px;
+}
+
+/* Custom Badge */
+  .badge-status {
+    font-size: 14px;
+    border-radius: 8px;
+    padding: 6px 6px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .badge-berlangsung {
+    background: #ffe082;
+    color: #b68900;
+    border: 1.5px solid #ffcc45;
+  }
+  .badge-selesai {
+    background: #59e3b4;
+    color: #036846;
+    border: 1.5px solid #22d090;
+  }

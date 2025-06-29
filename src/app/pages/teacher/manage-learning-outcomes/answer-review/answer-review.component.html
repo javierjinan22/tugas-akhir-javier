@@ -1,0 +1,59 @@
+<div class="container-fluid mt-4">
+  <h2 class="fw-bold mb-4" style="font-size: 24px;">Koreksi</h2>
+
+  <div class="table-responsive">
+    <table class="table align-middle table-bordered text-center">
+      <thead>
+        <tr class="text-center">
+          <th style="width: 5%">No.</th>
+          <th style="width: 15%">Jenis soal</th>
+          <th style="width: 30%">Soal</th>
+          <th style="width: 30%">Jawaban</th>
+          <th style="width: 10%">Salah</th>
+          <th style="width: 10%">Benar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let answer of studentAnswers; let i = index">
+          <td class="text-center">{{ i + 1 }}.</td>
+          <td>{{ answer.questionType }}</td>
+          <td>{{ answer.question }}</td>
+          <td>{{ answer.answer }}</td>
+          <td class="text-center">
+            <label class="radio-container">
+              <input 
+                type="radio" 
+                [name]="'answer_' + i" 
+                [value]="false" 
+                [(ngModel)]="answer.isCorrect" 
+                [checked]="answer.isCorrect === false"
+              >
+              <span class="radio-checkmark"></span>
+            </label>
+          </td>
+          <td class="text-center">
+            <label class="radio-container">
+              <input 
+                type="radio" 
+                [name]="'answer_' + i" 
+                [value]="true" 
+                [(ngModel)]="answer.isCorrect" 
+                [checked]="answer.isCorrect === true"
+              >
+              <span class="radio-checkmark"></span>
+            </label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-center mt-4 gap-3">
+    <button type="button" class="btn btn-outline-primary btn-rounded" (click)="onCancel()">
+      Batal
+    </button>
+    <button type="button" class="btn btn-primary btn-rounded" (click)="onSave()">
+      Simpan
+    </button>
+  </div>
+</div>

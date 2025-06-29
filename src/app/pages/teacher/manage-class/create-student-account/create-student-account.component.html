@@ -1,10 +1,8 @@
-<div class="modal-header">
-  <h5 class="modal-title">Daftar sebagai siswa</h5>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
-</div>
+<div class="container-fluid mt-4">
+<h2 class="fw-bold mb-4" style="font-size: 24px; ">Buatkan akun siswa</h2>
 
-<div class="modal-body">
-  <form (ngSubmit)="onSubmitStudentRegistration()">
+<div class="form-container p-4 p-md-5">
+    <form>
     <div class="mb-3">
       <label>Nama Lengkap <span class="text-danger">*</span></label>
       <input type="text" class="form-control" required [(ngModel)]="fullName" name="fullName" />
@@ -75,6 +73,14 @@
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-primary-custom w-100">Daftar</button>
+    <div class="d-flex justify-content-center mt-4 px-3 gap-3">
+    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
+      Batal
+    </button>
+    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
+      Buat akun
+    </button>
+  </div>
   </form>
+</div>
 </div>

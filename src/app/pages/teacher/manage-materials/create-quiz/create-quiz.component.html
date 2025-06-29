@@ -1,0 +1,88 @@
+<div class="form-container p-4 p-md-5">
+  <h2 class="fw-bold mb-4" style="font-size: 1.6rem;">Buat kuis</h2>
+
+  <form [formGroup]="quizForm" (ngSubmit)="onSubmit()">
+  <div formArrayName="questions">
+  <app-array-wrapper
+    [data]="questions.controls"
+    (addEvent)="addQuestion($event.index)"
+    (deleteEvent)="removeQuestion($event.index)"
+  >
+    <ng-template #content let-arrayIndex="arrayIndex">
+      <div [formGroupName]="arrayIndex" class="mb-4">
+        <!-- Tampilkan badge nomor soal jika mau -->
+        <div class="number-badge">{{ arrayIndex + 1 }}</div>
+        
+        <!-- Tipe soal -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Jenis soal <span class="text-danger">*</span></label>
+          <div class="d-flex gap-4 align-items-center">
+            <label style="cursor:pointer;">
+              <input type="radio"
+                [checked]="questions.at(arrayIndex).value.tipeSoal === 'pilihan_ganda'"
+                (change)="onTipeSoalChange(arrayIndex, 'pilihan_ganda')">
+              <span class="ms-2">Pilihan ganda</span>
+            </label>
+            <label style="cursor:pointer;">
+              <input type="radio"
+                [checked]="questions.at(arrayIndex).value.tipeSoal === 'isian_singkat'"
+                (change)="onTipeSoalChange(arrayIndex, 'isian_singkat')">
+              <span class="ms-2">Isian singkat</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Soal pakai CKEditor -->
+        <div class="mb-3">
+          <label>Soal <span class="text-danger">*</span></label>
+          <ckeditor
+            formControlName="soal"
+            [editor]="Editor"
+            [config]="editorConfig"
+            class="custom-ckeditor"
+          ></ckeditor>
+        </div>
+
+        <!-- Pilihan Ganda -->
+        <ng-container *ngIf="questions.at(arrayIndex).value.tipeSoal === 'pilihan_ganda'">
+        <div class="mb-3">
+            <label>Jawaban <span class="text-danger">*</span></label>
+            <div formArrayName="jawaban"> <!-- Tambahkan wrapper ini! -->
+            <div class="row align-items-center mb-2" *ngFor="let ctrl of getJawabanArray(arrayIndex).controls; let j = index">
+                <div class="col-auto fw-semibold">{{ 'ABCD'[j] }}.</div>
+                <div class="col">
+                <input type="text" [formControlName]="j" class="form-control custom-input" placeholder="Jawaban">
+                </div>
+                <div class="col-auto">
+                <input type="radio"
+                    [checked]="questions.at(arrayIndex).value.kunci === j"
+                    (change)="questions.at(arrayIndex).get('kunci')?.setValue(j)"
+                    [name]="'kunci-'+arrayIndex">
+                <span class="ms-1">Benar</span>
+                </div>
+            </div>
+            </div>
+        </div>
+        </ng-container>
+
+
+        <!-- Isian Singkat -->
+        <ng-container *ngIf="questions.at(arrayIndex).value.tipeSoal === 'isian_singkat'">
+          <div class="mb-3">
+            <label>Jawaban <span class="text-danger">*</span></label>
+            <textarea class="form-control custom-input" rows="3" formControlName="jawabanSingkat" placeholder="Kunci jawaban"></textarea>
+          </div>
+        </ng-container>
+      </div>
+    </ng-template>
+  </app-array-wrapper>
+
+  <!-- Tombol Simpan/Batal -->
+  <div class="d-flex gap-3 justify-content-center mt-4">
+    <button type="button" class="btn btn-outline-primary-custom px-5" (click)="onCancel()">Batal</button>
+    <button type="submit" class="btn btn-primary-custom px-5">Simpan</button>
+  </div>
+  </div>
+</form>
+
+</div>

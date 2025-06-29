@@ -1,0 +1,97 @@
+.table thead th {
+  font-weight: 700;
+  font-size: 1.08rem;
+  background: #fafbfc;
+  color: #212121;
+  vertical-align: middle;
+}
+
+.table td, .table th {
+  vertical-align: middle !important;
+}
+
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Custom radio button styling - keep as is */
+.radio-container {
+  display: block;
+  position: relative;
+  padding-left: 0;
+  cursor: pointer;
+  user-select: none;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto;
+}
+
+.radio-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.radio-checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 24px;
+  width: 24px;
+  background-color: white;
+  border: 2px solid #1BB6C1;
+  border-radius: 50%;
+}
+
+.radio-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.radio-container input:checked ~ .radio-checkmark:after {
+  display: block;
+}
+
+.radio-container .radio-checkmark:after {
+  top: 4px;
+  left: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #1BB6C1;
+}
+
+/* Button styling */
+.btn-rounded {
+  border-radius: 15px;
+  padding: 8px 24px;
+  min-width: 120px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+  color: white;
+}
+
+.btn-outline-primary {
+  color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  background-color: transparent;
+}
+
+.btn-primary:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-outline-primary:hover {
+  background-color: rgba(27, 182, 193, 0.1);
+}
