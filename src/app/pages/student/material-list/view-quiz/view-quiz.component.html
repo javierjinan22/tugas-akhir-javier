@@ -1,0 +1,90 @@
+<div class="quiz-container">
+  <!-- Header with title and timer -->
+  <div class="quiz-header">
+    <div class="quiz-title-section">
+      <span class="close-button" (click)="confirmExit()">×</span>
+      <h2 class="quiz-title">Akhiri Kuis</h2>
+    </div>
+    <div class="timer">
+      <span class="time">{{ formatTime(remainingTime) }}</span>
+    </div>
+  </div>
+  
+  <hr class="divider">
+  
+  <!-- Quiz content -->
+  <div class="quiz-content">
+    <!-- Question navigation sidebar -->
+    <div class="question-nav">
+      <div class="nav-label">Soal</div>
+      <div class="question-numbers">
+        <div 
+          *ngFor="let question of quiz.questions; let i = index" 
+          class="question-number" 
+          [ngClass]="{'active': currentQuestionIndex === i, 'answered': isQuestionAnswered(i)}"
+          (click)="goToQuestion(i)">
+          {{ i + 1 }}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Question content -->
+    <div class="question-content">
+      <div class="question-text">{{ currentQuestion.question }}</div>
+      
+      <!-- Multiple choice question -->
+      <ng-container *ngIf="currentQuestion.type === 'multiple-choice'">
+        <div class="options">
+          <div *ngFor="let option of currentQuestion.options; let i = index" class="option">
+            <label class="option-label">
+              <input 
+                type="radio" 
+                name="question{{currentQuestionIndex}}" 
+                [value]="i"
+                [(ngModel)]="currentQuestion.userAnswer"
+                (change)="saveAnswer()">
+              <span class="option-checkmark"></span>
+              <span class="option-text">{{ option }}</span>
+            </label>
+          </div>
+        </div>
+      </ng-container>
+      
+      <!-- Short answer question -->
+      <ng-container *ngIf="currentQuestion.type === 'short-answer'">
+        <div class="short-answer">
+          <div class="answer-label">Jawaban:</div>
+          <textarea 
+            class="answer-input" 
+            placeholder="Tulis feedback disini"
+            [(ngModel)]="currentQuestion.userAnswer"
+            (blur)="saveAnswer()"></textarea>
+        </div>
+      </ng-container>
+      
+      <!-- Navigation buttons -->
+      <div class="quiz-navigation">
+        <button 
+          class="nav-button prev-button" 
+          [disabled]="currentQuestionIndex === 0"
+          (click)="previousQuestion()">
+          <i class="fa fa-chevron-left"></i> Sebelumnya
+        </button>
+        
+        <button 
+          *ngIf="currentQuestionIndex < quiz.questions.length - 1" 
+          class="nav-button next-button" 
+          (click)="nextQuestion()">
+          Selanjutnya <i class="fa fa-chevron-right"></i>
+        </button>
+        
+        <button 
+          *ngIf="currentQuestionIndex === quiz.questions.length - 1"
+          class="finish-button"
+          (click)="finishQuiz()">
+          Selesaikan
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

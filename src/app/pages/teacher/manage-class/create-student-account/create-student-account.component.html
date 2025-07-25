@@ -1,86 +1,150 @@
 <div class="container-fluid mt-4">
-<h2 class="fw-bold mb-4" style="font-size: 24px; ">Buatkan akun siswa</h2>
-
-<div class="form-container p-4 p-md-5">
-    <form>
-    <div class="mb-3">
-      <label>Nama Lengkap <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" required [(ngModel)]="fullName" name="fullName" />
-    </div>
-
-    <div class="mb-3">
-      <label>Username <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" required [(ngModel)]="username" name="username" />
-    </div>
-
-    <div class="mb-3 position-relative">
-      <label>Password <span class="text-danger">*</span></label>
-      <input
-        [type]="passwordVisible ? 'text' : 'password'"
-        class="form-control"
-        required
-        [(ngModel)]="password"
-        name="password"
-      />
-      <fa-icon
-        [icon]="passwordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="togglePasswordVisibility()"
-      ></fa-icon>
-    </div>
-
-    <div class="mb-3 position-relative">
-      <label>Konfirmasi password <span class="text-danger">*</span></label>
-      <input
-        [type]="confirmPasswordVisible ? 'text' : 'password'"
-        class="form-control"
-        required
-        [(ngModel)]="confirmPassword"
-        name="confirmPassword"
-      />
-      <fa-icon
-        [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="toggleConfirmPasswordVisibility()"
-      ></fa-icon>
-    </div>
-
-    <div class="d-flex gap-2">
-      <div class="mb-3 flex-fill">
-        <label>Sekolah <span class="text-danger">*</span></label>
-
-        <ngx-select
-        [items]="schools"
-        placeholder="Pilih sekolah"
-        optionValueField="id"
-        optionTextField="nama_sekolah"
-        [allowClear]="false"
-        >
-        </ngx-select>
-
-      </div>
-      <div class="mb-3 flex-fill">
-        <label>Kelas <span class="text-danger">*</span></label>
-
-        <ngx-select
-        [items]="classes"
-        placeholder="Pilih kelas"
-        optionValueField="id"
-        optionTextField="nama_kelas"
-        [allowClear]="false"
-        >
-        </ngx-select>
-      </div>
-    </div>
-
-    <div class="d-flex justify-content-center mt-4 px-3 gap-3">
-    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
-      Batal
+  <!-- Back button dan header -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToConnectStudent()" title="Kembali ke tambah siswa">
+      <i class="fas fa-arrow-left"></i>
     </button>
-    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
-      Buat akun
-    </button>
+    <h2 class="fw-bold mb-0" style="font-size: 24px;">Buatkan akun siswa</h2>
   </div>
-  </form>
-</div>
+
+  <!-- Info sekolah guru -->
+  <div *ngIf="currentSchool" class="alert alert-info mb-4">
+    <i class="fas fa-school me-2"></i>
+    <strong>Sekolah:</strong> {{ currentSchool.nama }}
+    <small class="d-block text-muted mt-1">
+      Anda hanya dapat membuat akun siswa untuk sekolah yang Anda kelola.
+    </small>
+  </div>
+
+  <div class="form-container p-4 p-md-5">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmitClicked()">
+      <div class="mb-3">
+        <label>Nama Lengkap <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="nama_lengkap" />
+      </div>
+
+      <div class="mb-3">
+        <label>Username <span class="text-danger">*</span></label>
+        <input type="text" class="form-control" formControlName="username" />
+      </div>
+
+      <div class="mb-3 position-relative">
+        <label>Password <span class="text-danger">*</span></label>
+        <input
+          [type]="passwordVisible ? 'text' : 'password'"
+          class="form-control"
+          formControlName="password"
+        />
+        <fa-icon
+          [icon]="passwordVisible ? faEyeSlash : faEye"
+          class="toggle-password-icon"
+          (click)="togglePasswordVisibility()"
+        ></fa-icon>
+      </div>
+
+      <div class="mb-3 position-relative">
+        <label>Konfirmasi password <span class="text-danger">*</span></label>
+        <input
+          [type]="confirmPasswordVisible ? 'text' : 'password'"
+          class="form-control"
+          formControlName="konfirmasi_password"
+        />
+        <fa-icon
+          [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
+          class="toggle-password-icon"
+          (click)="toggleConfirmPasswordVisibility()"
+        ></fa-icon>
+      </div>
+
+      <div class="d-flex gap-2">
+        <div class="mb-3 flex-fill">
+          <label>Sekolah <span class="text-danger">*</span></label>
+          
+          <!-- Sekolah sudah terpilih otomatis dan tidak bisa diubah -->
+          <ngx-select
+            formControlName="sekolah"
+            [items]="schools"
+            placeholder="Pilih sekolah"
+            optionValueField="_id"
+            optionTextField="nama"
+            [allowClear]="false"
+            [disabled]="true"
+          ></ngx-select>
+
+          <small class="text-muted">
+            <i class="fas fa-lock me-1"></i>
+            Sekolah sudah ditentukan berdasarkan akun guru Anda
+          </small>
+        </div>
+        
+        <div class="mb-3 flex-fill">
+          <label>Kelas <span class="text-danger">*</span></label>
+
+          <ngx-select
+            formControlName="kelas"
+            [items]="classes"
+            placeholder="Pilih kelas"
+            optionValueField="_id"
+            optionTextField="nama_kelas"
+            [allowClear]="false"
+            [disabled]="loadingClasses || !registerForm.get('sekolah')?.value"
+          ></ngx-select>
+
+          <!-- Loading dan status info -->
+          <small *ngIf="loadingClasses" class="text-muted">
+            <i class="fas fa-spinner fa-spin me-1"></i>Memuat kelas...
+          </small>
+          <small *ngIf="!loadingClasses && classes.length === 0 && registerForm.get('sekolah')?.value" class="text-warning">
+            <i class="fas fa-exclamation-triangle me-1"></i>Belum ada kelas di sekolah ini
+          </small>
+          <small *ngIf="!loadingClasses && classes.length > 0 && currentClassId" class="text-success">
+            <i class="fas fa-check-circle me-1"></i>
+            Kelas target telah dipilih otomatis
+          </small>
+          <small *ngIf="!loadingClasses && classes.length > 0 && !currentClassId" class="text-info">
+            <i class="fas fa-info-circle me-1"></i>
+            {{ classes.length }} kelas tersedia
+          </small>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div *ngIf="errorMsg" class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ errorMsg }}
+      </div>
+
+      <!-- Loading school -->
+      <div *ngIf="loadingSchools" class="alert alert-info">
+        <i class="fas fa-spinner fa-spin me-2"></i>
+        Memuat informasi sekolah...
+      </div>
+
+      <!-- Action buttons -->
+      <div class="d-flex justify-content-center mt-4 px-3 gap-3">
+        <button 
+          type="button" 
+          class="btn btn-outline-primary btn-rounded" 
+          (click)="onCancelClicked()"
+          [disabled]="loading">
+          <i class="fas fa-times me-1"></i>
+          Batal
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-rounded" 
+          [disabled]="registerForm.invalid || loading || loadingSchools || loadingClasses">
+          <span *ngIf="loading">
+            <i class="fas fa-spinner fa-spin me-1"></i>
+            Membuat akun...
+          </span>
+          <span *ngIf="!loading">
+            <i class="fas fa-user-plus me-1"></i>
+            Buat akun
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
 </div>

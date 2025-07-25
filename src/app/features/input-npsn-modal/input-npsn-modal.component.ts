@@ -3,6 +3,7 @@ import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { faExclamation } from '@fortawesome/free-solid-svg-icons';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { SchoolConnectionModalComponent } from '../school-connection-modal/school-connection-modal.component';
+import { SchoolService } from 'src/app/service/school.service';
 
 
 @Component({
@@ -16,37 +17,36 @@ export class InputNpsnModalComponent implements OnInit {
   faExclamation = faExclamation;
   npsn: string = '';
   schoolNotFound: boolean = false;
+  school: any;  // Data sekolah yang akan diklaim
 
   constructor(
     public activeModal: BsModalRef,
-    private modalService: BsModalService// Import modal service untuk membuka modal lain
+    private modalService: BsModalService,
+    private schoolService: SchoolService 
   ) { }
 
   ngOnInit(): void {
   }
 
    onSearchSchool() {
-    // Contoh mock data sekolah
-    const schools = [
-      { npsn: '1234', nama_sekolah: 'SD Negeri Kauman', kecamatan: 'Kecamatan Pleret', kabupaten: 'Kabupaten Bantul', provinsi: 'DIY' },
-      { npsn: '5678', nama_sekolah: 'SD Muhammadiyah Bantul', kecamatan: 'Kecamatan Bantul', kabupaten: 'Kabupaten Bantul', provinsi: 'DIY' },
-    ];
-
-    // Cari sekolah berdasarkan NPSN
-    const foundSchool = schools.find(school => school.npsn === this.npsn.trim());
-
-    if (foundSchool) {
-      this.schoolNotFound = false;
-      // Tutup modal ini
-      this.activeModal.hide();
-
-      // Buka modal koneksi sekolah dan kirim data sekolah yang ditemukan
-      const initialState = { school: foundSchool };
-      this.modalService.show(SchoolConnectionModalComponent, { class: 'modal-dialog-centered', initialState });
-    } else {
-      // Tampilkan pesan error
-      this.schoolNotFound = true;
-    }
+    this.schoolService.findSchool(this.npsn).subscribe(
+      (response: any) => {
+        this.school = response;  // Menyimpan data sekolah sementara tanpa _id
+        this.schoolNotFound = false;
+        // Tampilkan modal konfirmasi untuk mengklaim sekolah
+        const initialState = { school: this.school };  // Kirim data sekolah untuk modal selanjutnya
+        this.modalService.show(SchoolConnectionModalComponent, {
+          class: 'modal-dialog-centered',
+          initialState
+        });
+        this.activeModal.hide();  // Menutup modal input NPSN
+      },
+      (error) => {
+        this.schoolNotFound = true;
+        console.error('Error mencari sekolah:', error);
+      }
+    );
   }
+
 
 }

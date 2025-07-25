@@ -1,0 +1,146 @@
+<div class="container-fluid mt-4">
+    <!-- Back button dan header -->
+    <div class="d-flex align-items-center mb-4">
+        <!-- Back button - hanya icon -->
+        <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 class="fw-bold mb-0" style="font-size: 24px;">Edit kelas</h2>
+    </div>
+
+    <!-- Loading indicator -->
+    <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+        <div class="text-center">
+            <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+            <p>Memuat data kelas...</p>
+        </div>
+    </div>
+
+    <!-- Main form container -->
+    <div class="form-container p-4 p-md-5" *ngIf="!isLoading">
+        <!-- Error message display -->
+        <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ errorMsg }}
+        </div>
+
+        <!-- Success message display -->
+        <div *ngIf="successMsg" class="alert alert-success mb-3">
+            <i class="fas fa-check-circle me-2"></i>
+            {{ successMsg }}
+        </div>
+
+        <!-- Loading message -->
+        <div *ngIf="isSubmitting" class="alert alert-info mb-3">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            Sedang memperbarui kelas...
+        </div>
+
+        <!-- Current class info -->
+        <div *ngIf="classData && !isSubmitting" class="alert alert-light mb-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <small class="text-muted"><strong>Data Kelas Saat Ini:</strong></small>
+                    <div><strong>Nama:</strong> {{ classData.nama_kelas }}</div>
+                    <div><strong>Tahun Ajaran:</strong> {{ classData.tahun_ajaran }}</div>
+                </div>
+                <div class="col-md-6" *ngIf="classData.sekolah">
+                    <small class="text-muted"><strong>Sekolah:</strong></small>
+                    <div>{{ classData.sekolah.nama }}</div>
+                    <div *ngIf="classData.siswa">
+                        <small class="text-muted">{{ classData.siswa.length || 0 }} siswa terdaftar</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Show existing classes info (excluding current class) -->
+        <div *ngIf="existingDataList.length > 0 && !isSubmitting" class="alert alert-light mb-3">
+            <small class="text-muted">
+                <strong>Kelas lain yang sudah ada:</strong> 
+                {{ getExistingClassNames().join(', ') }}
+            </small>
+        </div>
+
+        <!-- Edit form -->
+        <form [formGroup]="classForm" *ngIf="!isSubmitting">
+            <div class="row">
+                <div class="col-md-8">
+                    <label>Nama Kelas <span class="text-danger">*</span></label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        formControlName="className"
+                        [class.is-invalid]="isFieldInvalid('className')"
+                        placeholder="Masukkan nama kelas (contoh: Kelas 5A, 6B, dll)"
+                        (input)="onClassNameInput()"
+                    />
+                    
+                    <!-- Validation error messages -->
+                    <div *ngIf="hasFieldError('className', 'required')" class="text-danger mt-1">
+                        <small><i class="fas fa-exclamation-circle me-1"></i>Nama kelas harus diisi</small>
+                    </div>
+                    <div *ngIf="hasFieldError('className', 'minlength')" class="text-danger mt-1">
+                        <small><i class="fas fa-exclamation-circle me-1"></i>Nama kelas minimal 2 karakter</small>
+                    </div>
+                    <div *ngIf="hasFieldError('className', 'classNameExists')" class="text-danger mt-1">
+                        <small><i class="fas fa-times-circle me-1"></i>Nama kelas "{{ classForm.get('className')?.value }}" sudah digunakan. Silakan gunakan nama lain.</small>
+                    </div>
+                    
+                    <!-- Success indicator when name is available -->
+                    <div *ngIf="classForm.get('className')?.valid && classForm.get('className')?.value?.trim().length >= 2" class="text-success mt-1">
+                        <small><i class="fas fa-check-circle me-1"></i>Nama kelas tersedia</small>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label>Tahun Ajaran <span class="text-danger">*</span></label>
+                    <ngx-select
+                        [items]="academicYears"
+                        formControlName="academicYearId"
+                        placeholder="Pilih tahun ajaran"
+                        optionValueField="id"
+                        optionTextField="name"
+                        [class.is-invalid]="isFieldInvalid('academicYearId')">
+                    </ngx-select>
+                    <div *ngIf="hasFieldError('academicYearId', 'required')" class="text-danger mt-1">
+                        <small><i class="fas fa-exclamation-circle me-1"></i>Tahun ajaran harus dipilih</small>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Action buttons -->
+        <div class="d-flex justify-content-center mt-4 px-3 gap-3">
+            <button 
+                class="btn btn-outline-secondary btn-rounded" 
+                (click)="onCancelClicked()"
+                [disabled]="isSubmitting">
+                <i class="fas fa-times me-1"></i>
+                Batal
+            </button>
+            <button 
+                class="btn btn-warning btn-rounded" 
+                (click)="onSubmitClicked()"
+                [disabled]="isSubmitting || !school || classForm.invalid"
+                *ngIf="!successMsg">
+                <span *ngIf="isSubmitting">
+                    <i class="fas fa-spinner fa-spin me-2"></i>
+                    Memperbarui...
+                </span>
+                <span *ngIf="!isSubmitting">
+                    <i class="fas fa-edit me-1"></i>
+                    Perbarui kelas
+                </span>
+            </button>
+        </div>
+
+        <!-- Success action -->
+        <div class="d-flex justify-content-center mt-4" *ngIf="successMsg">
+            <button class="btn btn-success btn-rounded" (click)="onCancelClicked()">
+                <i class="fas fa-check me-1"></i>
+                Kembali ke Daftar Kelas
+            </button>
+        </div>
+    </div>
+</div>

@@ -10,6 +10,7 @@ export class TeacherLayoutComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    console.log('TeacherLayoutComponent loaded');
   }
 
 }

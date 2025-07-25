@@ -1,80 +1,107 @@
 <div class="container-fluid mt-4 custom-materi-container">
-  <h2 class="fw-bold mb-4" style="font-size: 24px;">Daftar siswa</h2>
-
-  <!-- Action buttons and search -->
-  <div class="row">
-
-    <div class="d-flex justify-content-end align-items-center">
-    <button class="btn btn-primary-custom" (click)="onTambah()">
-      Tambah
+  <!-- Back button dan header -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas">
+      <i class="fas fa-arrow-left"></i>
     </button>
-    </div>
-
-    <div class="col-md-2 mb-3">
-      <label class="mb-2">Kelas</label>
-      <ngx-select
-        [items]="classes"
-        placeholder="Pilih kelas"
-        optionValueField="id"
-        optionTextField="nama_kelas"
-        [(ngModel)]="selectedClass"
-        (ngModelChange)="onClassChange()"
-        [allowClear]="false">
-      </ngx-select>
-    </div>
-
-    <div class="col-md-2 mb-3">
-      <label class="mb-2">Tahun Ajaran</label>
-      <ngx-select
-        [items]="academicYears"
-        placeholder="Pilih tahun ajaran"
-        optionValueField="id"
-        optionTextField="nama"
-        [(ngModel)]="selectedAcademicYear"
-        (ngModelChange)="onYearChange()"
-        [allowClear]="false">
-      </ngx-select>
+    
+    <!-- Class info header -->
+    <div *ngIf="classInfo">
+      <h2 class="fw-bold mb-0" style="font-size: 24px;">
+        Daftar siswa - {{ classInfo.nama_kelas }}
+      </h2>
+      <p class="text-muted mb-0" style="font-size: 14px;">
+        Tahun Ajaran : {{ classInfo.tahun_ajaran }} | 
+        Total Siswa : {{ filteredSiswa.length }}
+      </p>
     </div>
     
-    <div class="d-flex justify-content-end align-items-center mb-3">
-    <div class="search-bar d-flex align-items-center">
-      <input 
-        #searchInput
-        type="text"
-        class="form-control rounded-pill me-2"
-        placeholder="Cari"
-        [(ngModel)]="keyword"
-        (keydown.enter)="onSearch()"
-        style="width: 230px;" />
+    <!-- Default header jika classInfo belum tersedia -->
+    <h2 *ngIf="!classInfo && !isLoading" class="fw-bold mb-0" style="font-size: 24px;">
+      Daftar siswa
+    </h2>
+  </div>
 
-      <span class="search-icon" (click)="onSearch()">
-        <i class="fa fa-search"></i>
-      </span>
-    </div>
-    </div>
+  <!-- Loading indicator -->
+  <div *ngIf="isLoading" class="text-center mb-4">
+    <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+    <p class="mt-2">Memuat data siswa...</p>
+  </div>
 
+  <!-- Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshData()">
+      <i class="fas fa-refresh me-1"></i>Coba Lagi
+    </button>
+  </div>
+
+  <!-- Action buttons and search -->
+  <div class="row" *ngIf="!isLoading && !errorMsg">
+    <div class="d-flex justify-content-end align-items-center">
+      <button class="btn btn-primary-custom" (click)="onTambah()" [disabled]="isLoading">
+        <i class="fas fa-plus me-1"></i>
+        Tambah
+      </button>
+    </div>
+    
+    <div class="d-flex justify-content-end align-items-center mb-3 mt-3" *ngIf="filteredSiswa.length > 0">
+      <div class="search-bar d-flex align-items-center">
+        <input 
+          #searchInput
+          type="text"
+          class="form-control rounded-pill me-2"
+          placeholder="Cari siswa..."
+          [(ngModel)]="keyword"
+          (keydown.enter)="onSearch()"
+          (input)="onSearch()"
+          [disabled]="isLoading"
+          style="width: 230px;" />
+
+        <span class="search-icon" (click)="onSearch()">
+          <i class="fa fa-search"></i>
+        </span>
+      </div>
+    </div>
   </div>
 
   <!-- Students table -->
-  <div class="table-responsive">
+  <div class="table-responsive" *ngIf="!isLoading && !errorMsg">
     <table class="table align-middle table-bordered text-center">
       <thead>
         <tr>
           <th>No.</th>
           <th>Nama siswa</th>
+          <th>Username</th>
+          <th>Email</th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let siswa of filteredSiswa; let i = index">
           <td>{{ i + 1 }}.</td>
-          <td>{{ siswa.nama }}</td>
+          <td>{{ siswa.nama_lengkap }}</td>
+          <td>{{ siswa.username || '-' }}</td>
+          <td>{{ siswa.email || '-' }}</td>
           <td class="aksi-cell">
-            <a href="#" (click)="hapusSiswa(siswa); $event.preventDefault()">Hapus</a>
+            <a href="#" (click)="hapusSiswa(siswa); $event.preventDefault()" 
+               class="text-danger">
+              <i class="fas fa-trash me-1"></i>
+            </a>
           </td>
         </tr>
         <tr *ngIf="filteredSiswa.length === 0">
-          <td colspan="3" class="text-center text-secondary py-4">Data tidak ditemukan.</td>
+          <td colspan="5" class="text-center text-secondary py-4">
+            <i class="fas fa-users fa-2x text-muted mb-2"></i>
+            <br>
+            {{ keyword ? 'Tidak ada siswa yang cocok dengan pencarian.' : 'Belum ada siswa di kelas ini.' }}
+            <br>
+            <button class="btn btn-primary btn-sm mt-2" (click)="onTambah()" *ngIf="!keyword">
+              <i class="fas fa-plus me-1"></i>Tambah Siswa Pertama
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

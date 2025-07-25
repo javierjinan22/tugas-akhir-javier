@@ -1,0 +1,25 @@
+<div class="materials-container">
+  <div *ngFor="let material of completedMaterials; let last = last">
+    <div class="material-item">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="material-title">{{ material.title }}</h5>
+        <div class="button-group">
+          <button 
+            *ngIf="material.izinkan_unduh === 1"
+            class="btn btn-download" 
+            (click)="downloadMaterial(material)"
+            title="Download Materi">
+            <i class="fas fa-download"></i>
+          </button>
+          <button class="btn btn-view" (click)="viewMaterial(material)">Lihat</button>
+        </div>
+      </div>
+    </div>
+    <hr *ngIf="!last" class="material-divider">
+  </div>
+  
+  <!-- Empty state when no materials are available -->
+  <div *ngIf="completedMaterials.length === 0" class="empty-state text-center p-5">
+    <p>Belum ada materi yang diselesaikan</p>
+  </div>
+</div>

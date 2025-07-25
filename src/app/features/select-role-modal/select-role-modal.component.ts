@@ -24,7 +24,6 @@ export class SelectRoleModalComponent implements OnInit {
   }
 
   onRoleSelected(role: string) {
-    console.log('Role selected:', role);
     // Close modal
     this.activeModal.hide();
 

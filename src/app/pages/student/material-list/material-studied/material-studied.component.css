@@ -1,0 +1,66 @@
+.materials-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 16px 24px;
+  background-color: white;
+}
+
+.material-item {
+  padding: 16px 0;
+}
+
+.material-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-view {
+  background-color: #F9D349;
+  color: #6C613B;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 24px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-view:hover {
+  background-color: #f0c926;
+}
+
+.btn-download {
+  background-color: #F9D349;
+  color: #6C613B;
+  border: none;
+  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.btn-download:hover {
+  background-color: #f0c926;
+}
+
+.material-divider {
+  margin: 0;
+  opacity: 0.6;
+}
+
+.empty-state {
+  color: #757575;
+  font-style: italic;
+}

@@ -1,0 +1,134 @@
+.btn-back-icon {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 1.5rem;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-back-icon:hover {
+  color: #1BB6C1;
+  background-color: rgba(27, 182, 193, 0.1);
+  transform: translateX(-2px);
+}
+
+.btn-back-icon:active {
+  transform: translateX(-1px);
+}
+
+.btn-back-icon:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(27, 182, 193, 0.25);
+}
+
+/* Menggunakan style yang sama dengan ManageClass */
+.table thead th {
+  font-weight: 700;
+  font-size: 1.08rem;
+  background: #fafbfc;
+  color: #212121;
+  vertical-align: middle;
+}
+
+.table td, .table th {
+  vertical-align: middle !important;
+}
+
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* Style untuk search bar - sama dengan ManageClass */
+.search-bar {
+  border: 2px solid #1cc4cc;
+  border-radius: 2rem;
+  padding: 2px 10px;
+  background: #fff;
+  height: 45px;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+  font-size: 1rem;
+}
+
+.search-bar input::placeholder {
+  color: #cfcfcf;
+  font-weight: 300;
+}
+
+.search-icon {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin-left: -36px;
+}
+
+/* Status badge styling */
+.badge {
+  font-size: 0.75em;
+  padding: 0.4em 0.6em;
+}
+
+/* Restore button hover effects */
+.btn-outline-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+.btn-outline-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+}
+
+/* Transition for smooth effects */
+.btn {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Table row hover effect */
+.table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Loading spinner */
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Info alert styling */
+.alert-info {
+  background-color: #e3f2fd;
+  border-color: #bbdefb;
+  color: #0d47a1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .d-flex.align-items-center.mb-4 {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .btn.btn-outline-secondary.me-3 {
+    margin-bottom: 1rem;
+    margin-right: 0 !important;
+  }
+}

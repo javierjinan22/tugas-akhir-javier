@@ -1,0 +1,136 @@
+<div class="container-fluid mt-4 custom-materi-container">
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button -->
+    <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h2 class="fw-bold mb-0" style="font-size: 24px;">Kelas yang diarsipkan</h2>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshArchivedClasses()">
+      <i class="fas fa-sync-alt me-1"></i>Coba Lagi
+    </button>
+  </div>
+
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-3" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat daftar kelas yang diarsipkan...</p>
+    </div>
+  </div>
+
+  <!-- Search bar -->
+  <div class="d-flex justify-content-end align-items-center mb-3" *ngIf="!loading && getTotalArchivedClassesCount() > 0">
+    <div class="search-bar d-flex align-items-center">
+      <input 
+        type="text"
+        class="form-control rounded-pill me-2"
+        placeholder="Cari nama kelas"
+        [(ngModel)]="keyword"  
+        (keydown.enter)="onSearch()"
+        (input)="onSearch()"
+        style="width: 230px;" />
+
+      <span class="search-icon" (click)="onSearch()" style="cursor: pointer;">
+        <i class="fa fa-search"></i>
+      </span>
+    </div>
+  </div>
+
+  <!-- Archived classes table -->
+  <div class="table-responsive" *ngIf="!loading && !errorMsg">
+    <table class="table align-middle table-bordered text-center">
+      <thead class="table-light">
+        <tr>
+          <th>No.</th>
+          <th>Nama kelas</th>
+          <th>Tahun Ajaran</th>
+          <th>Jumlah siswa</th>
+          <th>Tanggal Diarsipkan</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let kelas of filteredArchivedClasses; let i = index">
+          <td>{{ i + 1 }}.</td>
+          <td>
+            <strong>{{ kelas.nama_kelas }}</strong>
+          </td>
+          <td>
+            <small class="text-muted">{{ kelas.tahun_ajaran || '-' }}</small>
+          </td>
+          <td>
+            <span class="badge bg-info text-white">
+              {{ kelas.siswa ? kelas.siswa.length : 0 }} siswa
+            </span>
+          </td>
+          <td>
+            <small class="text-muted">
+              <i class="fas fa-calendar-alt me-1"></i>
+              {{ getArchivedDate(kelas.archived_at) }}
+            </small>
+          </td>
+          <td>
+            <!-- Pulihkan Kelas -->
+            <button 
+              class="btn btn-sm btn-outline-success" 
+              (click)="restoreClass(kelas)" 
+              [title]="'Pulihkan kelas ' + kelas.nama_kelas"
+              [disabled]="isRestoring(kelas._id)"
+              data-bs-toggle="tooltip"
+              data-bs-placement="top">
+              <i *ngIf="!isRestoring(kelas._id)" class="fas fa-undo me-1"></i>
+              <i *ngIf="isRestoring(kelas._id)" class="fas fa-spinner fa-spin me-1"></i>
+              Pulihkan
+            </button>
+          </td>
+        </tr>
+        
+        <!-- No data row -->
+        <tr *ngIf="getFilteredArchivedClassesCount() === 0 && keyword.trim()">
+          <td colspan="6" class="text-center text-secondary py-4">
+            <i class="fas fa-search me-2"></i>
+            Tidak ditemukan kelas yang diarsipkan dengan kata kunci "{{ keyword }}"
+          </td>
+        </tr>
+        
+        <!-- No archived classes at all -->
+        <tr *ngIf="getTotalArchivedClassesCount() === 0 && !keyword.trim()">
+          <td colspan="6" class="text-center text-secondary py-4">
+            <i class="fas fa-archive me-2"></i>
+            Tidak ada kelas yang diarsipkan.
+            <br>
+            <small class="text-muted mt-2 d-block">
+              Kelas yang diarsipkan akan muncul di sini
+            </small>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Stats info -->
+  <div *ngIf="!loading && !errorMsg && getTotalArchivedClassesCount() > 0" class="mt-3">
+    <small class="text-muted">
+      <i class="fas fa-info-circle me-1"></i>
+      Total kelas diarsipkan: {{ getTotalArchivedClassesCount() }}
+      <span *ngIf="getFilteredArchivedClassesCount() !== getTotalArchivedClassesCount()">
+        (menampilkan {{ getFilteredArchivedClassesCount() }} kelas)
+      </span>
+    </small>
+  </div>
+
+  <!-- Info message about archived classes -->
+  <div *ngIf="!loading && !errorMsg" class="mt-4">
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>
+      <strong>Informasi:</strong> Kelas yang diarsipkan tidak akan muncul di daftar kelas aktif. 
+      Anda dapat memulihkan kelas yang diarsipkan dengan mengklik tombol "Pulihkan".
+    </div>
+  </div>
+</div>

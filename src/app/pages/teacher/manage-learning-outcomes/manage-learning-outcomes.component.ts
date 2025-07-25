@@ -47,8 +47,6 @@ export class ManageLearningOutcomesComponent implements OnInit {
   }
 
   lihatKelas(kelas: hasilBelajar) {
-    // View class details
-    console.log('Lihat kelas:', kelas);
     // Navigate to class detail page or open a modal with class details
     this.router.navigate(['/guru/hasil-belajar/detail-materi-belajar', kelas.id]);
   }

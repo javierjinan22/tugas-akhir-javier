@@ -1,12 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-
-interface Student {
-  id: number;
-  nama: string;
-  classId: number;
-  academicYearId: number;
-}
+import { Router, ActivatedRoute } from '@angular/router';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { ClassService, Student, StudentsResponse } from 'src/app/service/class.service';
+import { ModalDeleteStudentComponent } from '../modal-delete-student/modal-delete-student.component';
 
 @Component({
   selector: 'app-class-detail',
@@ -15,60 +11,114 @@ interface Student {
 })
 export class ClassDetailComponent implements OnInit {
 
-  classes = [
-    { id: 1, nama_kelas: 'Kelas 1' },
-    { id: 2, nama_kelas: 'Kelas 2' },
-    { id: 3, nama_kelas: 'Kelas 3' }
-  ];
-
-  academicYears = [
-    { id: 1, nama: '2024/2025' },
-    { id: 2, nama: '2023/2024' },
-    { id: 3, nama: '2022/2023' }
-  ];
-
-  students: Student[] = [
-    { id: 1, nama: 'Ahmad Farhan', classId: 1, academicYearId: 1 },
-    { id: 2, nama: 'Budi Santoso', classId: 1, academicYearId: 1 },
-    { id: 3, nama: 'Citra Dewi', classId: 2, academicYearId: 1 },
-    { id: 4, nama: 'Dian Purnama', classId: 2, academicYearId: 1 },
-    { id: 5, nama: 'Eko Prasetyo', classId: 3, academicYearId: 1 },
-    { id: 6, nama: 'Fira Kirana', classId: 1, academicYearId: 2 },
-    { id: 7, nama: 'Galih Pratama', classId: 2, academicYearId: 2 },
-    { id: 8, nama: 'Hana Putri', classId: 3, academicYearId: 2 }
-  ];
+  classId: string = '';
+  classInfo: any = null;
+  students: Student[] = [];
+  filteredSiswa: Student[] = [];
+  keyword: string = '';
+  isLoading: boolean = false;
+  errorMsg: string = '';
 
   selectedClass: any = null;
   selectedAcademicYear: any = null;
-  keyword: string = '';
-  filteredSiswa: Student[] = [];
 
   constructor(
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private classService: ClassService,
+    private modalService: BsModalService
   ) { }
 
   ngOnInit(): void {
-    this.selectedClass = this.classes[0];
-    this.selectedAcademicYear = this.academicYears[0];
+    // Ambil classId dari route parameter
+    this.route.params.subscribe(params => {
+      this.classId = params['id'];
+      
+      if (this.classId) {
+        this.loadStudentsInClass();
+      }
+    });
+  }
+
+  // ✅ TAMBAH METHOD BACK TO MANAGE CLASSES
+  backToManageClasses(): void {
+    this.router.navigate(['/guru/kelola-kelas']);
+  }
+
+  loadStudentsInClass() {
+    this.isLoading = true;
+    this.errorMsg = '';
     
-    // Initial filter
-    this.filterStudents();
+    const token = localStorage.getItem('token');
+    
+    if (!token) {
+      this.errorMsg = 'Token tidak ditemukan. Silakan login ulang.';
+      this.isLoading = false;
+      return;
+    }
+
+    this.classService.getStudentsInClass(this.classId, token).subscribe({
+      next: (response: any) => {
+        
+        // Handle different response structures
+        if (response.success && response.data) {
+          this.students = response.data.siswa || [];
+          this.classInfo = response.data.kelas || null;
+        } else if (response.siswa) {
+          // If direct array response
+          this.students = response.siswa;
+          this.classInfo = response.kelas || null;
+        } else if (Array.isArray(response)) {
+          // If response is direct array
+          this.students = response;
+        } else {
+          this.students = [];
+          console.warn('Unexpected response format:', response);
+        }
+        
+        // Map data untuk kompatibilitas dengan template
+        this.filteredSiswa = this.students.map(student => ({
+          id: student._id,
+          nama: student.nama_lengkap || 'Nama tidak tersedia',
+          classId: 1,
+          academicYearId: 1,
+          ...student
+        }));
+        
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading students:', error);
+        this.errorMsg = 'Terjadi kesalahan saat memuat data siswa';
+        this.isLoading = false;
+      }
+    });
   }
 
   filterStudents() {
-    this.filteredSiswa = this.students.filter(student => {
-      // Filter by class if selected
-      const matchesClass = !this.selectedClass || student.classId === this.selectedClass.id;
-      
-      // Filter by academic year if selected
-      const matchesYear = !this.selectedAcademicYear || student.academicYearId === this.selectedAcademicYear.id;
-      
-      // Filter by keyword if provided
-      const matchesKeyword = !this.keyword || 
-        student.nama.toLowerCase().includes(this.keyword.toLowerCase());
-      
-      return matchesClass && matchesYear && matchesKeyword;
-    });
+    if (!this.keyword.trim()) {
+      this.filteredSiswa = this.students.map(student => ({
+        id: student._id,
+        nama: student.nama_lengkap || 'Nama tidak tersedia',
+        classId: 1,
+        academicYearId: 1,
+        ...student
+      }));
+      return;
+    }
+    
+    this.filteredSiswa = this.students
+      .filter(student => {
+        const nama = student.nama_lengkap || '';
+        return nama.toLowerCase().includes(this.keyword.toLowerCase());
+      })
+      .map(student => ({
+        id: student._id,
+        nama: student.nama_lengkap || 'Nama tidak tersedia',
+        classId: 1,
+        academicYearId: 1,
+        ...student
+      }));
   }
 
   onSearch() {
@@ -76,23 +126,68 @@ export class ClassDetailComponent implements OnInit {
   }
 
   onClassChange() {
-    this.filterStudents();
+    // Implement class change logic if needed
+    console.log('Class changed:', this.selectedClass);
   }
 
   onYearChange() {
-    this.filterStudents();
+    // Implement year change logic if needed
+    console.log('Year changed:', this.selectedAcademicYear);
   }
 
   onTambah() {
-    // Logic to add new student
-    console.log('Tambah student clicked');
-    this.router.navigate(['/guru/kelola-kelas/detail-kelas', this.selectedClass.id, 'tambah-siswa']);
+    this.router.navigate(['/guru/kelola-kelas/detail-kelas', this.classId, 'tambah-siswa']);
   }
 
-  hapusSiswa(siswa: Student) {
-    // Logic to delete student
-    console.log('Hapus student:', siswa);
-    this.filteredSiswa = this.filteredSiswa.filter(s => s.id !== siswa.id);
+  // ✅ UPDATE: Gunakan modal untuk hapus siswa
+  hapusSiswa(siswa: any) {
+    
+    const initialState = {
+      studentData: siswa,
+      classData: this.classInfo,
+      classId: this.classId,
+      onDeleteSuccess: () => {
+        this.handleDeleteSuccess(siswa);
+      },
+      onDeleteError: (error: any) => {
+        console.error('❌ Delete error callback triggered:', error);
+        this.handleDeleteError(siswa, error);
+      }
+    };
+    
+    const modalRef = this.modalService.show(ModalDeleteStudentComponent, {
+      class: 'modal-dialog-centered',
+      initialState,
+      ignoreBackdropClick: true,
+      keyboard: false
+    });
+
+    modalRef.onHide?.subscribe(() => {
+      console.log('Delete student modal closed');
+    });
   }
 
+  private handleDeleteSuccess(siswa: any): void {
+    
+    // Remove dari local arrays
+    this.students = this.students.filter(s => s._id !== siswa._id);
+    this.filteredSiswa = this.filteredSiswa.filter(s => s._id !== siswa._id);
+    
+    // Refresh data untuk memastikan konsistensi
+    setTimeout(() => {
+      this.loadStudentsInClass();
+    }, 1000);
+  }
+
+  private handleDeleteError(siswa: any, error: any): void {
+    console.error('❌ Error deleting student:', error);
+    
+    // Bisa menambahkan toast notification atau error handling lainnya
+    console.error(`❌ ${error.message || 'Gagal menghapus siswa'}`);
+  }
+
+  // Method untuk refresh data
+  refreshData() {
+    this.loadStudentsInClass();
+  }
 }

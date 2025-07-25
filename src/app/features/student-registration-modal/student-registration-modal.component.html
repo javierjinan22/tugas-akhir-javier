@@ -4,15 +4,15 @@
 </div>
 
 <div class="modal-body">
-  <form (ngSubmit)="onSubmitStudentRegistration()">
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()">
     <div class="mb-3">
       <label>Nama Lengkap <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" required [(ngModel)]="fullName" name="fullName" />
+      <input type="text" class="form-control" formControlName="nama_lengkap" />
     </div>
 
     <div class="mb-3">
       <label>Username <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" required [(ngModel)]="username" name="username" />
+      <input type="text" class="form-control" formControlName="username" />
     </div>
 
     <div class="mb-3 position-relative">
@@ -20,9 +20,7 @@
       <input
         [type]="passwordVisible ? 'text' : 'password'"
         class="form-control"
-        required
-        [(ngModel)]="password"
-        name="password"
+        formControlName="password"
       />
       <fa-icon
         [icon]="passwordVisible ? faEyeSlash : faEye"
@@ -32,13 +30,11 @@
     </div>
 
     <div class="mb-3 position-relative">
-      <label>Konfirmasi password <span class="text-danger">*</span></label>
+      <label>Konfirmasi Password <span class="text-danger">*</span></label>
       <input
         [type]="confirmPasswordVisible ? 'text' : 'password'"
         class="form-control"
-        required
-        [(ngModel)]="confirmPassword"
-        name="confirmPassword"
+        formControlName="konfirmasi_password"
       />
       <fa-icon
         [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
@@ -47,34 +43,34 @@
       ></fa-icon>
     </div>
 
-    <div class="d-flex gap-2">
-      <div class="mb-3 flex-fill">
-        <label>Sekolah <span class="text-danger">*</span></label>
-
-        <ngx-select
+    <div class="mb-3 flex-fill">
+      <label>Sekolah <span class="text-danger">*</span></label>
+      <ngx-select
+        formControlName="sekolah"
         [items]="schools"
+        optionValueField="_id"
+        optionTextField="nama"
         placeholder="Pilih sekolah"
-        optionValueField="id"
-        optionTextField="nama_sekolah"
         [allowClear]="false"
-        >
-        </ngx-select>
-
-      </div>
-      <div class="mb-3 flex-fill">
-        <label>Kelas <span class="text-danger">*</span></label>
-
-        <ngx-select
-        [items]="classes"
-        placeholder="Pilih kelas"
-        optionValueField="id"
-        optionTextField="nama_kelas"
-        [allowClear]="false"
-        >
-        </ngx-select>
-      </div>
+      ></ngx-select>
     </div>
 
-    <button type="submit" class="btn btn-primary btn-primary-custom w-100">Daftar</button>
+    <div class="mb-3 flex-fill">
+      <label>Kelas <span class="text-danger">*</span></label>
+      <ngx-select
+        formControlName="kelas"
+        [items]="classes"
+        optionValueField="_id"
+        optionTextField="nama_kelas"
+        placeholder="Pilih kelas"
+        [allowClear]="false"
+      ></ngx-select>
+    </div>
+
+    <small *ngIf="errorMsg" class="text-danger d-block mb-2">{{ errorMsg }}</small>
+
+    <button type="submit" class="btn btn-primary-custom w-100" [disabled]="registerForm.invalid || loading">
+      {{ loading ? 'Mendaftar...' : 'Daftar' }}
+    </button>
   </form>
 </div>

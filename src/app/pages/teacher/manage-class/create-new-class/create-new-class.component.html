@@ -1,39 +1,115 @@
 <div class="container-fluid mt-4">
-
-    <h2 class="fw-bold mb-4" style="font-size: 24px; ">Tambah kelas</h2>
+    <!-- Back button dan header -->
+    <div class="d-flex align-items-center mb-4">
+        <!-- Back button - hanya icon -->
+        <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 class="fw-bold mb-0" style="font-size: 24px;">Tambah kelas</h2>
+    </div>
 
     <div class="form-container p-4 p-md-5">
-        <form [formGroup]="classForm">
+        <!-- Error message display -->
+        <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ errorMsg }}
+        </div>
 
+        <!-- Loading message -->
+        <div *ngIf="isSubmitting" class="alert alert-info mb-3">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            Sedang membuat kelas...
+        </div>
+
+        <!-- Show existing classes info -->
+        <div *ngIf="existingDataList.length > 0 && !isSubmitting" class="alert alert-light mb-3">
+            <small class="text-muted">
+                <strong>Kelas yang sudah ada:</strong> 
+                {{ getExistingClassNames().join(', ') }}
+            </small>
+        </div>
+
+        <!-- School info -->
+        <div *ngIf="school && !isSubmitting" class="alert alert-info mb-3">
+            <i class="fas fa-school me-2"></i>
+            <strong>Sekolah:</strong> {{ school.nama }}
+            <small class="d-block text-muted mt-1">
+                Kelas baru akan dibuat untuk sekolah ini
+            </small>
+        </div>
+
+        <form [formGroup]="classForm" *ngIf="!isSubmitting">
             <div class="row">
+                <div class="col-md-8">
+                    <label>Nama Kelas <span class="text-danger">*</span></label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        formControlName="className"
+                        [class.is-invalid]="isFieldInvalid('className')"
+                        placeholder="Masukkan nama kelas (contoh: Kelas 5A, 6B, dll)"
+                        (input)="onClassNameInput()"
+                    />
+                    
+                    <!-- Validation error messages -->
+                    <div *ngIf="hasFieldError('className', 'required')" class="text-danger mt-1">
+                        <small><i class="fas fa-exclamation-circle me-1"></i>Nama kelas harus diisi</small>
+                    </div>
+                    <div *ngIf="hasFieldError('className', 'minlength')" class="text-danger mt-1">
+                        <small><i class="fas fa-exclamation-circle me-1"></i>Nama kelas minimal 2 karakter</small>
+                    </div>
+                    <div *ngIf="hasFieldError('className', 'classNameExists')" class="text-danger mt-1">
+                        <small><i class="fas fa-times-circle me-1"></i>Nama kelas "{{ classForm.get('className')?.value }}" sudah digunakan. Silakan gunakan nama lain.</small>
+                    </div>
+                    
+                    <!-- Success indicator when name is available -->
+                    <div *ngIf="classForm.get('className')?.valid && classForm.get('className')?.value?.trim().length >= 2" class="text-success mt-1">
+                        <small><i class="fas fa-check-circle me-1"></i>Nama kelas tersedia</small>
+                    </div>
+                </div>
 
-            <div class="col-md-8">
-                <label>Nama Kelas <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" formControlName="className" />
+                <div class="col-md-4">
+                    <label>Tahun Ajaran <span class="text-danger">*</span></label>
+                    <ngx-select
+                        [items]="academicYears"
+                        formControlName="academicYearId"
+                        placeholder="Pilih tahun ajaran"
+                        optionValueField="id"
+                        optionTextField="name"
+                        [class.is-invalid]="isFieldInvalid('academicYearId')">
+                    </ngx-select>
+                    <div *ngIf="hasFieldError('academicYearId', 'required')" class="text-danger mt-1">
+                        <small><i class="fas fa-exclamation-circle me-1"></i>Tahun ajaran harus dipilih</small>
+                    </div>
+                </div>
             </div>
-
-            <div class="col-md-4">
-                <label>Tahun Ajaran <span class="text-danger">*</span></label>
-                <ngx-select
-                    [items]="academicYears"
-                    formControlName="academicYearId"
-                    placeholder="Pilih tahun ajaran"
-                    optionValueField="id"
-                    optionTextField="name">
-                </ngx-select>
-            </div>
-            </div>
-
         </form>
 
+        <!-- Action buttons -->
         <div class="d-flex justify-content-center mt-4 px-3 gap-3">
-            <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
-            Batal
+            <button 
+                class="btn btn-outline-primary btn-rounded" 
+                (click)="onCancelClicked()"
+                [disabled]="isSubmitting">
+                <i class="fas fa-times me-1"></i>
+                Batal
             </button>
-            <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
-            Buat kelas
+            <button 
+                class="btn btn-primary btn-rounded" 
+                (click)="onSubmitClicked()"
+                [disabled]="isSubmitting || !school || classForm.invalid"
+                *ngIf="!isSubmitting">
+                <i class="fas fa-plus me-1"></i>
+                Buat kelas
+            </button>
+        </div>
+
+        <!-- Loading state button -->
+        <div class="d-flex justify-content-center mt-4" *ngIf="isSubmitting">
+            <button class="btn btn-primary btn-rounded" disabled>
+                <i class="fas fa-spinner fa-spin me-2"></i>
+                Membuat kelas...
             </button>
         </div>
     </div>
-
 </div>

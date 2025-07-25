@@ -1,0 +1,23 @@
+<div class="modal-body">
+  <!-- Icon Warning Overlapping -->
+  <div class="icon-warning-wrapper">
+    <fa-icon [icon]="faExclamation"></fa-icon>
+  </div>
+
+  <h5 class="modal-title text-center mt-4">Silakan pilih yang ingin anda unduh</h5>
+  <p class="modal-subtitle text-center">{{ materialTitle }}</p>
+
+  <div class="button-group-download mt-4 px-3">
+    <button class="btn btn-outline-primary" (click)="onCancelClicked()">
+      Batal
+    </button>
+    <button class="btn btn-primary btn-download" (click)="downloadMaterial()">
+      <i class="fas fa-download"></i>
+      <span>Download Materi</span>
+    </button>
+    <button class="btn btn-primary btn-download" (click)="downloadQuiz()">
+      <i class="fas fa-download"></i>
+      <span>Download Kuis</span>
+    </button>
+  </div>
+</div>

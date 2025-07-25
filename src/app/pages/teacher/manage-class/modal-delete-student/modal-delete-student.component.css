@@ -1,0 +1,203 @@
+.modal-body {
+  font-family: 'Poppins', sans-serif;
+  padding: 2rem;
+  border-radius: 20px;
+  position: relative;
+}
+
+/* Icon warning wrapper - sama seperti modal konfirmasi lainnya */
+.icon-warning-wrapper {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #EFE51B; /* Kuning untuk warning */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  box-shadow: 0 4px 12px rgba(239, 229, 27, 0.3);
+  z-index: 1000;
+}
+
+.icon-warning-wrapper fa-icon {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 1rem;
+  color: #333;
+}
+
+.student-name {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
+/* Student info card */
+.student-info-card {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 15px;
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+.student-info-card small {
+  font-weight: 500;
+  color: #6c757d;
+}
+
+.student-info-card div {
+  color: #333;
+  font-weight: 500;
+}
+
+/* Action card */
+.action-card {
+  border-radius: 12px;
+  padding: 25px 20px;
+  width: 220px;
+  cursor: pointer;
+  color: #fff;
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card:hover:not(.disabled) {
+  transform: translateY(-3px);
+}
+
+.action-card.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.delete-card {
+  background-color: #ff6b6b; /* Merah untuk delete */
+}
+
+.delete-card:hover:not(.disabled) {
+  background-color: #ff5252;
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+}
+
+.icon-wrapper {
+  margin-bottom: 15px;
+}
+
+.action-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.action-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  margin: 0;
+  color: #fff;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.btn-cancel {
+  background-color: transparent;
+  border: 2px solid #ddd;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  padding: 12px 40px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading overlay */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  z-index: 2000;
+}
+
+.spinner-wrapper {
+  text-align: center;
+  color: #ff6b6b;
+}
+
+.spinner-wrapper p {
+  margin: 0;
+  font-weight: 500;
+  color: #666;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .icon-warning-wrapper {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+  }
+  
+  .icon-warning-wrapper fa-icon {
+    font-size: 1.5rem;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .action-card {
+    width: 180px;
+    padding: 20px 15px;
+  }
+  
+  .action-title {
+    font-size: 14px;
+  }
+  
+  .action-text {
+    font-size: 11px;
+  }
+  
+  .student-info-card {
+    padding: 12px;
+    font-size: 13px;
+  }
+}

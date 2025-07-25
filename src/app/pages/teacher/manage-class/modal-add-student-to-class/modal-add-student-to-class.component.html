@@ -8,13 +8,122 @@
 
   <h5 class="modal-title text-center mt-4">Pindahkan siswa ke kelas ini</h5>
 
-  <div class="d-flex justify-content-between mt-4 px-3">
-    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
+  <!-- Student Info -->
+  <div class="mt-3 p-3 bg-light rounded" *ngIf="student">
+    <div class="row">
+      <div class="col-12">
+        <h6 class="fw-bold mb-2">Detail Siswa:</h6>
+        <p class="mb-1"><strong>Nama:</strong> {{ student.fullName }}</p>
+        <p class="mb-1"><strong>Username:</strong> {{ student.username }}</p>
+      </div>
+    </div>
+    
+    <!-- Kelas comparison -->
+    <div class="row mt-3">
+      <div class="col-6">
+        <div class="text-center">
+          <small class="text-muted d-block">Kelas Saat Ini:</small>
+          <div class="badge bg-secondary p-2 w-100">
+            {{ oldClassName || 'Belum ada kelas' }}
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="text-center">
+          <small class="text-muted d-block">Kelas Tujuan:</small>
+          <div class="badge bg-success p-2 w-100">
+            <!-- PERBAIKAN: Gunakan targetClassInfo langsung -->
+            <div>{{ targetClassInfo?.nama_kelas || newClassName || 'Kelas Tujuan' }}</div>
+          
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info tambahan kelas tujuan -->
+    <div *ngIf="targetClassInfo" class="mt-3 p-2 bg-info bg-opacity-10 rounded">
+      <small class="text-muted">Detail Kelas Tujuan:</small>
+      <div class="row mt-1">
+        <div class="col-6">
+          <small><strong>Nama Kelas:</strong> {{ targetClassInfo.nama_kelas }}</small>
+        </div>
+      </div>
+      <div class="row mt-1">
+        <div class="col-8">
+          <small><strong>Tahun Ajaran:</strong> {{ targetClassInfo.tahun_ajaran || '-' }}</small>
+        </div>
+      </div>
+      <div *ngIf="targetClassInfo.sekolah" class="mt-1">
+        <small><strong>Sekolah:</strong> {{ targetClassInfo.sekolah.nama }}</small>
+      </div>
+    </div>
+
+    <!-- Debug info - hapus setelah fix -->
+    <!-- <div class="mt-2 p-2 bg-warning bg-opacity-10 rounded" style="font-size: 11px;">
+      <strong>Debug:</strong><br>
+      newClassName: {{ newClassName }}<br>
+      targetClassInfo: {{ targetClassInfo | json }}
+    </div> -->
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMsg" class="alert alert-success mt-3">
+    <i class="fas fa-check-circle me-2"></i>
+    {{ successMsg }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mt-3">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+  </div>
+
+  <!-- Loading Message -->
+  <div *ngIf="isSubmitting" class="alert alert-info mt-3">
+    <i class="fas fa-spinner fa-spin me-2"></i>
+    Sedang memindahkan siswa ke {{ targetClassInfo?.nama_kelas || newClassName }}...
+  </div>
+
+  <!-- Confirmation Text -->
+  <div class="text-center mt-3" *ngIf="!successMsg && !errorMsg && !isSubmitting">
+    <p class="text-muted">
+      Apakah Anda yakin ingin memindahkan <strong>{{ student?.fullName }}</strong> 
+      ke kelas <strong>{{ targetClassInfo?.nama_kelas || newClassName }}</strong>?
+    </p>
+    <small class="text-info">
+      * Siswa akan otomatis keluar dari kelas sebelumnya
+    </small>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="d-flex justify-content-between mt-4 px-3" *ngIf="!successMsg">
+    <button 
+      class="btn btn-outline-secondary btn-rounded" 
+      (click)="onCancelClicked()"
+      [disabled]="isSubmitting">
+      <i class="fas fa-times me-1"></i>
       Batal
     </button>
-    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
-      Pindahkan
+    <button 
+      class="btn btn-success btn-rounded" 
+      (click)="onSubmitClicked()"
+      [disabled]="isSubmitting || !!errorMsg">
+      <span *ngIf="isSubmitting">
+        <i class="fas fa-spinner fa-spin me-1"></i>
+        Memindahkan...
+      </span>
+      <span *ngIf="!isSubmitting">
+        <i class="fas fa-arrow-right me-1"></i>
+        Pindahkan ke {{ targetClassInfo?.nama_kelas || newClassName }}
+      </span>
     </button>
   </div>
 
+  <!-- Close Button for Success -->
+  <div class="d-flex justify-content-center mt-4" *ngIf="successMsg">
+    <button class="btn btn-success btn-rounded" (click)="onCancelClicked()">
+      <i class="fas fa-check me-1"></i>
+      Tutup
+    </button>
+  </div>
 </div>

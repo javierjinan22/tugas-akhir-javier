@@ -17,6 +17,15 @@ import { ManageLearningOutcomesComponent } from './pages/teacher/manage-learning
 import { DetailLearningOutcomesComponent } from './pages/teacher/manage-learning-outcomes/detail-learning-outcomes/detail-learning-outcomes.component';
 import { DetailStudentsLearningOutcomesComponent } from './pages/teacher/manage-learning-outcomes/detail-students-learning-outcomes/detail-students-learning-outcomes.component';
 import { AnswerReviewComponent } from './pages/teacher/manage-learning-outcomes/answer-review/answer-review.component';
+import { StudentDashboardComponent } from './pages/student/student-dashboard/student-dashboard.component';
+import { MaterialListComponent } from './pages/student/material-list/material-list.component';
+import { ViewMaterialComponent } from './pages/student/material-list/view-material/view-material.component';
+import { TakeQuizComponent } from './pages/student/material-list/take-quiz/take-quiz.component';
+import { ViewQuizComponent } from './pages/student/material-list/view-quiz/view-quiz.component';
+import { DetailHistoryQuizComponent } from './pages/student/material-list/detail-history-quiz/detail-history-quiz.component';
+import { AuthGuard } from './guards/auth.guard';
+import { ClassEditComponent } from './pages/teacher/manage-class/class-edit/class-edit.component';
+import { ClassArchivedComponent } from './pages/teacher/manage-class/class-archived/class-archived.component';
 
 
 // const routes: Routes = [];
@@ -30,10 +39,14 @@ const routes: Routes = [
   {
     path: 'guru',
     component: TeacherLayoutComponent,
+    canActivate: [AuthGuard],
+    data: { role: 'guru' },
     children: [
-       { path: 'dashboard', component: TeacherDashboardComponent },
+       { path: 'dashboard', component: TeacherDashboardComponent,canActivate: [AuthGuard] },
        { path: 'kelola-kelas', component: ManageClassComponent },
+       { path: 'kelola-kelas/arsip', component: ClassArchivedComponent },
        { path: 'kelola-kelas/tambah-kelas', component: CreateNewClassComponent},
+       { path: 'kelola-kelas/edit-kelas/:id', component: ClassEditComponent},
        { path: 'kelola-kelas/detail-kelas/:id', component: ClassDetailComponent},
        { path: 'kelola-kelas/detail-kelas/:id/tambah-siswa', component: ConnectStudentToClassComponent},
        { path: 'kelola-kelas/detail-kelas/:id/tambah-siswa/buat-akun-siswa', component: CreateStudentAccountComponent},
@@ -44,17 +57,22 @@ const routes: Routes = [
        { path: 'hasil-belajar', component: ManageLearningOutcomesComponent },
        { path: 'hasil-belajar/detail-materi-belajar/:id', component: DetailLearningOutcomesComponent },
        { path: 'hasil-belajar/detail-materi-belajar/:id/detail-siswa', component: DetailStudentsLearningOutcomesComponent },
-       { path: 'hasil-belajar/detail-materi-belajar/:materiId/detail-siswa/:siswaId/koreksi-jawaban', component: AnswerReviewComponent 
-}
+       { path: 'hasil-belajar/detail-materi-belajar/:materiId/detail-siswa/:siswaId/koreksi-jawaban', component: AnswerReviewComponent }
 
     ]
   },
   {
     path: 'siswa',
     component: StudentLayoutComponent,
+    canActivate: [AuthGuard],
+    data: { role: 'siswa' },
     children: [
-      // { path: 'dashboard', component: SiswaDashboardComponent },
-      // { path: 'materi', component: DaftarMateriComponent },
+      { path: 'dashboard', component: StudentDashboardComponent },
+      { path: 'materi', component: MaterialListComponent},
+      { path: 'materi/lihat-materi', component: ViewMaterialComponent},
+      { path: 'materi/lihat-materi/:id/kuis', component: TakeQuizComponent},
+      { path: 'materi/lihat-materi/:id/kuis/kerjakan', component: ViewQuizComponent},
+      { path: 'materi/lihat-materi/:id/kuis/hasil', component: DetailHistoryQuizComponent},
       // { path: 'riwayat', component: RiwayatBelajarComponent }
     ]
   },

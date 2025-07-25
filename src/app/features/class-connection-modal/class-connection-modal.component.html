@@ -1,5 +1,3 @@
-<!-- 
-
 <div class="modal-body position-relative">
   <div class="icon-warning-wrapper">
     <div class="icon-warning">
@@ -8,67 +6,93 @@
   </div>
 
   <h5 class="modal-title text-center mt-4">
-    Anda belum memiliki kelas, mohon membuat kelas terlebih dahulu
+    <span *ngIf="!isMandatory">Tambah Kelas Baru</span>
+    <span *ngIf="isMandatory">Anda belum memiliki kelas, mohon membuat kelas terlebih dahulu</span>
   </h5>
 
-  <div class="school-details mt-3 px-3">
-    <app-array-wrapper (add)="onAdd()" (remove)="onRemove()">
-      <div class="form-row">
-        <div class="form-field">
-          <label>Nama kelas <span class="text-danger">*</span></label>
-          <input type="text" class="form-control input-rounded" formControlName="nama_kelas" />
+  <!-- School info -->
+  <div class="school-info text-center mt-2 mb-3" *ngIf="school">
+    <small class="text-muted">Sekolah: <strong>{{ school.nama }}</strong></small>
+  </div>
+
+  <!-- Error message -->
+  <div class="alert alert-danger mt-3 mx-3" *ngIf="submitError">
+    <i class="fas fa-exclamation-triangle me-2"></i>{{ submitError }}
+  </div>
+
+  <!-- Success message -->
+  <div class="alert alert-success mt-3 mx-3" *ngIf="classesCreated > 0 && !isSubmitting">
+    <i class="fas fa-check-circle me-2"></i>
+    Berhasil membuat {{ classesCreated }} kelas
+  </div>
+
+  <div class="school-details mt-3 px-3" *ngIf="isFormInitialized && classForm">
+    <div *ngFor="let classControl of classFormControls; let i = index" class="class-form-item mb-3">
+      <form [formGroup]="classControl">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Nama kelas <span class="text-danger">*</span></label>
+            <input type="text" class="form-control input-rounded" formControlName="nama_kelas" />
+            <div *ngIf="classControl.get('nama_kelas')?.invalid && classControl.get('nama_kelas')?.touched" class="text-danger mt-1">
+              <small><i class="fas fa-exclamation-circle me-1"></i>Nama kelas harus diisi</small>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Tahun Ajaran <span class="text-danger">*</span></label>
+            <ngx-select
+                [items]="academicYears"
+                formControlName="tahun_ajaran"
+                placeholder="Pilih tahun ajaran"
+                optionValueField="name"
+                optionTextField="name"
+                [allowClear]="false">
+            </ngx-select>
+            <div *ngIf="classControl.get('tahun_ajaran')?.invalid && classControl.get('tahun_ajaran')?.touched" class="text-danger mt-1">
+              <small><i class="fas fa-exclamation-circle me-1"></i>Tahun ajaran harus dipilih</small>
+            </div>
+          </div>
         </div>
-        <div class="form-field">
-          <label>Tahun ajaran <span class="text-danger">*</span></label>
-          <input type="text" class="form-control input-rounded" formControlName="tahun_ajaran" />
-        </div>
-      </div>
-    </app-array-wrapper>
-  </div>
-
-  <div class="d-flex justify-content-between mt-4 px-3">
-    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">Batal</button>
-    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">Buat Kelas</button>
-  </div>
-</div> -->
-
-<div class="modal-body position-relative">
-  <div class="icon-warning-wrapper">
-    <div class="icon-warning">
-      <fa-icon [icon]="faExclamation"></fa-icon>
-    </div>
-  </div>
-
-  <h5 class="modal-title text-center mt-4">
-    Anda belum memiliki kelas, mohon membuat kelas terlebih dahulu
-  </h5>
-
-  <div class="school-details mt-3 px-3">
-    <!-- Menggunakan array-wrapper untuk menangani form input dinamis -->
-    <app-array-wrapper [data]="classData" (addEvent)="onAdd()" (deleteEvent)="onRemove($event)">
-      <ng-template #content let-item="item" let-index="index">
         
-      <div class="form-row">
-        <div class="form-field">
-          <label>Nama kelas <span class="text-danger">*</span></label>
-          <input type="text" class="form-control input-rounded" formControlName="nama_kelas"/>
+        <!-- Action buttons for each form -->
+        <div class="form-actions mt-2">
+          <button type="button" class="btn btn-sm btn-success me-2" (click)="onAdd()">
+            <i class="fas fa-plus"></i> Tambah
+          </button>
+          <button type="button" class="btn btn-sm btn-danger" (click)="onRemove({index: i})" 
+                  [disabled]="classFormControls.length <= 1">
+            <i class="fas fa-trash"></i> Hapus
+          </button>
         </div>
-        <div class="form-field">
-          <label>Tahun ajaran <span class="text-danger">*</span></label>
-          <input type="text" class="form-control input-rounded" formControlName="tahun_ajaran"/>
-        </div>
-      </div>
-    </ng-template>
-
-    </app-array-wrapper>
+      </form>
+    </div>
   </div>
 
   <div class="d-flex justify-content-between mt-4 px-3">
-    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
+    <!-- Cancel button - hide if mandatory -->
+    <button class="btn btn-outline-primary btn-rounded" 
+            (click)="onCancelClicked()"
+            [disabled]="isSubmitting"
+            *ngIf="!isMandatory">
       Batal
     </button>
-    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
-      Buat Kelas
+    
+    <!-- For mandatory flow, show disabled cancel with tooltip -->
+    <div *ngIf="isMandatory" class="d-flex align-items-center">
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Anda harus membuat minimal 1 kelas untuk melanjutkan
+      </small>
+    </div>
+    
+    <button class="btn btn-primary btn-rounded" 
+            (click)="onSubmitClicked()" 
+            [disabled]="!isFormInitialized || classForm.invalid || isSubmitting">
+      <span *ngIf="isSubmitting">
+        <i class="fas fa-spinner fa-spin me-2"></i>Membuat Kelas...
+      </span>
+      <span *ngIf="!isSubmitting">
+        <i class="fas fa-plus me-2"></i>Buat Kelas
+      </span>
     </button>
   </div>
 </div>

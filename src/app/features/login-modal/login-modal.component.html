@@ -1,4 +1,4 @@
-<div class="modal-header">
+<!-- <div class="modal-header">
   <h5 class="modal-title modal-title-custom">Login</h5>
   <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
 </div>
@@ -17,5 +17,33 @@
 
     <p class="mb-3">Belum punya akun? <a (click)="onButtonRegistrationClicked()" class="link-daftar">Daftar</a></p>
     <button type="submit" class="btn btn-primary btn-login w-100">Masuk</button>
+  </form>
+</div> -->
+
+<div class="modal-header">
+  <h5 class="modal-title modal-title-custom">Login</h5>
+  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
+    <div class="mb-3">
+      <label class="form-label-custom">Username <span class="text-danger">*</span></label>
+      <input type="text" class="form-control" required formControlName="username" />
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label-custom">Password <span class="text-danger">*</span></label>
+      <input type="password" class="form-control" required formControlName="password" />
+    </div>
+
+    <div *ngIf="errorMsg" class="alert alert-danger text-center mb-2">
+      {{ errorMsg }}
+    </div>
+
+    <p class="mb-3">Belum punya akun? 
+      <a (click)="onButtonRegistrationClicked()" class="link-daftar">Daftar</a>
+    </p>
+    <button type="submit" class="btn btn-primary btn-login w-100" [disabled]="loginForm.invalid">Masuk</button>
   </form>
 </div>

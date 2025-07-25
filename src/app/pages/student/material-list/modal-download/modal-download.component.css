@@ -1,0 +1,148 @@
+.modal-body {
+  font-family: 'Poppins', sans-serif;
+  padding: 2.2rem 1rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: auto;
+  margin: 0 auto;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.icon-warning-wrapper {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #EFE51B;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+}
+
+.icon-warning-wrapper fa-icon {
+  color: #fff;
+  font-size: 2.3rem;
+  font-weight: 900;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 1rem;
+  color: #333;
+}
+
+.modal-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0;
+}
+
+label {
+  font-size: 14px;
+  display: block;
+}
+
+.input-rounded {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #1BB6C1;
+}
+
+/* Button Layout */
+.d-flex.justify-content-between.mt-4.px-3 {
+  gap: 8px;
+}
+
+.d-flex.justify-content-between.mt-4.px-3 > button {
+  height: 42px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 15px;
+  padding: 0 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid;
+  transition: all 0.3s ease;
+}
+
+.button-group-download {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2rem;
+}
+
+.button-group-download > button {
+  flex: none; /* Semua tombol membagi ruang secara rata */
+  max-width: 230px; /* biar tidak terlalu lebar pada layar sangat besar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  height: 46px;
+  padding: 0 20px;
+  white-space: nowrap;
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+
+.btn-outline-primary {
+  color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  background: transparent;
+}
+
+.btn-outline-primary:hover {
+  background: #1BB6C1;
+  color: #fff;
+}
+
+.btn-primary {
+  background: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-primary i {
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+  .modal-body {
+    max-width: 98vw;
+    padding: 1.2rem 0.7rem;
+  }
+  .button-group-download {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .button-group-download > button {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 0 10px;
+    font-size: 15px;
+  }
+}

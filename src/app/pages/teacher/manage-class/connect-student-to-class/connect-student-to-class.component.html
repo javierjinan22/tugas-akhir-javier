@@ -1,8 +1,49 @@
 <div class="container-fluid mt-4">
-  <h2 class="fw-bold mb-4" style="font-size: 24px;">Tambah siswa</h2>
+  <!-- Back button dan header -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToClassDetail()" title="Kembali ke detail kelas">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div>
+      <h2 class="fw-bold mb-0" style="font-size: 24px;">Tambah siswa</h2>
+      <!-- Class info subtitle -->
+      <p class="text-muted mb-0" style="font-size: 14px;" *ngIf="currentClassInfo">
+        Ke kelas: {{ currentClassInfo.nama_kelas }} 
+        <span *ngIf="currentClassInfo.tahun_ajaran">({{ currentClassInfo.tahun_ajaran }})</span>
+      </p>
+    </div>
+  </div>
 
-  <!-- Search and button in one row -->
-  <div class="row mb-4">
+  <!-- Debug info (hapus setelah testing) -->
+  <!-- <div class="alert alert-secondary mb-2" style="font-size: 12px;">
+    <strong>Debug:</strong> 
+    Total students: {{ allStudents.length }} | 
+    Search results: {{ filteredStudents.length }} | 
+    Show results: {{ showResults }} | 
+    Keyword: "{{ keyword }}"
+    <button class="btn btn-xs btn-secondary ms-2" (click)="debugData()">Debug Log</button>
+  </div> -->
+
+  <!-- Loading indicator for initial data load -->
+  <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat data siswa...</p>
+    </div>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshData()">
+      <i class="fas fa-refresh me-1"></i>Coba Lagi
+    </button>
+  </div>
+
+  <!-- Search and button section -->
+  <div class="row mb-4" *ngIf="!isLoading">
     <div class="col-md-6">
       <div class="d-flex flex-column align-items-start"> 
         <div class="search-bar d-flex align-items-center">
@@ -10,35 +51,68 @@
             #searchInput
             type="text"
             class="form-control rounded-pill me-2"
-            placeholder="Cari"
+            placeholder="Cari siswa..."
             [(ngModel)]="keyword"
             (keydown.enter)="onSearch()"
+            (input)="onSearch()"
+            [disabled]="isLoading"
             style="width: 300px;" />
-          <span class="search-icon" (click)="onSearch()">
+          
+          <!-- Search loading indicator -->
+          <span *ngIf="isSearching" class="me-2">
+            <i class="fas fa-spinner fa-spin text-primary"></i>
+          </span>
+          
+          <!-- Search icon -->
+          <span class="search-icon" (click)="onSearch()" *ngIf="!isSearching">
             <i class="fa fa-search"></i>
           </span>
+          
+          <!-- Clear search button -->
+          <button *ngIf="keyword" class="btn btn-sm btn-outline-secondary ms-2" (click)="clearSearch()">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-        <small class="text-info mt-1" style="font-style: italic;">Cari berdasarkan username atau nama lengkap</small>
+        <small class="text-info mt-1" style="font-style: italic;">
+          Cari berdasarkan username atau nama lengkap
+        </small>
+        <small class="text-muted mt-1" *ngIf="allStudents.length > 0">
+          Total siswa di sekolah: {{ allStudents.length }}
+        </small>
       </div>
     </div>
     
     <div class="col-md-6">
       <div class="d-flex justify-content-end">
-        <button class="btn btn-primary-custom" (click)="onTambah()">
+        <button class="btn btn-primary-custom" (click)="onTambah()" [disabled]="isLoading">
+          <i class="fas fa-user-plus me-1"></i>
           Buatkan akun siswa
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Students table - conditionally shown based on search results -->
-  <div class="table-responsive" *ngIf="showResults && filteredStudents.length > 0">
+  <!-- Search results info -->
+  <div *ngIf="keyword" class="alert alert-light mb-3">
+    <small>
+      <i class="fas fa-search me-1"></i>
+      Hasil pencarian untuk: <strong>"{{ keyword }}"</strong>
+      <span *ngIf="filteredStudents.length > 0"> - {{ filteredStudents.length }} siswa ditemukan</span>
+      <span *ngIf="filteredStudents.length === 0 && !isSearching"> - Tidak ada hasil</span>
+    </small>
+  </div>
+
+  <!-- Students table - tampilkan jika ada hasil search -->
+  <div class="table-responsive" *ngIf="keyword && filteredStudents.length > 0 && !isLoading">
     <table class="table align-middle table-bordered text-center">
       <thead>
         <tr>
           <th>No.</th>
           <th>Nama Lengkap</th>
           <th>Username</th>
+          <th>Kelas Saat Ini</th>
+          <th>Tahun Ajaran</th>
+          <th>Status</th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -47,8 +121,33 @@
           <td>{{ i + 1 }}.</td>
           <td>{{ student.fullName }}</td>
           <td>{{ student.username }}</td>
+          <td>
+            <span class="badge" 
+                  [class.bg-secondary]="student.currentClass === 'Belum ada kelas'"
+                  [class.bg-info]="student.currentClass !== 'Belum ada kelas'">
+              {{ student.currentClass }}
+            </span>
+          </td>
+          <td>{{ student.tahunAjaran || '-' }}</td>
+          <td>
+            <!-- Status apakah siswa sudah di kelas target -->
+            <span *ngIf="student.currentClassId === currentClassId" class="badge bg-warning">
+              Sudah di kelas ini
+            </span>
+            <span *ngIf="student.currentClassId !== currentClassId" class="badge bg-success">
+              Bisa dipindahkan
+            </span>
+          </td>
           <td class="aksi-cell">
-            <a href="#" (click)="addStudentToClass(student); $event.preventDefault()">Pindahkan</a> 
+            <button class="btn btn-sm" 
+                    [class.btn-success]="student.currentClassId !== currentClassId"
+                    [class.btn-secondary]="student.currentClassId === currentClassId"
+                    (click)="addStudentToClass(student)"
+                    [disabled]="isLoading || student.currentClassId === currentClassId">
+              <i class="fas fa-plus me-1"></i>
+              <span *ngIf="student.currentClassId !== currentClassId">Pindahkan</span>
+              <span *ngIf="student.currentClassId === currentClassId">Sudah di kelas</span>
+            </button>
           </td>
         </tr>
       </tbody>
@@ -56,7 +155,28 @@
   </div>
   
   <!-- No results message -->
-  <div class="alert alert-info" *ngIf="showResults && filteredStudents.length === 0">
-    Tidak ada siswa yang cocok dengan pencarian Anda.
+  <div class="alert alert-info" *ngIf="keyword && filteredStudents.length === 0 && !isSearching && !isLoading">
+    <i class="fas fa-info-circle me-2"></i>
+    Tidak ada siswa yang cocok dengan pencarian "<strong>{{ keyword }}</strong>".
+    <br>
+    <small class="text-muted">
+      Pastikan nama atau username yang dicari sudah benar, atau siswa tersebut belum berada di kelas yang sedang dipilih.
+    </small>
+  </div>
+
+  <!-- Instructions when no search is performed -->
+  <div class="alert alert-light" *ngIf="!keyword && !isLoading && allStudents.length > 0">
+    <i class="fas fa-lightbulb me-2"></i>
+    <strong>Petunjuk:</strong> Gunakan kolom pencarian di atas untuk mencari siswa berdasarkan nama lengkap atau username.
+    <br>
+    <small class="text-muted">
+      Contoh: Ketik "Jinan Mukti" atau "jinan123" untuk mencari siswa.
+    </small>
+  </div>
+
+  <!-- No students in school -->
+  <div class="alert alert-warning" *ngIf="!isLoading && allStudents.length === 0 && !errorMsg">
+    <i class="fas fa-users me-2"></i>
+    Belum ada siswa di sekolah ini. Silakan buat akun siswa terlebih dahulu.
   </div>
 </div>

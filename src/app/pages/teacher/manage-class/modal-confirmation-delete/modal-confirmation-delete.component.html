@@ -1,0 +1,42 @@
+<div class="modal-content custom-modal-content">
+  <div class="modal-body position-relative">
+    <!-- Icon Warning Overlapping - perbaiki struktur -->
+    <div class="icon-warning-wrapper">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
+
+    <h5 class="modal-title text-center mt-4">Konfirmasi Penghapusan Kelas</h5>
+    
+    <div class="text-center mt-3">
+      <p class="class-name">Anda akan menghapus kelas <strong>"{{ classData?.nama_kelas }}"</strong></p>
+      <p class="subtitle">Silakan pilih metode penghapusan:</p>
+    </div>
+    
+    <div class="d-flex justify-content-center gap-3 mt-4">
+      <!-- Card Arsipkan -->
+      <div class="action-card archive-card text-center" (click)="archiveClass()">
+        <div class="icon-wrapper">
+          <fa-icon [icon]="faArchive" size="2x"></fa-icon>
+        </div>
+        <h6 class="action-title">Arsipkan</h6>
+        <p class="action-text">Kelas akan dinonaktifkan dan dapat dikembalikan nanti</p>
+      </div>
+
+      <!-- Card Hapus Permanen -->
+      <div class="action-card delete-card text-center" (click)="deleteClassPermanently()">
+        <div class="icon-wrapper">
+          <fa-icon [icon]="faTrash" size="2x"></fa-icon>
+        </div>
+        <h6 class="action-title">Hapus Permanen</h6>
+        <p class="action-text">Kelas akan dihapus secara permanen dan tidak dapat dibatalkan</p>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+      <button type="button" class="btn btn-cancel" (click)="cancelAction()">
+        Batal
+      </button>
+    </div>
+  </div>
+</div>
+

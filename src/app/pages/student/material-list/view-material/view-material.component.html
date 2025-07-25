@@ -1,0 +1,67 @@
+<div class="view-material-container">
+  <div class="row">
+    <!-- Main content area -->
+    <div class="col-md-8">
+      <div class="material-content-card">
+        <div class="material-header">
+          <a [routerLink]="['/siswa/materi']" class="back-button">
+            <i class="fa-solid fa-arrow-left"></i>
+          </a>
+          <h4 class="material-title">{{ material.title }}</h4>
+        </div>
+
+        <div class="material-content">
+          <!-- Render current page content -->
+          <div class="material-page" [innerHTML]="currentPageContent"></div>
+        </div>
+
+        <div class="pagination-controls">
+          <button class="btn btn-icon" [disabled]="currentPageIndex === 0" (click)="previousPage()">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <span class="page-indicator">{{ currentPageIndex + 1 }} / {{ material.pages.length }}</span>
+          <button class="btn btn-icon" [disabled]="currentPageIndex === material.pages.length - 1" (click)="nextPage()">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar with progress -->
+    <div class="col-md-4">
+      <div class="progress-sidebar">
+        <div class="progress-section">
+          <div class="progress-header">
+            <span>{{ material.progress }}% Selesai</span>
+          </div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar" [style.width.%]="material.progress"></div>
+          </div>
+        </div>
+
+        <div class="status-section">
+          <div class="status-item">
+            <div class="status-circle" [ngClass]="{'checked': material.isRead}">
+              <i *ngIf="material.isRead" class="fas fa-check"></i>
+            </div>
+            <span class="status-text">Materi</span>
+          </div>
+          
+          <div class="status-item">
+            <div class="status-circle" [ngClass]="{'checked': material.quizCompleted}">
+              <i *ngIf="material.quizCompleted" class="fas fa-check"></i>
+            </div>
+            <span class="status-text">Kuis Latihan</span>
+          </div>
+        </div>
+
+        <div class="action-section mt-auto">
+            <button class="btn btn-quiz" [disabled]="!material.isRead" (click)="takeQuiz()">
+            <span>Kuis Latihan</span>
+            <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

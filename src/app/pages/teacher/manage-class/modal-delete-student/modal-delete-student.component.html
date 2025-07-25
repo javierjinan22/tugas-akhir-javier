@@ -1,0 +1,63 @@
+<div class="modal-content custom-modal-content">
+  <div class="modal-body position-relative">
+    <!-- Icon Warning Overlapping -->
+    <div class="icon-warning-wrapper">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
+
+    <h5 class="modal-title text-center mt-4">Konfirmasi Hapus Siswa</h5>
+    
+    <div class="text-center mt-3">
+      <p class="student-name">Anda akan menghapus siswa <strong>"{{ studentData?.nama_lengkap || studentData?.nama }}"</strong></p>
+      <p class="subtitle">Siswa akan dikeluarkan dari kelas <strong>"{{ classData?.nama_kelas }}"</strong> dan dapat ditambahkan kembali nanti.</p>
+    </div>
+
+    <!-- Student info card -->
+    <div class="student-info-card mt-3" *ngIf="studentData">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <small class="text-muted"><strong>Username:</strong></small>
+          <div>{{ studentData?.username || '-' }}</div>
+        </div>
+        <div class="text-end" *ngIf="studentData?.email">
+          <small class="text-muted"><strong>Email:</strong></small>
+          <div>{{ studentData.email }}</div>
+        </div>
+      </div>
+      <div class="mt-2" *ngIf="classData">
+        <small class="text-muted"><strong>Kelas saat ini:</strong></small>
+        <div>{{ classData.nama_kelas }} - {{ classData.tahun_ajaran || '-' }}</div>
+      </div>
+    </div>
+    
+    <!-- Action button -->
+    <div class="d-flex justify-content-center mt-4">
+      <!-- Card Hapus Siswa -->
+      <div class="action-card delete-card text-center" (click)="deleteStudent()" [class.disabled]="isDeleting">
+        <div class="icon-wrapper">
+          <fa-icon [icon]="isDeleting ? faSpinner : faUserMinus" [spin]="isDeleting" size="2x"></fa-icon>
+        </div>
+        <h6 class="action-title">
+          {{ isDeleting ? 'Menghapus...' : 'Hapus Siswa' }}
+        </h6>
+        <p class="action-text">
+          {{ isDeleting ? 'Sedang memproses penghapusan' : 'Siswa akan dikeluarkan dari kelas ini' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+      <button type="button" class="btn btn-cancel" (click)="cancelAction()" [disabled]="isDeleting">
+        {{ isDeleting ? 'Tunggu...' : 'Batal' }}
+      </button>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isDeleting">
+      <div class="spinner-wrapper">
+        <fa-icon [icon]="faSpinner" [spin]="true" size="2x"></fa-icon>
+        <p class="mt-2">Menghapus siswa dari kelas...</p>
+      </div>
+    </div>
+  </div>
+</div>

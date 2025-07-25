@@ -1,0 +1,63 @@
+<div class="modal-content custom-modal-content">
+  <div class="modal-body position-relative">
+    <!-- Icon Warning Overlapping - sama seperti modal konfirmasi lainnya -->
+    <div class="icon-warning-wrapper">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
+
+    <h5 class="modal-title text-center mt-4">Konfirmasi Pemulihan Kelas</h5>
+    
+    <div class="text-center mt-3">
+      <p class="class-name">Anda akan memulihkan kelas <strong>"{{ classData?.nama_kelas }}"</strong></p>
+      <p class="subtitle">Kelas yang dipulihkan akan kembali aktif dan dapat digunakan seperti biasa.</p>
+    </div>
+
+    <!-- Class info card -->
+    <div class="class-info-card mt-3">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <small class="text-muted"><strong>Tahun Ajaran:</strong></small>
+          <div>{{ classData?.tahun_ajaran || '-' }}</div>
+        </div>
+        <div class="text-end">
+          <small class="text-muted"><strong>Jumlah Siswa:</strong></small>
+          <div>{{ classData?.siswa?.length || 0 }} siswa</div>
+        </div>
+      </div>
+      <div class="mt-2" *ngIf="classData?.archived_at">
+        <small class="text-muted"><strong>Diarsipkan pada:</strong></small>
+        <div>{{ getArchivedDate(classData.archived_at) }}</div>
+      </div>
+    </div>
+    
+    <!-- Action buttons -->
+    <div class="d-flex justify-content-center gap-3 mt-4">
+      <!-- Card Pulihkan -->
+      <div class="action-card restore-card text-center" (click)="restoreClass()" [class.disabled]="isRestoring">
+        <div class="icon-wrapper">
+          <fa-icon [icon]="isRestoring ? faSpinner : faUndo" [spin]="isRestoring" size="2x"></fa-icon>
+        </div>
+        <h6 class="action-title">
+          {{ isRestoring ? 'Memulihkan...' : 'Pulihkan Kelas' }}
+        </h6>
+        <p class="action-text">
+          {{ isRestoring ? 'Sedang memproses pemulihan' : 'Kelas akan kembali aktif dan dapat digunakan' }}
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+      <button type="button" class="btn btn-cancel" (click)="cancelAction()" [disabled]="isRestoring">
+        {{ isRestoring ? 'Tunggu...' : 'Batal' }}
+      </button>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" *ngIf="isRestoring">
+      <div class="spinner-wrapper">
+        <fa-icon [icon]="faSpinner" [spin]="true" size="2x"></fa-icon>
+        <p class="mt-2">Memulihkan kelas...</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,89 @@
+/* Import the base view-material styles */
+@import '../view-material/view-material.component.css';
+
+/* Quiz specific styles */
+.quiz-section-title {
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 16px;
+}
+
+.quiz-intro {
+  font-size: 14px;
+}
+
+.quiz-start-message {
+  font-weight: 500;
+  margin-top: 20px;
+}
+
+.btn-start {
+  background-color: #1BB6C1;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 24px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.btn-start:hover {
+  background-color: #17a2b8;
+}
+
+/* Quiz history table */
+.quiz-history-table {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.quiz-history-table thead {
+  background-color: #f8f9fa;
+}
+
+.quiz-history-table th,
+.quiz-history-table td {
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-pass {
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+}
+
+.status-fail {
+  background-color: rgba(220, 53, 69, 0.2);
+  color: #dc3545;
+}
+
+.btn-view-detail {
+  background-color: #e9ecef;
+  border: none;
+  border-radius: 12px;
+  color: #495057;
+  font-size: 12px;
+  padding: 4px 12px;
+}
+
+.btn-view-detail:hover {
+  background-color: #dee2e6;
+}
+
+/* Bottom button */
+.action-section .btn-quiz {
+  background-color: #f7d340;
+}
+
+.action-section .btn-quiz:hover {
+  background-color: #f0c926;
+}

@@ -1,0 +1,71 @@
+<div class="quiz-result-container">
+  <!-- Header -->
+  <div class="result-header">
+    <div class="header-left">
+      <span class="close-button" (click)="goBack()">×</span>
+      <h2 class="result-title">Hasil Kuis</h2>
+    </div>
+  </div>
+  
+  <hr class="divider">
+  
+  <!-- Result content -->
+  <div class="result-content">
+    <!-- Left sidebar with quiz info -->
+    <div class="quiz-info-sidebar">
+      <div class="quiz-info">
+        <div class="info-item">
+          <strong>Tanggal Ujian :</strong> {{ formatDate(quizResult.completedAt) }}
+        </div>
+        <div class="info-item">
+          <strong>Jumlah Soal :</strong> {{ quizResult.totalQuestions }}
+        </div>
+      </div>
+      
+      <div class="score-card">
+        <div class="score-label">Total Nilai</div>
+        <div class="score-value">{{ quizResult.score }}</div>
+      </div>
+
+      
+      <button class="btn-view" (click)="goPredicate()">
+          Lihat predikat
+      </button>
+     
+    </div>
+    
+    <!-- Right content with questions -->
+    <div class="questions-review">
+      <div *ngFor="let question of quizResult.questions; let i = index" class="question-item">
+        <div class="question-header">
+          <div class="question-number-circle">{{ i + 1 }}</div>
+          <span class="question-text">{{ question.question }}</span>
+          <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
+            {{ getQuestionScore(question) }}
+          </div>
+        </div>
+        
+        <!-- Multiple choice question display -->
+        <div *ngIf="question.type === 'multiple-choice'" class="options-review">
+          <div *ngFor="let option of question.options; let optionIndex = index" 
+               class="option-item"
+               [ngClass]="getOptionClass(question, optionIndex)">
+            <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
+              <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check"></i>
+              <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times"></i>
+            </span>
+            <span class="option-text">{{ option }}</span>
+          </div>
+        </div>
+        
+        <!-- Short answer question display -->
+        <div *ngIf="question.type === 'short-answer'" class="short-answer-review">
+          <div class="user-answer">
+            <strong>Jawaban Anda:</strong>
+            <div class="answer-text">{{ question.userAnswer || 'Tidak dijawab' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

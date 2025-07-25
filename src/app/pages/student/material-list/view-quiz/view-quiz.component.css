@@ -1,0 +1,255 @@
+.quiz-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 30px auto;
+  max-width: 1300px;
+  min-height: 600px;
+  overflow: hidden;
+}
+
+/* Header styling */
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.quiz-title-section {
+  display: flex;
+  align-items: center;
+}
+
+.close-button {
+  font-size: 24px;
+  font-weight: bold;
+  margin-right: 16px;
+  cursor: pointer;
+}
+
+.quiz-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.timer {
+  background-color: white;
+  border: 1px solid #FDCE56;
+  color: #000;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 6px 12px;
+}
+
+.divider {
+  margin: 0;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Quiz content */
+.quiz-content {
+  display: flex;
+  min-height: 540px;
+}
+
+/* Question navigation */
+.question-nav {
+  width: 240px;
+  padding: 20px 0;
+  border-right: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  margin-left: 20px;
+}
+
+.nav-label {
+  font-weight: 600;
+  margin-bottom: 16px;
+  margin-left: 12px;
+}
+
+.question-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: start;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.question-number {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.question-number.active {
+  background-color: #1BB6C1;
+  color: white;
+}
+
+.question-number.answered:not(.active) {
+  background-color: #e2d370;
+}
+
+/* Question content */
+.question-content {
+  flex-grow: 1;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.question-text {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+/* Multiple choice options */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.option-label {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 36px;
+  cursor: pointer;
+  font-size: 16px;
+  user-select: none;
+}
+
+.option-label input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.option-checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 24px;
+  width: 24px;
+  background-color: white;
+  border: 2px solid #1BB6C1;
+  border-radius: 50%;
+}
+
+.option-label:hover input ~ .option-checkmark {
+  background-color: #f0f9fa;
+}
+
+.option-label input:checked ~ .option-checkmark {
+  background-color: #1BB6C1;
+}
+
+.option-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.option-label input:checked ~ .option-checkmark:after {
+  display: block;
+}
+
+.option-label .option-checkmark:after {
+  left: 8px;
+  top: 4px;
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Short answer */
+.short-answer {
+  margin-top: 16px;
+}
+
+.answer-label {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.answer-input {
+  width: 100%;
+  height: 120px;
+  padding: 12px;
+  border: 2px solid #1BB6C1;
+  border-radius: 8px;
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.answer-input:focus {
+  outline: none;
+  border-color: #0e8e98;
+  box-shadow: 0 0 0 2px rgba(27, 182, 193, 0.2);
+}
+
+/* Navigation buttons */
+.quiz-navigation {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 32px;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-button:hover:not(:disabled) {
+  background-color: #e0e0e0;
+}
+
+.nav-button i {
+  margin: 0 6px;
+}
+
+.finish-button {
+  padding: 10px 24px;
+  background-color: #FDCE56;
+  border: none;
+  border-radius: 20px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.finish-button:hover {
+  background-color: #f7c431;
+}
