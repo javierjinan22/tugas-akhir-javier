@@ -157,12 +157,22 @@
   border-color: #f7d340;
 }
 
+.status-circle.small {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.status-circle.small i {
+  font-size: 10px;
+}
+
 .status-text {
   font-weight: 500;
   font-size: 14px;
 }
 
-/* Quiz button */
 .action-section {
   margin-top: auto;
   position: absolute;
@@ -198,4 +208,101 @@
 
 .btn-quiz:not(:disabled):hover {
   background-color: #f0c926;
+}
+
+/* ✅ TAMBAH: Style untuk button quiz completed */
+.btn-quiz-completed {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.btn-quiz-completed:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+  color: white;
+}
+
+.btn-quiz-completed:focus {
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* ✅ TAMBAH: Style untuk button disabled */
+.btn-quiz.disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.btn-quiz.disabled:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.bab-list-section {
+  margin: 15px 0;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 15px;
+}
+
+.bab-header {
+  margin-bottom: 10px;
+}
+
+.bab-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.bab-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin-bottom: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.bab-item:hover {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.bab-item.current-bab {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.bab-text {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.bab-item.current-bab .bab-text {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .bab-item {
+    padding: 6px 8px;
+  }
+  
+  .bab-text {
+    font-size: 12px;
+  }
+  
+  .status-circle.small {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+  }
 }

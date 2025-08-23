@@ -1,11 +1,227 @@
+/* ✅ LAYOUT STYLES DARI CREATE-NEW-CLASS */
+.btn-back-icon {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 1.5rem;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-back-icon:hover {
+  color: #1BB6C1;
+  background-color: rgba(27, 182, 193, 0.1);
+  transform: translateX(-2px);
+}
+
+.btn-back-icon:active {
+  transform: translateX(-1px);
+}
+
+.btn-back-icon:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(27, 182, 193, 0.25);
+}
+
 .form-container {
   background: #f7f7f7;
   border-radius: 22px;
-  max-width: 980px; /* lebar ditambah */
-  margin: 40px auto;
+  /* max-width: 980px;  */
+  margin: 0 auto;
   box-shadow: 0 4px 12px rgba(36, 44, 54, 0.04);
 }
 
+/* ✅ SECTION SEPARATORS */
+.section-separator {
+  border-top: 1px solid #dee2e6;
+  margin: 30px 0;
+  padding-top: 30px;
+}
+
+/* Form fields in top section */
+.top-section .mb-3:last-child,
+.top-section .mb-4:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* ✅ WIZARD CONTAINER STYLING */
+.wizard-container {
+  /* max-width: 980px; */
+  margin: 0 auto;
+}
+
+.wizard {
+  padding: 20px 20px;
+  /* box-shadow: 0 4px 12px rgba(36, 44, 54, 0.04); */
+}
+
+/* ✅ WIZARD STYLES - Fixed vertical centering */
+.wizard .nav-tabs {
+  border: none;
+  margin-bottom: 0;
+  position: relative;
+  display: flex;
+  align-items: stretch; /* Changed from center to stretch */
+  padding: 0;
+  height: 50px; /* Fixed height instead of min-height */
+}
+
+/* Full width line behind circles - Gray background */
+.wizard .nav-tabs:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #e0e0e0;
+  transform: translateY(-50%);
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* Active line overlay - Orange progress */
+.wizard .nav-tabs:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 50%; /* Half width for step 1 */
+  height: 4px;
+  background: #ff9800;
+  transform: translateY(-50%);
+  z-index: 2;
+  transition: all 0.5s ease;
+  border-radius: 2px;
+}
+
+/* Step 2 active - full width orange line */
+.wizard.step-2 .nav-tabs:after {
+  width: 100%;
+}
+
+.wizard .nav-tabs .nav-item {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* This centers the circle in the available height */
+  height: 100%; /* Take full height of nav-tabs */
+}
+
+.wizard .nav-tabs .nav-item .nav-link {
+  width: 50px;
+  height: 50px;
+  margin: 0;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 50%;
+  color: #888;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  line-height: 1;
+  /* Remove any margin/padding that might offset the position */
+  padding: 0;
+}
+
+.wizard .nav-tabs .nav-item .nav-link:hover {
+  text-decoration: none;
+  transform: scale(1.05);
+}
+
+.wizard .nav-tabs .nav-item .nav-link.active {
+  background: #ff9800;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* ✅ FIXED: Disabled state - solid but not clickable */
+.wizard .nav-tabs .nav-item .nav-link.disabled {
+  background: #e0e0e0; /* Keep solid background */
+  color: #888; /* Keep readable text color */
+  opacity: 1; /* Remove transparency - this was the issue! */
+  pointer-events: none; /* Still not clickable */
+  cursor: not-allowed;
+  /* Add subtle visual indication that it's disabled */
+  box-shadow: none;
+}
+
+/* ✅ ALTERNATIVE: Add a subtle disabled indicator without transparency */
+.wizard .nav-tabs .nav-item .nav-link.disabled::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(240, 240, 240, 0.3); /* Very subtle overlay */
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.wizard .nav-tabs .nav-item .nav-link.disabled .step-number {
+  position: relative;
+  z-index: 2;
+}
+
+/* Step labels below circles - positioned outside the nav-tabs height */
+.step-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #888;
+  text-align: center;
+  margin-top: 15px; /* Increased to account for fixed nav-tabs height */
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 100%; /* Position below the nav-tabs */
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+}
+
+/* Active step label styling */
+.wizard .nav-item:first-child .step-label {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.wizard.step-2 .nav-item:first-child .step-label {
+  color: #888;
+  font-weight: 500;
+}
+
+.wizard.step-2 .nav-item:last-child .step-label {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+/* ✅ DISABLED LABEL STYLING */
+.wizard .nav-item .nav-link.disabled + .step-label {
+  color: #888; /* Keep readable but muted */
+  opacity: 1; /* No transparency on label either */
+}
+
+.step-number {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* ✅ FORM STYLING */
 .custom-input {
   border: 1.5px solid #15b2c4;
   border-radius: 12px;
@@ -21,6 +237,11 @@
   box-shadow: none;
 }
 
+.custom-input.is-invalid {
+  border-color: #dc3545;
+}
+
+/* ✅ CHECKBOX STYLING */
 .kelas-checkbox-group {
   display: flex;
   flex-wrap: wrap;
@@ -65,7 +286,7 @@
   border: solid #fff;
   border-width: 0 4px 4px 0;
   border-radius: 2px;
-  transform: translate(-50%, -50%) rotate(45deg); /* <--- KUNCI */
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 
 .kelas-checkbox:hover .custom-check,
@@ -73,49 +294,82 @@
   border-color: #0e8ba0;
 }
 
-
-.btn-warning {
-  background: #ffc107;
-  color: #232323;
-  font-size: 1rem;
-  border-radius: 12px;
-  font-weight: 700;
-  border: none;
+/* ✅ RADIO BUTTON STYLING */
+.radio-label {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  margin-right: 20px;
 }
 
-.btn-primary-custom {
-  font-family: Poppins, sans-serif;
-  font-weight: 500;
-  color: white;
+.radio-label input[type="radio"] {
+  display: none;
+}
+
+.radio-custom {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #15b2c4;
+  border-radius: 50%;
+  margin-right: 8px;
+  background: #fff;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom {
+  background: #15b2c4;
+  border-color: #15b2c4;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ✅ BUTTON STYLING DARI CREATE-NEW-CLASS */
+.btn-rounded {
+  border-radius: 25px;
+  padding: 12px 24px;
+  font-weight: 600;
   font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary.btn-rounded {
   background-color: #1BB6C1;
   border-color: #1BB6C1;
-  border-radius: 15px;
-  padding: 8px 16px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.btn-primary-custom:hover {
+.btn-primary.btn-rounded:hover {
   background-color: #0891b2;
   border-color: #0891b2;
+  transform: translateY(-1px);
 }
 
-.btn-outline-primary-custom{
-  font-family: Poppins, sans-serif;
-  font-weight: 500;
-  color: #212121;
-  font-size: 16px;
+.btn-outline-primary.btn-rounded {
+  color: #1BB6C1;
   border-color: #1BB6C1;
-  border-radius: 15px;
-  padding: 8px  16px;
 }
 
-.btn-outline-primary-custom:hover {
-  background-color: #0891b2;
+.btn-outline-primary.btn-rounded:hover {
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
   color: white;
-  border-color: #0891b2;
+  transform: translateY(-1px);
 }
 
+/* ✅ CKEDITOR STYLING */
 .custom-ckeditor {
   border-radius: 12px;
   background: #fff;
@@ -127,11 +381,37 @@
 
 ::ng-deep .ck-editor__editable[role="textbox"] {
   min-height: 350px !important;
-  /* font-size: 1.05rem; */
   padding-left: 8px;
   resize: vertical;
 }
 
+/* ✅ Add to your existing CSS */
+
+/* CKEditor styling untuk soal */
+.custom-ckeditor.is-invalid .ck-editor__editable {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* CKEditor untuk soal - sedikit lebih kecil dari materi */
+.question-item .custom-ckeditor .ck-editor__editable {
+  min-height: 120px !important; /* Lebih kecil dari editor materi */
+  max-height: 300px !important;
+  overflow-y: auto;
+}
+
+/* Responsive untuk CKEditor soal */
+@media (max-width: 768px) {
+  .question-item .custom-ckeditor .ck-editor__editable {
+    min-height: 100px !important;
+  }
+  
+  .question-item .custom-ckeditor .ck-toolbar {
+    flex-wrap: wrap;
+  }
+}
+
+/* ✅ TOGGLE SWITCH */
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -140,11 +420,13 @@
   margin-right: 8px;
   vertical-align: middle;
 }
+
 .toggle-switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
+
 .toggle-slider {
   position: absolute;
   cursor: pointer;
@@ -166,9 +448,183 @@
   border-radius: 50%;
   box-shadow: 0 2px 6px #bbb2;
 }
+
 .toggle-switch input:checked + .toggle-slider {
   background: #15b2c4;
 }
+
 .toggle-switch input:checked + .toggle-slider:before {
   transform: translateX(22px);
+}
+
+/* ✅ ITEM STYLING */
+.bab-item,
+.question-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  background: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* ✅ STEP CONTENT */
+.step-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.question-number {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #F9A826 !important;
+  border-radius: 6px !important;
+  width: 32px !important;
+  height: 32px !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  margin-right: 12px !important;
+  flex-shrink: 0 !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ RESPONSIVE */
+@media (max-width: 768px) {
+  .wizard {
+    padding: 25px 15px;
+  }
+  
+  .wizard .nav-tabs {
+    height: 45px; /* Reduced height for mobile */
+  }
+  
+  .wizard .nav-tabs .nav-item .nav-link {
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
+  }
+  
+  .step-number {
+    font-size: 18px;
+  }
+  
+  .step-label {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .wizard {
+    padding: 20px 10px;
+  }
+  
+  .wizard .nav-tabs {
+    height: 40px; /* Further reduced for small mobile */
+  }
+  
+  .wizard .nav-tabs .nav-item .nav-link {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .step-number {
+    font-size: 16px;
+  }
+  
+  .step-label {
+    font-size: 11px;
+    margin-top: 10px;
+  }
+}
+
+/* ✅ CSS Grid Layout untuk Jawaban dan Kunci Jawaban */
+.jawaban-kunci-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 15px;
+  margin-bottom: 10px;
+  /* padding: 0 5px; */
+}
+
+.jawaban-header {
+  /* grid-column: 2; */
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.kunci-header {
+  grid-column: 3;
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.jawaban-kunci-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.option-label {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+  min-width: 20px;
+}
+
+
+
+.option-radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+}
+
+/* ✅ Responsive adjustments */
+@media (max-width: 768px) {
+  .jawaban-kunci-header {
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+  }
+  
+  .kunci-header {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .jawaban-kunci-row {
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+  }
+  
+  .option-radio {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
 }

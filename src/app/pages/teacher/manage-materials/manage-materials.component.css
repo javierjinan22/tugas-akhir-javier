@@ -12,6 +12,73 @@
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
+  border-color: #dee2e6;
+}
+
+/* Style untuk tombol Tambah */
+.btn-primary-custom {
+  font-family: Poppins, sans-serif;
+  font-weight: 500;
+  color: white;
+  font-size: 16px;
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+  border-radius: 15px;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary-custom:hover {
+  background-color: #0891b2;
+  border-color: #0891b2;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Search bar styling - menggunakan style yang sudah ada */
+.search-bar {
+  border: 2px solid #1cc4cc;
+  border-radius: 2rem;
+  padding: 2px 10px;
+  background: #fff;
+  height: 45px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  font-size: 1rem;
+  width: 230px;
+  padding: 0;
+  margin: 0;
+}
+
+.search-bar input::placeholder {
+  color: #cfcfcf;
+  font-weight: 300;
+}
+
+.search-bar input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.search-icon {
+  color: #ffd700;
+  font-size: 1.5rem;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.search-icon:hover {
+  color: #ffed4e;
 }
 
 /* Tambahan style agar tombol/aksi tetap konsisten dengan desain sebelumnya */
@@ -23,49 +90,95 @@
   font-size: 1rem;
   cursor: pointer;
 }
+
 .aksi-separator {
   display: inline-block;
   margin: 0 2px;
 }
 
-/* Style untuk tombol Tambah dan search bar */
-.btn-primary-custom {
-  font-family: Poppins, sans-serif;
-  font-weight: 500;
-  color: white;
-  font-size: 16px;
+/* Custom styling untuk Materials component */
+.custom-materi-container {
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Badge styling */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.375em 0.5em;
+}
+
+/* Button group styling */
+.btn-group .btn {
+  border-radius: 4px;
+  margin-right: 2px;
+}
+
+.btn-group .btn:last-child {
+  margin-right: 0;
+}
+
+/* Loading and error states */
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Switch styling */
+.form-check-input {
+  width: 2.5em;
+  height: 1.25em;
+}
+
+.form-check-input:checked {
   background-color: #1BB6C1;
   border-color: #1BB6C1;
-  border-radius: 15px;
-  padding: 8px 16px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.btn-primary-custom:hover {
-  background-color: #0891b2;
-  border-color: #0891b2;
+.form-check-input:focus {
+  border-color: #1BB6C1;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(27, 182, 193, 0.25);
 }
 
-.search-bar {
-  border: 2px solid #1cc4cc;
-  border-radius: 2rem;
-  padding: 2px 10px;
-  background: #fff;
-  height: 45px;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .search-bar {
+    width: 200px;
+  }
+  
+  .search-bar input {
+    width: 160px !important;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .btn-group .btn {
+    margin-right: 0;
+    border-radius: 4px;
+  }
 }
-.search-bar input {
-  border: none;
-  outline: none;
-  box-shadow: none;
-  background: transparent;
-  font-size: 1rem;
-}
-.search-bar input::placeholder {
-  color: #cfcfcf;
-  font-weight: 300;
-}
-.search-icon {
-  color: #ffd700;
-  font-size: 1.5rem;
-  margin-left: -36px;
+
+@media (max-width: 576px) {
+  .d-flex.justify-content-end {
+    justify-content: center !important;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .search-bar {
+    width: 100% !important;
+    max-width: 300px;
+  }
+  
+  .search-bar input {
+    width: calc(100% - 40px) !important;
+  }
 }

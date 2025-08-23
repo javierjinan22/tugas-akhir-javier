@@ -1,0 +1,302 @@
+<div class="container-fluid mt-4">
+  <!-- Back button dan header -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToManageMaterials()" title="Kembali ke daftar materi">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h2 class="fw-bold mb-0" style="font-size: 24px;">Detail Materi</h2>
+    <div class="ms-auto">
+      <button class="btn btn-outline-primary btn-rounded" (click)="editMaterial()">
+        <i class="fas fa-edit me-1"></i>
+        Edit Materi
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="form-container p-4 p-md-5 mb-4">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Memuat detail materi...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMsg" class="form-container p-4 p-md-5 mb-4">
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ errorMsg }}
+    </div>
+    <button class="btn btn-secondary btn-rounded" (click)="backToManageMaterials()">
+      <i class="fas fa-arrow-left me-2"></i>
+      Kembali ke Kelola Materi
+    </button>
+  </div>
+
+  <!-- ✅ SIMPLIFIED Material Info Card -->
+  <div *ngIf="!isLoading && !errorMsg && material" class="material-info-card mb-4">
+    <div class="material-header-content">
+      <div class="material-main-info">
+        <h3 class="material-title">{{ material.title }}</h3>
+        <p class="material-description" *ngIf="material.description">{{ material.description }}</p>
+        <p class="material-description" *ngIf="!material.description">Tidak ada deskripsi</p>
+      </div>
+      
+      <div class="material-meta-info">
+        <div class="meta-row">
+          <div class="meta-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span>{{ formatDate(material.createdAt) }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="badge" [ngClass]="getStatusClass()">{{ getStatusText() }}</span>
+          </div>
+        </div>
+        
+        <div class="meta-row">
+          <div class="meta-item">
+            <i class="fas fa-users"></i>
+            <span *ngIf="material.kelasNames.length > 0">{{ material.kelasNames.join(', ') }}</span>
+            <span *ngIf="material.kelasNames.length === 0" class="text-muted">Tidak ada kelas</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas" [ngClass]="material.flagUnduh ? 'fa-download' : 'fa-download-slash'"></i>
+            <span>{{ material.flagUnduh ? 'Dapat diunduh' : 'Tidak dapat diunduh' }}</span>
+          </div>
+        </div>
+
+        <div class="meta-row" *ngIf="getTotalQuestions() > 0">
+          <div class="meta-item">
+            <i class="fas fa-clock"></i>
+            <span>Waktu pengerjaan: {{ formatWaktuPengerjaan() }}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-question-circle"></i>
+            <span>{{ getTotalQuestions() }} soal kuis</span>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabset Navigation -->
+  <div *ngIf="!isLoading && !errorMsg && material" class="wizard-container mb-4">
+    <div class="wizard" [class.step-2]="currentTab === 'quiz'">
+      <ul class="nav nav-tabs justify-content-between" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link rounded-circle d-flex align-items-center justify-content-center"
+             [class.active]="currentTab === 'materi'"
+             (click)="switchTab('materi')"
+             role="tab">
+            <span class="step-number">
+              <i class="fas fa-book"></i>
+            </span>
+          </a>
+          <div class="step-label">
+            Materi ({{ material.pages.length }} {{ material.pages.length === 1 ? 'halaman' : 'halaman' }})
+          </div>
+        </li>
+        <li class="nav-item" role="presentation">
+          <a class="nav-link rounded-circle d-flex align-items-center justify-content-center"
+             [class.active]="currentTab === 'quiz'"
+             [class.disabled]="getTotalQuestions() === 0"
+             (click)="switchTab('quiz')"
+             role="tab">
+            <span class="step-number">
+              <i class="fas fa-clipboard-question"></i>
+            </span>
+          </a>
+          <div class="step-label">
+            Kuis ({{ getTotalQuestions() }} {{ getTotalQuestions() === 1 ? 'soal' : 'soal' }})
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Tab Content -->
+  <div *ngIf="!isLoading && !errorMsg && material" class="step-content">
+    
+    <!-- TAB 1: MATERI -->
+    <div *ngIf="currentTab === 'materi'" class="form-container p-4 p-md-5">
+      <div class="tab-header mb-4">
+        <h4 class="fw-bold mb-2">Preview Materi</h4>
+        <p class="text-muted mb-0">Berikut adalah tampilan materi sebagaimana yang akan dilihat oleh siswa</p>
+      </div>
+
+      <!-- Material Content -->
+      <div *ngIf="material.pages.length > 0" class="material-content-wrapper">
+        <div class="material-page-header mb-3">
+          <span class="page-indicator-badge">
+            Halaman {{ currentPageIndex + 1 }} dari {{ material.pages.length }}
+          </span>
+        </div>
+        
+        <div class="material-content-area">
+          <div class="material-page" [innerHTML]="currentPageContent"></div>
+        </div>
+
+        <!-- Navigation Controls -->
+        <div class="material-navigation mt-4">
+          <div class="d-flex align-items-center justify-content-center gap-3">
+            <button class="btn btn-nav-custom" 
+                    [disabled]="currentPageIndex === 0" 
+                    (click)="previousPage()">
+              <i class="fas fa-chevron-left me-1"></i>
+              Sebelumnya
+            </button>
+            
+            <span class="page-indicator-text">
+              {{ currentPageIndex + 1 }} / {{ material.pages.length }}
+            </span>
+            
+            <button class="btn btn-nav-custom" 
+                    [disabled]="currentPageIndex === material.pages.length - 1" 
+                    (click)="nextPage()">
+              Selanjutnya
+              <i class="fas fa-chevron-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Material Content -->
+      <div *ngIf="material.pages.length === 0" class="no-content-message">
+        <div class="text-center py-5">
+          <i class="fas fa-book-open text-muted mb-3" style="font-size: 3rem;"></i>
+          <h5 class="text-muted mb-2">Tidak ada konten materi</h5>
+          <p class="text-muted">Belum ada BAB atau isian materi yang dibuat</p>
+          <button class="btn btn-primary btn-rounded mt-3" (click)="editMaterial()">
+            <i class="fas fa-plus me-2"></i>
+            Tambah Konten Materi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: KUIS -->
+    <div *ngIf="currentTab === 'quiz'" class="form-container p-4 p-md-5">
+      <div class="tab-header mb-4">
+        <h4 class="fw-bold mb-2">Preview Kuis</h4>
+        <p class="text-muted mb-0">Berikut adalah tampilan kuis dengan kunci jawaban sebagaimana yang akan dilihat oleh siswa</p>
+      </div>
+
+      <!-- Quiz Content -->
+      <div *ngIf="getTotalQuestions() > 0" class="quiz-content-wrapper">
+        <div class="quiz-page-header mb-3">
+          <span class="page-indicator-badge">
+            Soal {{ getQuestionNumber() }} dari {{ getTotalQuestions() }}
+          </span>
+        </div>
+
+        <div class="question-item mb-4">
+          <div class="question-header">
+            <div class="question-number">{{ getQuestionNumber() }}</div>
+            <div class="ms-2">
+              <span class="badge badge-jenis-soal">
+                {{ getCurrentQuestion().jenis_soal === 'pilihan_ganda' ? 'Pilihan Ganda' : 'Isian Singkat' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Soal -->
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Soal</label>
+            <div class="question-content" [innerHTML]="getCurrentQuestion().soal"></div>
+          </div>
+
+          <!-- Pilihan Ganda -->
+          <ng-container *ngIf="getCurrentQuestion().jenis_soal === 'pilihan_ganda'">
+            <div class="mb-3">
+              <div class="jawaban-kunci-header">
+                <div class="jawaban-header">Pilihan Jawaban</div>
+              </div>
+              
+              <div class="answer-options">
+                <div *ngFor="let jawaban of getCurrentQuestion().jawaban; let j = index" 
+                     class="row align-items-center mb-2">
+                  <div class="col-auto fw-semibold">{{ jawaban.label }}.</div>
+                  <div class="col">
+                    <div class="answer-text" 
+                         [ngClass]="{'correct-answer': getCurrentQuestion().kunci_jawaban === jawaban.label}">
+                      {{ jawaban.text }}
+                    </div>
+                  </div>
+                  <div class="col-auto">
+                    <span *ngIf="getCurrentQuestion().kunci_jawaban === jawaban.label" 
+                          class="badge bg-success">
+                      <i class="fas fa-check me-1"></i>Benar
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Isian Singkat -->
+          <ng-container *ngIf="getCurrentQuestion().jenis_soal === 'isian_singkat'">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Kunci Jawaban</label>
+              <div class="correct-answer-display">
+                <i class="fas fa-key me-2"></i>
+                {{ getCurrentQuestion().kunci_jawaban }}
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Quiz Navigation -->
+        <div class="quiz-navigation mt-4">
+          <div class="d-flex align-items-center justify-content-center gap-3">
+            <button class="btn btn-nav-custom" 
+                    [disabled]="currentQuizIndex === 0" 
+                    (click)="previousQuestion()">
+              <i class="fas fa-chevron-left me-1"></i>
+              Sebelumnya
+            </button>
+            
+            <span class="page-indicator-text">
+              {{ getQuestionNumber() }} / {{ getTotalQuestions() }}
+            </span>
+            
+            <button class="btn btn-nav-custom" 
+                    [disabled]="currentQuizIndex === getTotalQuestions() - 1" 
+                    (click)="nextQuestion()">
+              Selanjutnya
+              <i class="fas fa-chevron-right ms-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Quiz Content -->
+      <div *ngIf="getTotalQuestions() === 0" class="no-content-message">
+        <div class="text-center py-5">
+          <i class="fas fa-question-circle text-muted mb-3" style="font-size: 3rem;"></i>
+          <h5 class="text-muted mb-2">Tidak ada kuis</h5>
+          <p class="text-muted">Belum ada soal kuis yang dibuat untuk materi ini</p>
+          <button class="btn btn-primary btn-rounded mt-3" (click)="editMaterial()">
+            <i class="fas fa-plus me-2"></i>
+            Tambah Soal Kuis
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div *ngIf="!isLoading && !errorMsg && material" class="d-flex gap-3 justify-content-center mt-4 mb-5">
+    <button class="btn btn-outline-secondary btn-rounded" (click)="backToManageMaterials()">
+      <i class="fas fa-arrow-left me-1"></i>
+      Kembali
+    </button>
+    <button class="btn btn-primary btn-rounded" (click)="editMaterial()">
+      <i class="fas fa-edit me-1"></i>
+      Edit Materi
+    </button>
+  </div>
+</div>

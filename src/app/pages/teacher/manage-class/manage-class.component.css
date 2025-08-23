@@ -86,6 +86,9 @@
 }
 
 /* Custom styling for manage class component */
+.custom-class-container {
+  font-family: 'Poppins', sans-serif;
+}
 
 /* Button group styling */
 .btn-group .btn {
@@ -115,8 +118,8 @@
 }
 
 .form-check-input:checked {
-  background-color: #198754;
-  border-color: #198754;
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
 }
 
 .form-check-input:focus {

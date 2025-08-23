@@ -1,57 +1,186 @@
 <div class="container-fluid mt-4 custom-materi-container">
   <h2 class="fw-bold mb-4" style="font-size: 24px;">Daftar materi anda</h2>
 
-  <div class="d-flex justify-content-end align-items-center mb-3">
-    <button class="btn btn-primary-custom" (click)="onTambah()">
-      Tambah
+  <!-- Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshMaterials()">
+      <i class="fas fa-sync-alt me-1"></i>Coba Lagi
     </button>
   </div>
 
-  <div class="d-flex justify-content-end align-items-center mb-3">
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-3" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat daftar materi...</p>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="d-flex justify-content-end align-items-center mb-3" *ngIf="!loading && getTotalMaterialsCount() > 0">
+    <button class="btn btn-primary-custom" (click)="onTambah()">
+      <i class="fas fa-plus me-1"></i>
+      Tambah materi
+    </button>
+  </div>
+
+  <!-- Search bar -->
+  <div class="d-flex justify-content-end align-items-center mb-3" *ngIf="!loading && getTotalMaterialsCount() > 0">
     <div class="search-bar d-flex align-items-center">
       <input 
         #searchInput
         type="text"
         class="form-control rounded-pill me-2"
-        placeholder="Cari"
-        [(ngModel)]="keyword"
+        placeholder="Cari judul materi atau kelas"
+        [(ngModel)]="keyword"  
         (keydown.enter)="onSearch()"
+        (input)="onSearch()"
         style="width: 230px;" />
 
-      <span class="search-icon" (click)="onSearch()">
+      <span class="search-icon" (click)="onSearchIconClick()" style="cursor: pointer;">
         <i class="fa fa-search"></i>
       </span>
     </div>
   </div>
 
-  <div class="table-responsive">
+  <!-- Materials table -->
+  <div class="table-responsive" *ngIf="!loading && !errorMsg">
     <table class="table align-middle table-bordered text-center">
-      <thead>
+      <thead class="table-light">
         <tr>
           <th>No.</th>
           <th>Judul Materi</th>
           <th>Kelas tertaut</th>
+          <th>Jumlah Soal</th>
+          <th>Status</th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let materi of filteredMateri; let i = index">
           <td>{{ i + 1 }}.</td>
-          <td>{{ materi.judul }}</td>
-          <td>{{ materi.kelas.join(', ') }}</td>
-          <td class="aksi-cell">
-            <a href="#" (click)="lihatMateri(materi)">Lihat</a>
-            <span class="aksi-separator"></span>
-            <a [routerLink]="['/guru/kelola-materi/edit-materi']" (click)="editMateri()">Edit</a>
-            <span class="aksi-separator"></span>
-            <a href="#" (click)="hapusMateri(materi)">Hapus</a>
+          <td class="text-start">
+            <span>{{ materi.judul }}</span>
+          </td>
+          <td>
+            <div *ngIf="materi.kelas.length > 0; else noClass">
+              <span *ngFor="let kelas of materi.kelas; let last = last" 
+                    class=" me-1 mb-1">
+                {{ kelas }}<span *ngIf="!last">,</span>
+              </span>
+            </div>
+            <ng-template #noClass>
+              <span class="text-muted">Belum ditautkan</span>
+            </ng-template>
+          </td>
+          <td>
+            <span>
+              {{ materi.soal_count }} soal
+            </span>
+          </td>
+          <td>
+            <div class="d-flex align-items-center justify-content-center">
+              <!-- Status Badge -->
+              <span class="badge me-2" 
+                    [class.bg-success]="materi.is_active" 
+                    [class.bg-secondary]="!materi.is_active">
+                {{ materi.is_active ? 'Aktif' : 'Tidak Aktif' }}
+              </span>
+              
+              <!-- Toggle Switch -->
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  [id]="'switch-' + materi._id"
+                  [checked]="materi.is_active"
+                  [disabled]="isToggling(materi._id)"
+                  (change)="toggleMaterialStatus(materi, $event)"
+                  [title]="materi.is_active ? 'Klik untuk menonaktifkan materi' : 'Klik untuk mengaktifkan materi'"
+                  style="cursor: pointer;">
+                
+                <!-- Loading spinner for toggle -->
+                <i *ngIf="isToggling(materi._id)" 
+                   class="fas fa-spinner fa-spin text-primary ms-1" 
+                   style="font-size: 12px;"></i>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="btn-group" role="group" aria-label="Aksi materi">
+              <!-- Lihat Detail -->
+              <button 
+                class="btn btn-sm btn-outline-primary" 
+                (click)="lihatMateri(materi)" 
+                [title]="'Lihat detail materi ' + materi.judul"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top">
+                <i class="fas fa-eye"></i>
+              </button>
+              
+              <!-- Edit Materi -->
+              <button 
+                class="btn btn-sm btn-outline-warning" 
+                (click)="editMateri(materi)" 
+                [title]="'Edit materi ' + materi.judul"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top">
+                <i class="fas fa-edit"></i>
+              </button>
+              
+              <!-- Hapus Materi -->
+              <button 
+                class="btn btn-sm btn-outline-danger" 
+                (click)="hapusMateri(materi)" 
+                [title]="'Hapus materi ' + materi.judul"
+                [disabled]="isDeleting(materi._id)"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top">
+                <i *ngIf="!isDeleting(materi._id)" class="fas fa-trash"></i>
+                <i *ngIf="isDeleting(materi._id)" class="fas fa-spinner fa-spin"></i>
+              </button>
+            </div>
           </td>
         </tr>
-        <tr *ngIf="filteredMateri.length === 0">
-          <td colspan="4" class="text-center text-secondary py-4">Data tidak ditemukan.</td>
+        
+        <!-- No data row -->
+        <tr *ngIf="getFilteredMaterialsCount() === 0 && keyword.trim()">
+          <td colspan="6" class="text-center text-secondary py-4">
+            <i class="fas fa-search me-2"></i>
+            Tidak ditemukan materi dengan kata kunci "{{ keyword }}"
+          </td>
+        </tr>
+        
+        <!-- No materials at all -->
+        <tr *ngIf="getTotalMaterialsCount() === 0 && !keyword.trim()">
+          <td colspan="6" class="text-center text-secondary py-4">
+            <i class="fas fa-book me-2"></i>
+            Belum ada materi yang dibuat.
+            <br>
+            <button class="btn btn-primary btn-sm mt-2" (click)="onTambah()">
+              <i class="fas fa-plus me-1"></i>Buat Materi Pertama
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Stats info - UPDATED untuk menunjukkan bahwa inactive materials tetap dihitung -->
+  <div *ngIf="!loading && !errorMsg && getTotalMaterialsCount() > 0" class="mt-3">
+    <small class="text-muted">
+      <i class="fas fa-info-circle me-1"></i>
+      Total: {{ getTotalMaterialsCount() }} materi
+      <span *ngIf="getFilteredMaterialsCount() !== getTotalMaterialsCount()">
+        (menampilkan {{ getFilteredMaterialsCount() }} materi)
+      </span>
+      • 
+      <span class="text-success">Aktif: {{ getActiveMaterialsCount() }}</span>
+      • 
+      <span class="text-secondary">Tidak Aktif: {{ getInactiveMaterialsCount() }}</span>
+    </small>
   </div>
 </div>
 

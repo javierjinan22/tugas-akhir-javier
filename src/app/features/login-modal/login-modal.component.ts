@@ -58,7 +58,7 @@ export class LoginModalComponent implements OnInit {
         if (res.role === 'guru') {
           this.handleTeacherLogin();
         } else if (res.role === 'siswa') {
-          this.router.navigate(['/siswa/dashboard']);
+          this.handleStudentLogin();
         }
       },
       err => {
@@ -95,6 +95,32 @@ export class LoginModalComponent implements OnInit {
       }
     });
   }
+
+  private handleStudentLogin() {
+  // Ambil profil siswa (sekolah & kelas) dari endpoint /users/me
+  this.authService.getProfile().subscribe({
+    next: (profileRes) => {
+      if (profileRes.success && profileRes.data) {
+        // Simpan info sekolah dan kelas di localStorage
+        if (profileRes.data.sekolah) {
+          localStorage.setItem('schoolId', profileRes.data.sekolah.id);
+          localStorage.setItem('schoolName', profileRes.data.sekolah.nama);
+        }
+        if (profileRes.data.kelas) {
+          localStorage.setItem('classId', profileRes.data.kelas.id);
+          localStorage.setItem('className', profileRes.data.kelas.nama_kelas);
+        }
+      }
+      // Redirect ke dashboard siswa
+      this.router.navigate(['/siswa/dashboard']);
+    },
+    error: (err) => {
+      console.error('❌ Error getProfile:', err);
+      // Tetap redirect, bisa tampilkan pesan error jika perlu
+      this.router.navigate(['/siswa/dashboard']);
+    }
+  });
+}
 
   private checkSchoolClasses(school: School) {
     // Cek kelas dari response getMySchool (tidak perlu API call terpisah)

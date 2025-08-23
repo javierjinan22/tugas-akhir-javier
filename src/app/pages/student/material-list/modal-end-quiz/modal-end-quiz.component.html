@@ -6,15 +6,32 @@
     </div>
   </div>
 
-  <h5 class="modal-title text-center mt-4">Anda yakin mengakhiri kuis sekarang?</h5>
-
-  <div class="d-flex justify-content-between mt-4 px-3">
-    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
-      Batal
-    </button>
-    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
-      Akhiri kuis
-    </button>
+  <!-- ✅ UPDATE: Loading state saat submit -->
+  <div *ngIf="isSubmitting" class="text-center">
+    <div class="spinner-border spinner-border-sm mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <h5 class="modal-title">Menyimpan jawaban...</h5>
+    <p class="text-muted">Mohon tunggu sebentar</p>
   </div>
 
+  <!-- ✅ Normal state -->
+  <div *ngIf="!isSubmitting">
+    <h5 class="modal-title text-center mt-4">Anda yakin mengakhiri kuis sekarang?</h5>
+
+    <div class="d-flex justify-content-between mt-4 px-3">
+      <button 
+        class="btn btn-outline-primary btn-rounded" 
+        (click)="onCancelClicked()"
+        [disabled]="isSubmitting">
+        Batal
+      </button>
+      <button 
+        class="btn btn-primary btn-rounded" 
+        (click)="onSubmitClicked()"
+        [disabled]="isSubmitting">
+        Akhiri kuis
+      </button>
+    </div>
+  </div>
 </div>

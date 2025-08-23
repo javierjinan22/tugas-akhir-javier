@@ -1,66 +1,79 @@
 <div class="view-material-container">
-  <div class="row">
+  <!-- ✅ Loading state -->
+  <div *ngIf="loading" class="text-center p-4">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Memuat data kuis...</p>
+  </div>
+
+  <!-- ✅ Error state -->
+  <div *ngIf="error && !loading" class="alert alert-danger m-4">
+    <i class="fas fa-exclamation-triangle"></i>
+    {{ error }}
+    <button class="btn btn-primary btn-sm ms-2" (click)="loadMaterialData()">Coba Lagi</button>
+  </div>
+
+  <!-- ✅ Main content - hanya tampil jika data sudah dimuat -->
+  <div *ngIf="!loading && !error && material" class="row">
     <!-- Main content area -->
     <div class="col-md-8">
       <div class="material-content-card">
         <div class="material-header">
-          <a [routerLink]="['/siswa/materi/lihat-materi', material.slug]" class="back-button">
+          <!-- ✅ Perbaikan: gunakan materialId -->
+          <button class="back-button" (click)="goBackToMaterial()">
             <i class="fa-solid fa-arrow-left"></i>
-          </a>
+          </button>
           <h4 class="material-title">{{ material.title }}</h4>
         </div>
 
         <div class="material-content">
-          <div class="quiz-intro">
-            <h5 class="quiz-section-title">Aturan</h5>
-            <p>
-              Ini adalah modul untuk menguji pengetahuan Anda tentang materi yang sudah Anda pelajari.
-              Terdapat 5 pertanyaan yang harus dikerjakan dalam ujian ini. Beberapa ketentuan dari ujian ini
-              adalah:
-            </p>
-            <ul>
-              <li>Syarat nilai kelulusan : 75%</li>
-              <li>Durasi ujian : 10 menit</li>
-            </ul>
-            <p>
-              Apabila tidak memenuhi syarat kelulusan, maka Anda harus menunggu selama 1 menit untuk
-              mengulang pengerjaan ujian kembali.
-            </p>
-            <p class="quiz-start-message">Selamat Mengerjakan!</p>
+          <div class="quiz-intro" [innerHTML]="currentPageContent"></div>
 
-            <div class="text-end">
-              <button class="btn btn-start" (click)="startQuiz()">Mulai</button>
-            </div>
+          <div class="text-end">
+            <button class="btn btn-start" (click)="startQuiz()">
+              {{ getStartQuizButtonText() }}
+            </button>
+          </div>
 
-            <h5 class="quiz-section-title mt-4">Riwayat</h5>
-            <div class="table-responsive">
-              <table class="table quiz-history-table">
-                <thead>
-                  <tr>
-                    <th>Tanggal</th>
-                    <th>Nilai</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let attempt of quizAttempts">
-                    <td>{{ attempt.date | date: 'dd MMM yyyy HH:mm' }}</td>
-                    <td>{{ attempt.score }}</td>
-                    <td>
-                      <span class="status-badge" [ngClass]="{'status-pass': attempt.isPassed, 'status-fail': !attempt.isPassed}">
-                        {{ attempt.isPassed ? 'Lulus' : 'Tidak Lulus' }}
-                      </span>
-                    </td>
-                    <td>
-                      <button class="btn btn-view-detail" (click)="viewQuizDetail(attempt)">
-                        Lihat Detail
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <h5 class="quiz-section-title mt-4">
+            {{ material?.quizCompleted ? 'Riwayat Pengerjaan' : 'Riwayat' }}
+          </h5>
+
+          <div class="table-responsive">
+            <table class="table quiz-history-table">
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Nilai</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- ✅ Tampilkan pesan jika tidak ada riwayat -->
+                <tr *ngIf="quizAttempts.length === 0">
+                  <td colspan="4" class="text-center text-muted">
+                    Belum ada riwayat pengerjaan kuis
+                  </td>
+                </tr>
+                
+                <tr *ngFor="let attempt of quizAttempts">
+                  <td>{{ attempt.date | date: 'dd MMM yyyy HH:mm' }}</td>
+                  <td>{{ attempt.score }}</td>
+                  <td>
+                    <span class="status-badge" [ngClass]="{'status-pass': attempt.isPassed, 'status-fail': !attempt.isPassed}">
+                      {{ attempt.isPassed ? 'Lulus' : 'Tidak Lulus' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-view-detail" (click)="viewQuizDetail(attempt)">
+                      Lihat Detail
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>

@@ -48,7 +48,6 @@ export class ManageClassComponent implements OnInit {
       next: (response: ClassesBySchoolResponse) => {
 
         if (response.success && response.data && Array.isArray(response.data)) {
-          // ✅ FILTER: Hanya tampilkan kelas yang TIDAK diarsipkan (archived_at = null)
           this.kelas = response.data.filter(cls => !cls.archived_at);
           this.filteredKelas = [...this.kelas];
           
@@ -60,7 +59,7 @@ export class ManageClassComponent implements OnInit {
         this.loading = false;
       },
       error: (err) => {
-        console.error('❌ Error fetching classes:', err);
+        console.error(err);
         this.errorMsg = 'Gagal memuat data kelas. Silakan coba lagi.';
         this.kelas = [];
         this.filteredKelas = [];
@@ -97,8 +96,7 @@ export class ManageClassComponent implements OnInit {
   editKelas(kelas: any) {
     this.router.navigate(['/guru/kelola-kelas/edit-kelas', kelas._id]);
   }
-
-  // Updated hapus kelas to use modal
+ 
   hapusKelas(kelas: any) {
     const initialState = {
       classData: kelas
@@ -108,7 +106,7 @@ export class ManageClassComponent implements OnInit {
       ModalConfirmationDeleteComponent, 
       {
         initialState,
-        class: 'modal-dialog-centered', // Hilangkan modal-lg untuk ukuran yang lebih compact
+        class: 'modal-dialog-centered', 
         backdrop: 'static'
       }
     );
@@ -137,11 +135,11 @@ export class ManageClassComponent implements OnInit {
         this.kelas = this.kelas.filter(k => k._id !== kelas._id);
         this.filteredKelas = this.filteredKelas.filter(k => k._id !== kelas._id);
         
-        if (isPermanent) {
-          alert(`Kelas "${kelas.nama_kelas}" berhasil dihapus secara permanen.`);
-        } else {
-          alert(`Kelas "${kelas.nama_kelas}" berhasil diarsipkan.`);
-        }
+        // if (isPermanent) {
+        //   alert(`Kelas "${kelas.nama_kelas}" berhasil dihapus secara permanen.`);
+        // } else {
+        //   alert(`Kelas "${kelas.nama_kelas}" berhasil diarsipkan.`);
+        // }
         
         this.deletingClass[kelas._id] = false;
       },
@@ -156,7 +154,7 @@ export class ManageClassComponent implements OnInit {
           errorMessage = 'Kelas tidak ditemukan.';
         }
         
-        alert(errorMessage);
+        // alert(errorMessage);
         this.deletingClass[kelas._id] = false;
       }
     });
@@ -203,7 +201,7 @@ export class ManageClassComponent implements OnInit {
           errorMessage = 'Kelas tidak ditemukan.';
         }
         
-        alert(errorMessage);
+        // alert(errorMessage);
         this.togglingClass[kelas._id] = false;
       }
     });

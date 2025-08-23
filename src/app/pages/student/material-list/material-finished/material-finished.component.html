@@ -2,7 +2,7 @@
   <div *ngFor="let material of completedMaterials; let last = last">
     <div class="material-item">
       <div class="d-flex justify-content-between align-items-center">
-        <h5 class="material-title">{{ material.title }}</h5>
+        <h5 class="material-title">{{ material.judul_materi }}</h5>
         <div class="button-group">
           <button 
             *ngIf="material.izinkan_unduh === 1"

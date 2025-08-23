@@ -4,10 +4,10 @@
     <div class="col-md-8">
       <div class="material-content-card">
         <div class="material-header">
-          <a [routerLink]="['/siswa/materi']" class="back-button">
+          <button class="back-button" (click)="goBack()">
             <i class="fa-solid fa-arrow-left"></i>
-          </a>
-          <h4 class="material-title">{{ material.title }}</h4>
+          </button>
+          <h4 class="material-title">{{ material?.title }}</h4>
         </div>
 
         <div class="material-content">
@@ -40,6 +40,7 @@
         </div>
 
         <div class="status-section">
+          <!-- Status Materi (keseluruhan) -->
           <div class="status-item">
             <div class="status-circle" [ngClass]="{'checked': material.isRead}">
               <i *ngIf="material.isRead" class="fas fa-check"></i>
@@ -47,6 +48,26 @@
             <span class="status-text">Materi</span>
           </div>
           
+          <!-- ✅ TAMBAH: Daftar Bab dengan title -->
+          <div class="bab-list-section" *ngIf="material?.pages && material.pages.length > 0">
+            <div class="bab-header">
+              <span class="bab-title">Daftar Bab:</span>
+            </div>
+            
+            <div class="bab-item" 
+                 *ngFor="let page of material.pages; let i = index" 
+                 [ngClass]="{'current-bab': i === currentPageIndex}"
+                 (click)="loadPage(i)">
+              <div class="status-circle small" [ngClass]="{'checked': page.isRead}">
+                <i *ngIf="page.isRead" class="fas fa-check"></i>
+              </div>
+              <span class="bab-text" [title]="page.title">
+                {{ i + 1 }}. {{ page.title | slice:0:30 }}{{ page.title.length > 30 ? '...' : '' }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Status Kuis -->
           <div class="status-item">
             <div class="status-circle" [ngClass]="{'checked': material.quizCompleted}">
               <i *ngIf="material.quizCompleted" class="fas fa-check"></i>
@@ -56,11 +77,12 @@
         </div>
 
         <div class="action-section mt-auto">
-            <button class="btn btn-quiz" [disabled]="!material.isRead" (click)="takeQuiz()">
-            <span>Kuis Latihan</span>
+          <button [class]="getQuizButtonClass()" [disabled]="!canTakeQuiz()" (click)="takeQuiz()">
+            <span>{{ getQuizButtonText() }}</span>
             <i class="fas fa-arrow-right"></i>
-            </button>
+          </button>
         </div>
+        
       </div>
     </div>
   </div>

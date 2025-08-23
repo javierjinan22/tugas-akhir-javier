@@ -39,6 +39,7 @@
             formControlName="soal"
             [editor]="Editor"
             [config]="editorConfig"
+            (ready)="onEditorReady($event)"
             class="custom-ckeditor"
           ></ckeditor>
         </div>

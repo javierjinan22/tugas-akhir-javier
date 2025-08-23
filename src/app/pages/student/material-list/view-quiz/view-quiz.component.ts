@@ -3,20 +3,21 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { interval, Subscription } from 'rxjs';
 import { ModalEndQuizComponent } from '../modal-end-quiz/modal-end-quiz.component';
+import { StudentProgressService } from '../../../../service/student-progress.service';
 
 interface QuizQuestion {
   id: number;
-  type: 'multiple-choice' | 'short-answer';
+  type: 'pilihan_ganda' | 'isian_singkat';
   question: string;
   options?: string[];
-  correctAnswer?: string | number;
+  correctAnswer?: string;
   userAnswer?: string | number;
 }
 
 interface Quiz {
-  id: number;
+  id: string;
   title: string;
-  timeLimit: number; // in seconds
+  timeLimit: number; 
   questions: QuizQuestion[];
 }
 
@@ -26,91 +27,31 @@ interface Quiz {
   styleUrls: ['./view-quiz.component.css']
 })
 export class ViewQuizComponent implements OnInit, OnDestroy {
-  quiz: Quiz = {
-    id: 1,
-    title: 'Akhiri Kuis',
-    timeLimit: 1000, // 10 minutes
-    questions: [
-      {
-        id: 1,
-        type: 'multiple-choice',
-        question: 'Bagaimana sikap yang benar saat mengomentari postingan teman di internet?',
-        options: [
-          'Menggunakan kata-kata kasar agar teman merasa malu',
-          'Memberikan komentar yang sopan dan membangun',
-          'Menghina teman karena pendapatnya berbeda',
-          'Tidak peduli dan mengabaikan teman'
-        ],
-        correctAnswer: 1
-      },
-      {
-        id: 2,
-        type: 'short-answer',
-        question: 'Bagaimana pendapat anda mengenai penyebaran berita hoax di internet?',
-        correctAnswer: ''
-      },
-      {
-        id: 3,
-        type: 'multiple-choice',
-        question: 'Apa yang sebaiknya dilakukan ketika menemukan informasi di internet?',
-        options: [
-          'Langsung mempercayai informasi tersebut',
-          'Membagikan informasi tersebut ke semua teman',
-          'Mengecek kebenaran informasi dari beberapa sumber',
-          'Mengabaikan semua informasi'
-        ],
-        correctAnswer: 2
-      },
-      {
-        id: 4,
-        type: 'multiple-choice',
-        question: 'Apa yang dimaksud dengan etika digital?',
-        options: [
-          'Cara menggunakan gadget',
-          'Aturan penggunaan internet yang baik dan benar',
-          'Hukum tentang internet',
-          'Cara menginstal aplikasi'
-        ],
-        correctAnswer: 1
-      },
-      {
-        id: 5,
-        type: 'short-answer',
-        question: 'Jelaskan bagaimana cara anda menjaga privasi saat menggunakan media sosial?',
-        correctAnswer: ''
-      },
-      {
-        id: 6,
-        type: 'short-answer',
-        question: 'Jelaskan bagaimana cara anda menjaga privasi saat menggunakan media sosial?',
-        correctAnswer: ''
-      }
-    ]
-  };
-
+  quiz: Quiz | null = null;
   currentQuestionIndex: number = 0;
   remainingTime: number = 0;
   timerSubscription?: Subscription;
   materialId: string = '';
+  loading: boolean = false;
+  error: string = '';
 
-  get currentQuestion(): QuizQuestion {
-    return this.quiz.questions[this.currentQuestionIndex];
+  get currentQuestion(): QuizQuestion | null {
+    return this.quiz?.questions[this.currentQuestionIndex] || null;
   }
 
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private studentProgressService: StudentProgressService
   ) { }
 
   ngOnInit(): void {
-    // Get material ID from route
     this.route.params.subscribe(params => {
-      this.materialId = params['id'] || '1';
-      
-      // Load quiz data (in a real app this would be from an API)
-      this.loadQuizState();
-      this.startTimer();
+      this.materialId = params['id'];
+      if (this.materialId) {
+        this.loadQuizData();
+      }
     });
   }
 
@@ -121,36 +62,111 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadQuizState(): void {
-    // Check localStorage for saved quiz state
-    const savedState = localStorage.getItem(`quiz_${this.materialId}_state`);
-    
-    if (savedState) {
-      const state = JSON.parse(savedState);
-      this.currentQuestionIndex = state.currentQuestionIndex || 0;
-      
-      // Load saved answers
-      if (state.answers) {
-        state.answers.forEach((answer: any, index: number) => {
-          if (index < this.quiz.questions.length) {
-            this.quiz.questions[index].userAnswer = answer;
-          }
-        });
+  // ✅ Load quiz data dari API
+  loadQuizData(): void {
+    this.loading = true;
+    this.error = '';
+
+    this.studentProgressService.getMateriDetailForViewing(this.materialId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          const materialData = response.data.material;
+          const quizData = response.data.quiz;
+
+          // ✅ Transform API data ke format komponen
+          this.quiz = {
+            id: materialData.id,
+            title: materialData.title,
+            timeLimit: (materialData.waktu_pengerjaan || 10) * 60, // konversi menit ke detik
+            questions: quizData.questions.map((q: any, index: number) => ({
+              id: index,
+              type: q.type === 'pilihan_ganda' ? 'pilihan_ganda' : 'isian_singkat',
+              question: q.question,
+              options: q.options || [],
+              correctAnswer: q.correct_answer,
+              userAnswer: undefined
+            }))
+          };
+
+          this.loadQuizState();
+          this.startTimer();
+        } else {
+          this.error = 'Gagal memuat data kuis';
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading quiz data:', error);
+        this.error = 'Gagal memuat data kuis';
+        this.loading = false;
       }
-    }
+    });
+  }
+
+  loadQuizState(): void {
+  if (!this.quiz) return;
+
+  // ✅ Check if quiz was completed - if yes, start fresh
+  const completedResult = localStorage.getItem(`quiz_result_${this.materialId}`);
+  if (completedResult) {
+    console.log('🔄 Quiz was completed before, starting fresh');
+    this.clearQuizState();
+    this.remainingTime = this.quiz.timeLimit;
+    return;
+  }
+
+  // Check localStorage for saved quiz state
+  const savedState = localStorage.getItem(`quiz_${this.materialId}_state`);
+  
+  if (savedState) {
+    const state = JSON.parse(savedState);
+    this.currentQuestionIndex = state.currentQuestionIndex || 0;
     
-    // Check timer
+    // Load saved answers
+    if (state.answers) {
+      state.answers.forEach((answer: any, index: number) => {
+        if (index < this.quiz!.questions.length) {
+          this.quiz!.questions[index].userAnswer = answer;
+        }
+      });
+    }
+
+    // ✅ PERBAIKAN: Check timer dengan validasi yang lebih ketat
     const savedTimer = localStorage.getItem(`quiz_${this.materialId}_timer`);
     if (savedTimer) {
-      const timerData = JSON.parse(savedTimer);
-      const elapsedTime = Math.floor((Date.now() - timerData.startTime) / 1000);
-      this.remainingTime = Math.max(0, timerData.remainingTime - elapsedTime);
+      try {
+        const timerData = JSON.parse(savedTimer);
+        const elapsedTime = Math.floor((Date.now() - timerData.startTime) / 1000);
+        const timeLeft = timerData.remainingTime - elapsedTime;
+        
+        // ✅ Jika waktu sudah habis atau kurang dari 0, reset timer
+        if (timeLeft <= 0) {
+          console.log('⏰ Timer expired, resetting to full time');
+          this.remainingTime = this.quiz.timeLimit;
+          this.clearTimerState(); // Clear hanya timer state
+        } else {
+          this.remainingTime = Math.max(0, timeLeft);
+        }
+      } catch (error) {
+        console.error('Error parsing timer data:', error);
+        this.remainingTime = this.quiz.timeLimit;
+      }
     } else {
       this.remainingTime = this.quiz.timeLimit;
     }
+  } else {
+    // ✅ Fresh start - full time
+    this.remainingTime = this.quiz.timeLimit;
   }
+}
+
+private clearTimerState(): void {
+  localStorage.removeItem(`quiz_${this.materialId}_timer`);
+}
 
   saveQuizState(): void {
+    if (!this.quiz) return;
+
     // Save current question index and answers
     const answers = this.quiz.questions.map(q => q.userAnswer || null);
     
@@ -167,20 +183,24 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   }
 
   startTimer(): void {
-    this.timerSubscription = interval(1000).subscribe(() => {
-      if (this.remainingTime > 0) {
-        this.remainingTime--;
-        // Save timer state every 10 seconds
-        if (this.remainingTime % 10 === 0) {
-          this.saveQuizState();
-        }
-      } else {
-        // Time's up - automatically submit the quiz
-        // this.finishQuiz();
-        this.remainingTime = 30;
-      }
-    });
+  // ✅ Stop existing timer if any
+  if (this.timerSubscription) {
+    this.timerSubscription.unsubscribe();
   }
+
+  this.timerSubscription = interval(1000).subscribe(() => {
+    if (this.remainingTime > 0) {
+      this.remainingTime--;
+      // Save timer state every 10 seconds
+      if (this.remainingTime % 10 === 0) {
+        this.saveQuizState();
+      }
+    } else {
+      // Time's up - automatically submit the quiz
+      this.finishQuiz();
+    }
+  });
+}
 
   formatTime(seconds: number): string {
     const minutes = Math.floor(seconds / 60);
@@ -196,14 +216,14 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   }
 
   nextQuestion(): void {
-    if (this.currentQuestionIndex < this.quiz.questions.length - 1) {
+    if (this.quiz && this.currentQuestionIndex < this.quiz.questions.length - 1) {
       this.currentQuestionIndex++;
       this.saveQuizState();
     }
   }
 
   goToQuestion(index: number): void {
-    if (index >= 0 && index < this.quiz.questions.length) {
+    if (this.quiz && index >= 0 && index < this.quiz.questions.length) {
       this.currentQuestionIndex = index;
       this.saveQuizState();
     }
@@ -214,70 +234,163 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   }
 
   isQuestionAnswered(index: number): boolean {
+    if (!this.quiz) return false;
     const question = this.quiz.questions[index];
     return question.userAnswer !== undefined && question.userAnswer !== null && question.userAnswer !== '';
   }
 
-  // Update the finishQuiz method
-finishQuiz(): void {
+  finishQuiz(): void {
+  if (!this.quiz) return;
+
+  // ✅ Stop timer sebelum submit
+  if (this.timerSubscription) {
+    this.timerSubscription.unsubscribe();
+  }
+
   // Save final state
   this.saveQuizState();
   
-  // Calculate score (for multiple choice questions)
-  let correctAnswers = 0;
-  let totalMultipleChoice = 0;
-  
-  this.quiz.questions.forEach(question => {
-    if (question.type === 'multiple-choice') {
-      totalMultipleChoice++;
-      if (question.userAnswer === question.correctAnswer) {
-        correctAnswers++;
+  // Format answers sesuai yang diharapkan backend
+  const answers = this.quiz.questions.map((q, index) => {
+    let studentAnswer = '';
+    
+    if (q.type === 'pilihan_ganda') {
+      if (typeof q.userAnswer === 'number') {
+        studentAnswer = String.fromCharCode(65 + q.userAnswer);
+      } else if (typeof q.userAnswer === 'string') {
+        studentAnswer = q.userAnswer;
+      } else {
+        studentAnswer = '';
       }
+    } else {
+      studentAnswer = String(q.userAnswer || '');
+    }
+
+    return {
+      question_index: index,
+      student_answer: studentAnswer
+    };
+  });
+
+  console.log('🔍 Prepared answers for API:', answers);
+
+  // Submit to API
+  this.studentProgressService.submitQuizAttempt(this.materialId, answers).subscribe({
+    next: (response) => {
+      console.log('Quiz submitted successfully:', response);
+      
+      let score = 0;
+      if (response.data?.score !== undefined) {
+        score = response.data.score;
+      } else {
+        score = this.calculateLocalScore();
+      }
+      
+      // Save result and show modal
+      this.saveQuizResult(score);
+      
+      //  Clear state sebelum show modal
+      this.clearQuizState();
+      
+      this.showEndModal();
+    },
+    error: (error) => {
+      console.error('Error submitting quiz:', error);
+      const score = this.calculateLocalScore();
+      this.saveQuizResult(score);
+      
+      // Clear state meskipun error
+      this.clearQuizState();
+      
+      this.showEndModal();
     }
   });
-  
-  const score = totalMultipleChoice > 0 ? Math.round((correctAnswers / totalMultipleChoice) * 100) : 0;
-  
-  // Save quiz result to localStorage for the result page
+}
+
+  private calculateLocalScore(): number {
+    if (!this.quiz) return 0;
+    
+    let correctAnswers = 0;
+    let totalMultipleChoice = 0;
+    
+    this.quiz.questions.forEach(question => {
+      if (question.type === 'pilihan_ganda') {
+        totalMultipleChoice++;
+        const userAnswerLetter = typeof question.userAnswer === 'number' ? 
+          String.fromCharCode(65 + question.userAnswer) : question.userAnswer;
+        if (userAnswerLetter === question.correctAnswer) {
+          correctAnswers++;
+        }
+      }
+    });
+    
+    return totalMultipleChoice > 0 ? Math.round((correctAnswers / totalMultipleChoice) * 100) : 0;
+  }
+
+  private saveQuizResult(score: number): void {
+  if (!this.quiz) return;
+
   const quizResult = {
     quizId: this.quiz.id,
     materialId: this.materialId,
     completedAt: new Date().toISOString(),
     totalQuestions: this.quiz.questions.length,
     score: score,
-    questions: this.quiz.questions.map(q => ({
-      id: q.id,
+    questions: this.quiz.questions.map((q, index) => ({
+      id: index,
       question: q.question,
-      type: q.type,
+      type: q.type === 'pilihan_ganda' ? 'multiple-choice' : 'short-answer',
       options: q.options || [],
-      correctAnswer: q.correctAnswer,
-      userAnswer: q.userAnswer,
-      isCorrect: q.type === 'multiple-choice' ? q.userAnswer === q.correctAnswer : null
+      correctAnswer: q.type === 'pilihan_ganda' ? 
+        (typeof q.correctAnswer === 'string' ? q.correctAnswer.charCodeAt(0) - 65 : q.correctAnswer) : 
+        q.correctAnswer,
+      userAnswer: q.type === 'pilihan_ganda' ? 
+        (typeof q.userAnswer === 'number' ? q.userAnswer : 
+         (typeof q.userAnswer === 'string' && q.userAnswer ? q.userAnswer.charCodeAt(0) - 65 : null)) : 
+        q.userAnswer,
+      isCorrect: q.type === 'pilihan_ganda' ? 
+        (typeof q.userAnswer === 'number' ? String.fromCharCode(65 + q.userAnswer) : q.userAnswer) === q.correctAnswer : 
+        null
     }))
   };
   
+  console.log('💾 Saving quiz result:', quizResult); // Debug log
   localStorage.setItem(`quiz_result_${this.materialId}`, JSON.stringify(quizResult));
+}
+
+  private showEndModal(): void {
+    const initialState = {
+      quizId: this.quiz?.id,
+      materialId: this.materialId
+    };
+    
+    this.modalService.show(ModalEndQuizComponent, { 
+      class: 'modal-dialog-centered',
+      initialState 
+    });
+  }
+
+  private clearQuizState(): void {
+  localStorage.removeItem(`quiz_${this.materialId}_state`);
   
-  const initialState = {
-    quizId: this.quiz.id,
-    materialId: this.materialId
-  };
-  this.modalService.show(ModalEndQuizComponent, { 
-    class: 'modal-dialog-centered',
-    initialState 
-  });
+  localStorage.removeItem(`quiz_${this.materialId}_timer`);
   
-  // Clear timer subscription
   if (this.timerSubscription) {
     this.timerSubscription.unsubscribe();
+    this.timerSubscription = undefined;
   }
 }
 
   confirmExit(): void {
-    const confirmed = confirm('Apakah Anda yakin ingin keluar dari kuis? Progres Anda akan disimpan.');
-    if (confirmed) {
-      this.saveQuizState();
-      this.router.navigate(['/siswa/materi/lihat-materi', this.materialId]);
+  const confirmed = confirm('Apakah Anda yakin ingin keluar dari kuis? Progres Anda akan disimpan.');
+  if (confirmed) {
+    this.saveQuizState();
+    
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
     }
+    
+    this.router.navigate(['/siswa/materi/lihat-materi', this.materialId]);
   }
+}
 }

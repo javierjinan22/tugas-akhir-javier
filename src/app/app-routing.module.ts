@@ -26,6 +26,7 @@ import { DetailHistoryQuizComponent } from './pages/student/material-list/detail
 import { AuthGuard } from './guards/auth.guard';
 import { ClassEditComponent } from './pages/teacher/manage-class/class-edit/class-edit.component';
 import { ClassArchivedComponent } from './pages/teacher/manage-class/class-archived/class-archived.component';
+import { DetailMaterialsComponent } from './pages/teacher/manage-materials/detail-materials/detail-materials.component';
 
 
 // const routes: Routes = [];
@@ -52,7 +53,8 @@ const routes: Routes = [
        { path: 'kelola-kelas/detail-kelas/:id/tambah-siswa/buat-akun-siswa', component: CreateStudentAccountComponent},
        { path: 'kelola-materi', component: ManageMaterialsComponent},
        { path: 'kelola-materi/tambah-materi', component: CreateMaterialsComponent },
-       { path: 'kelola-materi/edit-materi', component: EditMaterialsComponent},
+       { path: 'kelola-materi/edit-materi/:id', component: EditMaterialsComponent},
+       { path: 'kelola-materi/detail-materi/:id', component: DetailMaterialsComponent}, 
        { path: 'kelola-materi/tambah-materi/tambah-quiz', component: CreateQuizComponent },
        { path: 'hasil-belajar', component: ManageLearningOutcomesComponent },
        { path: 'hasil-belajar/detail-materi-belajar/:id', component: DetailLearningOutcomesComponent },
@@ -69,7 +71,7 @@ const routes: Routes = [
     children: [
       { path: 'dashboard', component: StudentDashboardComponent },
       { path: 'materi', component: MaterialListComponent},
-      { path: 'materi/lihat-materi', component: ViewMaterialComponent},
+      { path: 'materi/lihat-materi/:id', component: ViewMaterialComponent},
       { path: 'materi/lihat-materi/:id/kuis', component: TakeQuizComponent},
       { path: 'materi/lihat-materi/:id/kuis/kerjakan', component: ViewQuizComponent},
       { path: 'materi/lihat-materi/:id/kuis/hasil', component: DetailHistoryQuizComponent},

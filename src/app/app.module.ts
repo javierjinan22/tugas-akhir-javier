@@ -63,6 +63,7 @@ import { ManageMaterialsComponent } from './pages/teacher/manage-materials/manag
 import { CreateMaterialsComponent } from './pages/teacher/manage-materials/create-materials/create-materials.component';
 import { EditMaterialsComponent } from './pages/teacher/manage-materials/edit-materials/edit-materials.component';
 import { CreateQuizComponent } from './pages/teacher/manage-materials/create-quiz/create-quiz.component';
+import { ModalConfirmationDeleteMaterialsComponent } from './pages/teacher/manage-materials/modal-confirmation-delete-materials/modal-confirmation-delete-materials.component';
 
 // Teacher learning outcomes
 import { TeacherDashboardComponent } from './pages/teacher/teacher-dashboard/teacher-dashboard.component';
@@ -81,6 +82,7 @@ import { ModalConfirmationDeleteComponent } from './pages/teacher/manage-class/m
 import { ClassArchivedComponent } from './pages/teacher/manage-class/class-archived/class-archived.component';
 import { ModalRestoreClassComponent } from './pages/teacher/manage-class/modal-restore-class/modal-restore-class.component';
 import { ModalDeleteStudentComponent } from './pages/teacher/manage-class/modal-delete-student/modal-delete-student.component';
+import { DetailMaterialsComponent } from './pages/teacher/manage-materials/detail-materials/detail-materials.component';
 
 @NgModule({
   declarations: [
@@ -129,6 +131,7 @@ import { ModalDeleteStudentComponent } from './pages/teacher/manage-class/modal-
     CreateMaterialsComponent,
     EditMaterialsComponent,
     CreateQuizComponent,
+    ModalConfirmationDeleteMaterialsComponent,
     
     // Teacher learning outcomes
     ManageLearningOutcomesComponent,
@@ -144,7 +147,8 @@ import { ModalDeleteStudentComponent } from './pages/teacher/manage-class/modal-
          ModalConfirmationDeleteComponent,
          ClassArchivedComponent,
          ModalRestoreClassComponent,
-         ModalDeleteStudentComponent
+         ModalDeleteStudentComponent,
+         DetailMaterialsComponent
   ],
   imports: [
     BrowserModule,

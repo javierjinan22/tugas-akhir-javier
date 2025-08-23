@@ -1,79 +1,448 @@
-<div class="form-container p-4 p-md-5">
-  <h2 class="fw-bold mb-4" style="font-size: 24px">Edit materi</h2>
+<div class="container-fluid mt-4">
+  <!-- Back button dan header -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToManageMaterials()" title="Kembali ke daftar materi">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h2 class="fw-bold mb-0" style="font-size: 24px;">Edit materi</h2>
+  </div>
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()">
-
-    <!-- Judul materi -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Judul materi <span class="text-danger">*</span></label>
-      <input type="text" class="form-control custom-input" formControlName="judul" placeholder="Judul materi">
-      <div *ngIf="form.get('judul')?.invalid && form.get('judul')?.touched" class="text-danger small">
-        Judul materi wajib diisi
-      </div>
+  <!-- ✅ Loading Material -->
+  <div *ngIf="isLoadingMaterial" class="d-flex justify-content-center align-items-center" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+      <p class="text-muted">Memuat data materi...</p>
     </div>
+  </div>
 
-    <!-- Deskripsi singkat -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Deskripsi singkat <span class="text-danger">*</span></label>
-      <input type="text" class="form-control custom-input" formControlName="deskripsi" placeholder="Deskripsi singkat">
-      <div *ngIf="form.get('deskripsi')?.invalid && form.get('deskripsi')?.touched" class="text-danger small">
-        Deskripsi singkat wajib diisi
-      </div>
-    </div>
-
-    <!-- Kelas yang ditautkan -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Kelas yang ditautkan <span class="text-danger">*</span></label>
-
-        <div class="kelas-checkbox-group mb-2">
-        <label *ngFor="let kelas of kelasList" class="kelas-checkbox">
-            <input
-            type="checkbox"
-            [checked]="form.value.kelas.includes(kelas)"
-            (change)="onKelasChange($event, kelas)"
-            />
-            <span class="custom-check"></span>
-            {{ kelas }}
-        </label>
-        </div>
-
-      <div *ngIf="form.get('kelas')?.invalid && form.get('kelas')?.touched" class="text-danger small">
-        Pilih minimal satu kelas
-      </div>
-    </div>
-
-    <!-- Lewati, langsung buat kuis -->
-    <div class="mb-3">
-      <button type="button" class="btn btn-warning" (click)="onSkipQuiz()">
-        Lewati, Langsung buat kuis
+  <!-- ✅ Error Loading Material -->
+  <div *ngIf="!isLoadingMaterial && errorMsg && !originalMaterial" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <div class="mt-2">
+      <button class="btn btn-outline-danger btn-sm" (click)="backToManageMaterials()">
+        <i class="fas fa-arrow-left me-1"></i>Kembali
       </button>
     </div>
+  </div>
 
-    <!-- Isian BAB -->
-    <div class="mb-3">
-      <label class="form-label fw-semibold">Isian BAB</label>
-      <ckeditor
-        formControlName="isiBab"
-        [editor]="Editor"
-        [config]="editorConfig"
-        class="custom-ckeditor"
-      ></ckeditor>
+  <!-- ✅ Main Content - Only show when material is loaded -->
+  <div *ngIf="!isLoadingMaterial && originalMaterial">
+    
+    <!-- ✅ CARD 1: Form Data Utama -->
+    <div class="form-container p-4 p-md-5 mb-4">
+      <!-- Error message display -->
+      <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {{ errorMsg }}
+      </div>
+
+      <!-- Loading message -->
+      <div *ngIf="isSubmitting" class="alert alert-info mb-3">
+        <i class="fas fa-spinner fa-spin me-2"></i>
+        Sedang memperbarui materi...
+      </div>
+
+      <form [formGroup]="materialForm" *ngIf="!isSubmitting">
+        <div class="row">
+          <!-- Judul materi -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Judul materi <span class="text-danger">*</span></label>
+            <input 
+              type="text" 
+              class="form-control custom-input" 
+              formControlName="judul" 
+              placeholder="Judul materi"
+              [class.is-invalid]="materialForm.get('judul')?.invalid && materialForm.get('judul')?.touched">
+            <div *ngIf="materialForm.get('judul')?.invalid && materialForm.get('judul')?.touched" class="text-danger small">
+              <i class="fas fa-exclamation-circle me-1"></i>Judul materi wajib diisi
+            </div>
+          </div>
+
+          <!-- Deskripsi singkat -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Deskripsi singkat <span class="text-danger">*</span></label>
+            <input 
+              type="text" 
+              class="form-control custom-input" 
+              formControlName="deskripsi" 
+              placeholder="Deskripsi singkat"
+              [class.is-invalid]="materialForm.get('deskripsi')?.invalid && materialForm.get('deskripsi')?.touched">
+            <div *ngIf="materialForm.get('deskripsi')?.invalid && materialForm.get('deskripsi')?.touched" class="text-danger small">
+              <i class="fas fa-exclamation-circle me-1"></i>Deskripsi singkat wajib diisi
+            </div>
+          </div>
+        </div>
+
+        <!-- Kelas yang ditautkan -->
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Kelas yang ditautkan <span class="text-danger">*</span></label>
+          
+          <!-- ✅ Loading state -->
+          <div *ngIf="isLoadingClasses" class="text-muted mb-2">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            Memuat data kelas...
+          </div>
+          
+          <!-- ✅ No classes available -->
+          <div *ngIf="!isLoadingClasses && kelasList.length === 0" class="text-muted mb-2">
+            <i class="fas fa-info-circle me-2"></i>
+            Tidak ada kelas aktif tersedia. 
+            <button type="button" class="btn btn-link p-0 ms-1" (click)="refreshClasses()">
+              <i class="fas fa-refresh me-1"></i>Muat ulang
+            </button>
+          </div>
+          
+          <!-- ✅ Checkbox group -->
+          <div *ngIf="!isLoadingClasses && kelasList.length > 0" class="kelas-checkbox-group mb-2">
+            <label *ngFor="let kelas of kelasList; trackBy: trackByKelasId" class="kelas-checkbox">
+              <input
+                type="checkbox"
+                [checked]="materialForm.value.kelas.includes(kelas.id)"
+                (change)="onKelasChange($event, kelas.id)"
+              />
+              <span class="custom-check"></span>
+              {{ kelas.nama }}
+            </label>
+          </div>
+          
+          <!-- ✅ Validation error -->
+          <div *ngIf="materialForm.get('kelas')?.invalid && materialForm.get('kelas')?.touched" class="text-danger small">
+            <i class="fas fa-exclamation-circle me-1"></i>Pilih minimal satu kelas
+          </div>
+          
+          <!-- ✅ DEBUG: Show selected kelas (optional, can be removed) -->
+          <div *ngIf="materialForm.value.kelas?.length > 0" class="mt-2">
+            <small class="text-muted">
+              Kelas terpilih: {{ getSelectedKelasNames().join(', ') }}
+            </small>
+          </div>
+        </div>
+      </form>
     </div>
 
-    <!-- Izinkan unduh materi -->
-    <div class="mb-4 d-flex align-items-center">
-    <label class="toggle-switch mb-0">
-        <input type="checkbox" formControlName="izinkanUnduh">
-        <span class="toggle-slider"></span>
-    </label>
-    <span class="ms-2">Izinkan unduh materi</span>
+    <!-- ✅ STEP WIZARD INDICATOR -->
+    <div class="wizard-container mb-4">
+      <div class="wizard" [class.step-2]="currentStep === 2">
+        <ul class="nav nav-tabs justify-content-between" role="tablist">
+          <li class="nav-item" role="presentation">
+            <a class="nav-link rounded-circle d-flex align-items-center justify-content-center"
+               [class.active]="currentStep === 1"
+               (click)="goToStep(1)"
+               role="tab">
+            <span class="step-number">1</span>
+            </a>
+            <div class="step-label">Isian materi</div>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link rounded-circle d-flex align-items-center justify-content-center"
+               [class.active]="currentStep === 2"
+               [class.disabled]="!isStep1Valid()"
+               (click)="goToStep(2)"
+               role="tab">
+            <span class="step-number">2</span>
+            </a>
+            <div class="step-label">Kuis</div>
+          </li>
+        </ul>
+      </div>
     </div>
 
+    <!-- ✅ STEP 1: ISIAN MATERI -->
+    <div *ngIf="currentStep === 1" class="step-content">
+      <div class="form-container p-4 p-md-5">
+        <form [formGroup]="materialForm" (ngSubmit)="onSubmitMaterial()">
+          
+          <!-- Form Array untuk BAB -->
+          <div formArrayName="babList">
+            <app-array-wrapper
+              [data]="babArray.controls"
+              (addEvent)="addBab($event.index)"
+              (deleteEvent)="removeBab($event.index)"
+            >
+              <ng-template #content let-arrayIndex="arrayIndex">
+                <div [formGroupName]="arrayIndex" class="bab-item mb-4">
+                  
+                  <!-- Judul BAB -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Judul BAB</label>
+                    <input 
+                      type="text" 
+                      class="form-control custom-input" 
+                      formControlName="judulBab" 
+                      placeholder="Judul BAB">
+                  </div>
 
-    <!-- Tombol aksi -->
-    <div class="d-flex gap-3 justify-content-center">
-      <button type="button" class="btn btn-outline-primary-custom px-5" (click)="onBatal()">Batal</button>
-      <button type="submit" class="btn btn-primary-custom px-5">Simpan</button>
+                  <!-- Isian BAB -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Isian BAB</label>
+                    <ckeditor
+                      formControlName="isiBab"
+                      [editor]="Editor"
+                      [config]="editorConfig"
+                      (ready)="onEditorReady($event)"
+                      class="custom-ckeditor"
+                    ></ckeditor>
+                  </div>
+
+                </div>
+              </ng-template>
+            </app-array-wrapper>
+          </div>
+
+          <!-- Izinkan unduh materi -->
+          <div class="mb-4 d-flex align-items-center">
+            <label class="toggle-switch mb-0">
+              <input type="checkbox" formControlName="izinkanUnduh">
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="ms-2">Izinkan unduh materi</span>
+          </div>
+
+          <!-- Tombol aksi Step 1 -->
+          <div class="d-flex gap-3 justify-content-center">
+            <button 
+              type="button" 
+              class="btn btn-outline-primary btn-rounded" 
+              (click)="onBatal()"
+              [disabled]="isSubmitting">
+              <i class="fas fa-times me-1"></i>
+              Batal
+            </button>
+            <!-- ✅ Skip Quiz button -->
+            <!-- <button 
+              type="button" 
+              class="btn btn-outline-secondary btn-rounded" 
+              (click)="onSkipQuiz()"
+              [disabled]="isSubmitting || !isStep1Valid()">
+              <i class="fas fa-save me-1"></i>
+              Simpan Tanpa Kuis
+            </button> -->
+            <button 
+              type="submit" 
+              class="btn btn-primary btn-rounded"
+              [disabled]="isSubmitting || !isStep1Valid()">
+              <i class="fas fa-arrow-right me-1"></i>
+              Lanjut ke Kuis
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
-  </form>
+
+    <!-- ✅ STEP 2: KUIS -->
+    <div *ngIf="currentStep === 2" class="step-content">
+      <div class="form-container p-4 p-md-5">
+        <form [formGroup]="quizForm" (ngSubmit)="onSubmitQuiz()">
+
+          <div class="col-md-12 mb-3">
+            <label class="form-label fw-semibold">Waktu pengerjaan (menit) <span class="text-danger">*</span></label>
+            <input 
+              type="number" 
+              class="form-control custom-input" 
+              formControlName="waktu_pengerjaan" 
+              placeholder="Waktu pengerjaan"
+              [class.is-invalid]="quizForm.get('waktu_pengerjaan')?.invalid && quizForm.get('waktu_pengerjaan')?.touched">
+            <div *ngIf="quizForm.get('waktu_pengerjaan')?.invalid && quizForm.get('waktu_pengerjaan')?.touched" class="text-danger small">
+              <i class="fas fa-exclamation-circle me-1"></i>Waktu pengerjaan wajib diisi.
+            </div>
+          </div>
+
+          <div formArrayName="questions">
+            <app-array-wrapper
+              [data]="questions.controls"
+              (addEvent)="addQuestion($event.index)"
+              (deleteEvent)="removeQuestion($event.index)"
+            >
+              <ng-template #content let-arrayIndex="arrayIndex">
+                <div [formGroupName]="arrayIndex" class="question-item mb-4">
+
+                  <div class="question-header">
+                    <div class="question-number">{{ arrayIndex + 1 }}</div>
+                    <!-- ✅ Question validation indicator with touch check -->
+                    <div class="ms-2" *ngIf="shouldShowQuestionErrors(arrayIndex)">
+                      <span *ngIf="isQuestionValid(arrayIndex)" class="badge bg-success">
+                        <i class="fas fa-check me-1"></i>Lengkap
+                      </span>
+                      <span *ngIf="!isQuestionValid(arrayIndex)" class="badge bg-warning">
+                        <i class="fas fa-exclamation-triangle me-1"></i>Belum lengkap
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <!-- ✅ Question error message with touch check -->
+                  <div *ngIf="!isQuestionValid(arrayIndex) && shouldShowQuestionErrors(arrayIndex)" 
+                       class="alert alert-warning mb-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ getQuestionErrorMessage(arrayIndex) }}
+                  </div>
+                  
+                  <!-- Tipe soal -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Jenis soal <span class="text-danger">*</span></label>
+                    <div class="d-flex gap-4 align-items-center">
+                      <label class="radio-label">
+                        <input type="radio"
+                          [checked]="questions.at(arrayIndex).value.tipeSoal === 'pilihan_ganda'"
+                          (change)="onTipeSoalChange(arrayIndex, 'pilihan_ganda')">
+                        <span class="radio-custom"></span>
+                        <span class="ms-2">Pilihan ganda</span>
+                      </label>
+                      <label class="radio-label">
+                        <input type="radio"
+                          [checked]="questions.at(arrayIndex).value.tipeSoal === 'isian_singkat'"
+                          (change)="onTipeSoalChange(arrayIndex, 'isian_singkat')">
+                        <span class="radio-custom"></span>
+                        <span class="ms-2">Isian singkat</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Soal -->
+                  <!-- <div class="mb-3">
+                    <label class="form-label fw-semibold">Soal <span class="text-danger">*</span></label>
+                    <textarea 
+                      class="form-control custom-input" 
+                      rows="4" 
+                      formControlName="soal" 
+                      placeholder="Tulis soal di sini..."
+                      [class.is-invalid]="shouldShowSoalError(arrayIndex)"></textarea>
+                   
+                    <div *ngIf="shouldShowSoalError(arrayIndex)" class="text-danger small">
+                      <i class="fas fa-exclamation-circle me-1"></i>Soal wajib diisi
+                    </div>
+                  </div> -->
+
+                  <!-- Soal -->
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Soal <span class="text-danger">*</span></label>
+                    <!-- ✅ CHANGED: From textarea to CKEditor -->
+                    <ckeditor
+                      formControlName="soal"
+                      [editor]="Editor"
+                      [config]="soalEditorConfig"
+                      (ready)="onEditorReady($event)"
+                      class="custom-ckeditor"
+                      [class.is-invalid]="shouldShowSoalError(arrayIndex)"
+                    ></ckeditor>
+                    <!-- ✅ UPDATED: Soal validation with touch check -->
+                    <div *ngIf="shouldShowSoalError(arrayIndex)" class="text-danger small">
+                      <i class="fas fa-exclamation-circle me-1"></i>Soal wajib diisi
+                    </div>
+                  </div>
+
+                  <!-- Pilihan Ganda -->
+                  <ng-container *ngIf="questions.at(arrayIndex).value.tipeSoal === 'pilihan_ganda'">
+                    <div class="mb-3">
+                      <div class="jawaban-kunci-header">
+                        <div class="jawaban-header">Jawaban <span class="text-danger">*</span></div>
+                        <div class="kunci-header">Kunci jawaban <span class="text-danger">*</span></div>
+                      </div>
+                      
+                      <div formArrayName="jawaban">
+                        <div class="row align-items-center mb-2" *ngFor="let ctrl of getJawabanArray(arrayIndex).controls; let j = index">
+                          <div class="col-auto fw-semibold">{{ 'ABCD'[j] }}.</div>
+                          <div class="col">
+                            <input type="text" 
+                                   [formControlName]="j" 
+                                   class="form-control custom-input" 
+                                   placeholder="Jawaban"
+                                   [class.is-invalid]="hasEmptyAnswerAtIndex(arrayIndex, j)">
+                          </div>
+                          <div class="col-auto">
+                            <label class="radio-label">
+                              <input type="radio"
+                                [checked]="questions.at(arrayIndex).value.kunci === j"
+                                (change)="questions.at(arrayIndex).get('kunci')?.setValue(j); questions.at(arrayIndex).get('kunci')?.markAsTouched()"
+                                [name]="'kunci-'+arrayIndex">
+                              <span class="radio-custom"></span>
+                              <span class="ms-1">Benar</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- ✅ Validation feedback with touch check -->
+                      <div *ngIf="hasEmptyAnswers(arrayIndex)" class="text-danger small">
+                        <i class="fas fa-exclamation-circle me-1"></i>Semua pilihan jawaban harus diisi
+                      </div>
+                      <div *ngIf="hasNoSelectedKey(arrayIndex)" class="text-danger small">
+                        <i class="fas fa-exclamation-circle me-1"></i>Pilih kunci jawaban yang benar
+                      </div>
+                    </div>
+                  </ng-container>
+
+                  <!-- Isian Singkat -->
+                  <ng-container *ngIf="questions.at(arrayIndex).value.tipeSoal === 'isian_singkat'">
+                    <div class="mb-3">
+                      <label class="form-label fw-semibold">Jawaban <span class="text-danger">*</span></label>
+                      <textarea class="form-control custom-input" 
+                               rows="3" 
+                               formControlName="jawabanSingkat" 
+                               placeholder="Kunci jawaban"
+                               [class.is-invalid]="shouldShowIsianSingkatError(arrayIndex)"></textarea>
+                      <!-- ✅ Isian singkat validation with touch check -->
+                      <div *ngIf="shouldShowIsianSingkatError(arrayIndex)" class="text-danger small">
+                        <i class="fas fa-exclamation-circle me-1"></i>Kunci jawaban wajib diisi
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-template>
+            </app-array-wrapper>
+          </div>
+
+          <!-- ✅ Quiz completion status -->
+          <div class="alert alert-info mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Status Kuis:</strong>
+                <span *ngIf="isStep2Valid()" class="text-success ms-2">
+                  <i class="fas fa-check-circle"></i> Semua soal sudah lengkap
+                </span>
+                <span *ngIf="!isStep2Valid()" class="text-warning ms-2">
+                  <i class="fas fa-exclamation-triangle"></i> 
+                  {{ getIncompleteQuestionsCount() }} soal belum lengkap
+                </span>
+              </div>
+              <div>
+                <span class="badge bg-primary">
+                  {{ getCompleteQuestionsCount() }} / {{ questions.length }} soal lengkap
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol aksi Step 2 -->
+          <div class="d-flex gap-3 justify-content-center mt-4">
+            <button 
+              type="button" 
+              class="btn btn-outline-primary btn-rounded" 
+              (click)="onBatal()"
+              [disabled]="isSubmitting">
+              <i class="fas fa-arrow-left me-1"></i>
+              Sebelumnya
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary btn-rounded"
+              [disabled]="isSubmitting || !isStep2Valid()">
+              <i class="fas fa-save me-1"></i>
+              Perbarui dengan Kuis
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Loading state button -->
+    <div class="d-flex justify-content-center mt-4" *ngIf="isSubmitting">
+      <button class="btn btn-primary btn-rounded" disabled>
+        <i class="fas fa-spinner fa-spin me-2"></i>
+        Memperbarui materi...
+      </button>
+    </div>
+  </div>
 </div>

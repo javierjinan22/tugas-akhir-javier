@@ -87,3 +87,35 @@
 .action-section .btn-quiz:hover {
   background-color: #f0c926;
 }
+
+/* ✅ TAMBAH: Style untuk quiz completed message */
+.quiz-completed-message {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+  border-radius: 0.25rem;
+  padding: 12px;
+  margin: 10px 0;
+}
+
+.alert-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-success i {
+  color: #155724;
+  font-size: 1.1em;
+}
+
+/* ✅ Style untuk button ulangi kuis */
+.btn-start.retry {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-start.retry:hover {
+  background-color: #138496;
+  border-color: #117a8b;
+}

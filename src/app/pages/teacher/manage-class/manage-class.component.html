@@ -1,4 +1,4 @@
-<div class="container-fluid mt-4 custom-materi-container">
+<div class="container-fluid mt-4 custom-class-container">
   <h2 class="fw-bold mb-4" style="font-size: 24px;">Daftar kelas anda</h2>
 
   <!-- Error message -->
@@ -66,13 +66,13 @@
         <tr *ngFor="let kelas of filteredKelas; let i = index">
           <td>{{ i + 1 }}.</td>
           <td>
-            <strong>{{ kelas.nama_kelas }}</strong>
+            <span>{{ kelas.nama_kelas }}</span>
           </td>
           <td>
             <small class="text-muted">{{ kelas.tahun_ajaran || '-' }}</small>
           </td>
           <td>
-            <span class="badge bg-info text-white">
+            <span>
               {{ kelas.siswa ? kelas.siswa.length : 0 }} siswa
             </span>
           </td>

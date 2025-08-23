@@ -1,25 +1,91 @@
 <div class="materials-container">
-  <div *ngFor="let material of studiedMaterials; let last = last">
-    <div class="material-item">
-      <div class="d-flex justify-content-between align-items-center">
-        <h5 class="material-title">{{ material.judul_materi }}</h5>
-        <div class="button-group">
-          <button 
-            *ngIf="material.izinkan_unduh === 1"
-            class="btn btn-download" 
-            (click)="downloadMaterial(material)"
-            title="Download Materi">
-            <i class="fas fa-download"></i>
-          </button>
-          <button class="btn btn-view" (click)="viewMaterial(material)">Lanjut belajar</button>
+  <!-- Loading state -->
+  <div *ngIf="loading" class="text-center p-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Memuat materi...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="loadStudiedMaterials()">
+      Coba Lagi
+    </button>
+  </div>
+
+  <!-- Materials list -->
+  <div *ngIf="!loading && !error">
+    <div *ngFor="let material of studiedMaterials; let last = last">
+      <div class="material-item">
+        <div class="d-flex justify-content-between align-items-start">
+          <div class="material-info">
+            <h5 class="material-title">{{ material.judul_materi }}</h5>
+            
+            <!-- Material metadata -->
+            <div class="material-meta">
+              <small class="text-muted d-block">
+                {{ getBabProgress(material) }}
+                <span *ngIf="hasQuiz(material)" class="ms-2">
+                  • {{ material.total_soal }} soal kuis
+                </span>
+              </small>
+              
+              <!-- Status badge -->
+              <div class="d-flex align-items-center mt-1">
+                <span class="status-badge" 
+                      [ngClass]="{
+                        'studying': material.status === 'in_progress', 
+                        'not-started': material.status === 'not_started'
+                      }">
+                  {{ getStatusText(material) }}
+                </span>
+                
+                <!-- Last accessed -->
+                <small class="text-muted ms-2" *ngIf="material.status === 'in_progress'">
+                  {{ getLastAccessedText(material) }}
+                </small>
+              </div>
+            </div>
+            
+            <!-- Progress bar -->
+            <div class="progress mt-2" style="height: 6px;" *ngIf="material.status === 'in_progress'">
+              <div class="progress-bar" 
+                   [style.width.%]="getProgressPercentage(material)"
+                   role="progressbar">
+              </div>
+              <small class="text-muted mt-1 d-block">
+                {{ getProgressPercentage(material) }}% selesai
+              </small>
+            </div>
+          </div>
+          
+          <!-- Action buttons -->
+          <div class="button-group">
+            <!-- ✅ TAMBAH: Button Download -->
+            <button 
+              *ngIf="canDownload(material)"
+              class="btn btn-download" 
+              (click)="downloadMaterial(material)"
+              title="Download Materi">
+              <i class="fas fa-download"></i>
+            </button>
+            
+            <button class="btn btn-view" (click)="viewMaterial(material)">
+              {{ material.status === 'in_progress' ? 'Lanjut belajar' : 'Mulai belajar' }}
+            </button>
+          </div>
         </div>
       </div>
+      <hr *ngIf="!last" class="material-divider">
     </div>
-    <hr *ngIf="!last" class="material-divider">
-  </div>
-  
-  <!-- Empty state when no materials are available -->
-  <div *ngIf="studiedMaterials.length === 0" class="empty-state text-center p-5">
-    <p>Belum ada materi yang diselesaikan</p>
+    
+    <!-- Empty state -->
+    <div *ngIf="studiedMaterials.length === 0" class="empty-state text-center p-5">
+      <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+      <h5>Belum ada materi untuk dipelajari</h5>
+      <p class="text-muted">Materi akan muncul sesuai dengan kelas Anda</p>
+    </div>
   </div>
 </div>

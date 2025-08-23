@@ -1,0 +1,140 @@
+.modal-body {
+  font-family: 'Poppins', sans-serif;
+  padding: 2rem;
+  border-radius: 20px;
+  position: relative;
+}
+
+/* Icon warning overlapping */
+.icon-warning-wrapper {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #EFE51B; /* Kuning */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  box-shadow: 0 4px 12px rgba(239, 229, 27, 0.3);
+  z-index: 1000;
+}
+
+.icon-warning-wrapper fa-icon {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 1rem;
+  color: #333;
+}
+
+.material-name {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0;
+}
+
+.action-card {
+  border-radius: 12px;
+  padding: 25px 20px;
+  width: 180px;
+  cursor: pointer;
+  color: #fff;
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-card:hover {
+  transform: translateY(-3px);
+}
+
+.delete-card {
+  background-color: #ff6b6b;
+}
+
+.delete-card:hover {
+  background-color: #ff5252;
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+}
+
+.icon-wrapper {
+  margin-bottom: 15px;
+}
+
+.action-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.action-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  margin: 0;
+  color: #fff;
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+.btn-cancel {
+  background-color: transparent;
+  border: 2px solid #ddd;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  padding: 12px 40px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #f8f9fa;
+  border-color: #1BB6C1;
+  color: #1BB6C1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .icon-warning-wrapper {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+  }
+  
+  .icon-warning-wrapper fa-icon {
+    font-size: 1.5rem;
+  }
+  
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .action-card {
+    width: 150px;
+    padding: 20px 15px;
+  }
+  
+  .action-title {
+    font-size: 14px;
+  }
+  
+  .action-text {
+    font-size: 11px;
+  }
+}

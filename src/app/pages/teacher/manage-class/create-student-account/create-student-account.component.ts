@@ -214,7 +214,7 @@ export class CreateStudentAccountComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         
-        alert('Akun siswa berhasil dibuat!');
+        // alert('Akun siswa berhasil dibuat!');
         
         // Navigate back to connect student page
         this.backToConnectStudent();

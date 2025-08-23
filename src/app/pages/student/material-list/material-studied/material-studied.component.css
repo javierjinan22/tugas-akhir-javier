@@ -36,7 +36,7 @@
   background-color: #f0c926;
 }
 
-.btn-download {
+/* .btn-download {
   background-color: #F9D349;
   color: #6C613B;
   border: none;
@@ -53,6 +53,22 @@
 
 .btn-download:hover {
   background-color: #f0c926;
+} */
+
+.btn-download {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.btn-download:hover {
+  background: #e9ecef;
+  color: #495057;
+  transform: translateY(-1px);
 }
 
 .material-divider {
@@ -63,4 +79,38 @@
 .empty-state {
   color: #757575;
   font-style: italic;
+}
+
+.material-info {
+  flex: 1;
+  margin-right: 15px;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.status-badge.studying {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.status-badge.not-started {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #dee2e6;
+}
+
+.progress {
+  border-radius: 2px;
+  background-color: #e9ecef;
+}
+
+.progress-bar {
+  background-color: #1BB6C1;
+  transition: width 0.3s ease;
 }

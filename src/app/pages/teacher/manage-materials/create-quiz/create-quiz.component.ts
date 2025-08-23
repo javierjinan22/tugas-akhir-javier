@@ -2,6 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 const ClassicEditor = require('@ckeditor/ckeditor5-build-classic');
 
+// declare const ClassicEditor: any;
+
+// import * as ClassicEditor from 'src/assets/ckeditor/ckeditor.js';
+
 @Component({
   selector: 'app-create-quiz',
   templateUrl: './create-quiz.component.html',
@@ -14,11 +18,15 @@ export class CreateQuizComponent implements OnInit {
   // CKEditor
   public Editor = ClassicEditor;
   public editorConfig = {
-    // plugin image, media, dll
+    placeholder: 'Tulis soal di sini...',
     toolbar: [
-      'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote',
-      '|', 'insertTable', 'imageUpload', 'mediaEmbed', 'undo', 'redo'
-    ]
+      'heading', '|', 'bold', 'italic', 'link', 
+      'bulletedList', 'numberedList', 'blockQuote', 'insertTable',
+      'imageUpload', 'mediaEmbed', 'sourceEditing', 'undo', 'redo'
+    ],
+    mediaEmbed: {
+      previewsInData: true
+    }
   };
 
   constructor(
@@ -31,6 +39,28 @@ export class CreateQuizComponent implements OnInit {
         this.createQuestionGroup()
       ])
     });
+  }
+
+  onEditorReady(editor: any): void {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
+      return {
+        upload() {
+          return loader.file.then((file: File) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              resolve({ default: reader.result });
+            };
+            reader.onerror = (error: any) => {
+              reject(error);
+            };
+            reader.readAsDataURL(file);
+          }));
+        },
+        abort() {
+          // Cleanup if needed
+        }
+      };
+    };
   }
 
   get questions(): FormArray {
@@ -47,7 +77,7 @@ export class CreateQuizComponent implements OnInit {
       tipeSoal: ['pilihan_ganda', Validators.required],   // default: pilihan ganda
       soal: ['', Validators.required],
       jawaban: this.fb.array([ '', '', '', '' ], Validators.required), // 4 jawaban default
-      kunci: [null, Validators.required], // index (misal 0)
+      kunci_jawaban: [null, Validators.required], // index (misal 0)
       jawabanSingkat: ['']  // untuk isian singkat
     });
   }
@@ -64,7 +94,7 @@ export class CreateQuizComponent implements OnInit {
     const qGroup = this.questions.at(i) as FormGroup;
     qGroup.patchValue({
       tipeSoal: tipe,
-      kunci: null,
+      kunci_jawaban: null,
       jawaban: tipe === 'pilihan_ganda' ? ['', '', '', ''] : [],
       jawabanSingkat: ''
     });

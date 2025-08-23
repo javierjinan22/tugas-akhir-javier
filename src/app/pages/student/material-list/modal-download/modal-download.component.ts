@@ -4,7 +4,7 @@ import { faExclamation, faExclamationCircle } from '@fortawesome/free-solid-svg-
 import { BsModalRef } from 'ngx-bootstrap/modal';
 
 export interface DownloadOptions {
-  materialId: number;
+  materialId: string; // Changed from number to string
   materialTitle: string;
   slug: string;
 }
@@ -20,7 +20,7 @@ export class ModalDownloadComponent implements OnInit {
   faExclamation = faExclamation;
   
   // Properties that will be passed from the parent component
-  materialId!: number;
+  materialId!: string;
   materialTitle!: string;
   slug!: string;
 

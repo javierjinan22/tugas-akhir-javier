@@ -9,8 +9,29 @@
   
   <hr class="divider">
   
-  <!-- Result content -->
-  <div class="result-content">
+  <!-- ✅ TAMBAH: Loading state -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p>Memuat detail hasil kuis...</p>
+    </div>
+  </div>
+
+  <!-- ✅ TAMBAH: Error state -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="text-center py-5">
+      <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle mb-2"></i>
+        <p>{{ error }}</p>
+        <button class="btn btn-primary btn-sm" (click)="goBack()">Kembali</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ✅ EXISTING: Result content - hanya tampil jika tidak loading dan tidak error -->
+  <div *ngIf="!loading && !error" class="result-content">
     <!-- Left sidebar with quiz info -->
     <div class="quiz-info-sidebar">
       <div class="quiz-info">
@@ -27,11 +48,9 @@
         <div class="score-value">{{ quizResult.score }}</div>
       </div>
 
-      
       <button class="btn-view" (click)="goPredicate()">
           Lihat predikat
       </button>
-     
     </div>
     
     <!-- Right content with questions -->
@@ -51,10 +70,12 @@
                class="option-item"
                [ngClass]="getOptionClass(question, optionIndex)">
             <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
+              <!-- ✅ Show check untuk jawaban yang benar -->
               <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check"></i>
+              <!-- ✅ Show X untuk jawaban user yang salah -->
               <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times"></i>
             </span>
-            <span class="option-text">{{ option }}</span>
+            <span class="option-text">{{ getCleanOption(option) }}</span>
           </div>
         </div>
         
@@ -63,6 +84,13 @@
           <div class="user-answer">
             <strong>Jawaban Anda:</strong>
             <div class="answer-text">{{ question.userAnswer || 'Tidak dijawab' }}</div>
+          </div>
+          <!-- ✅ TAMBAH: Note untuk isian singkat -->
+          <div class="grading-note">
+            <small class="text-muted">
+              <i class="fas fa-info-circle"></i>
+              Jawaban isian singkat akan dinilai secara manual oleh pengajar
+            </small>
           </div>
         </div>
       </div>
