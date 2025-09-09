@@ -66,6 +66,32 @@
             </div>
           </div>
         </ng-container>
+
+        <!-- Benar/Salah question - tampilan mirip pilihan ganda -->
+        <ng-container *ngIf="currentQuestion.type === 'benar_salah'">
+          <div class="benar-salah-options">
+            <div class="row g-3">
+              <div class="col-6">
+                <button 
+                  type="button"
+                  class="btn-benar-salah btn-salah"
+                  [class.selected]="isBenarSalahSelected('Salah')"
+                  (click)="selectBenarSalah('Salah')">
+                  <span class="btn-text">Salah</span>
+                </button>
+              </div>
+              <div class="col-6">
+                <button 
+                  type="button"
+                  class="btn-benar-salah btn-benar"
+                  [class.selected]="isBenarSalahSelected('Benar')"
+                  (click)="selectBenarSalah('Benar')">
+                  <span class="btn-text">Benar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
         
         <!-- Short answer question -->
         <ng-container *ngIf="currentQuestion.type === 'isian_singkat'">

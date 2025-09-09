@@ -1,0 +1,161 @@
+<div class="container-fluid mt-4 custom-materi-container">
+  <!-- ✅ TAMBAH: Back button dan header seperti komponen lainnya -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="goBack()" title="Kembali ke daftar siswa">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    
+    <!-- Header info -->
+    <div *ngIf="studentInfo && materiInfo">
+      <h2 class="fw-bold mb-0" style="font-size: 24px;">
+        Review Jawaban
+      </h2>
+      <p class="text-muted mb-0" style="font-size: 14px;">
+        <i class="fas fa-user me-1"></i>{{ studentInfo.nama_siswa }} | 
+        <i class="fas fa-book me-1"></i>{{ materiInfo.judul_materi }} | 
+        <i class="fas fa-star me-1"></i>Nilai: {{ quizResult?.score || 0 }}
+      </p>
+    </div>
+    
+    <!-- Default header jika data belum tersedia -->
+    <h2 *ngIf="!studentInfo && !loading" class="fw-bold mb-0" style="font-size: 24px;">
+      Review Jawaban
+    </h2>
+  </div>
+
+  <!-- ✅ Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-4" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat hasil kuis siswa...</p>
+    </div>
+  </div>
+
+  <!-- ✅ Error message -->
+  <div *ngIf="errorMsg && !loading" class="alert alert-danger mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <div class="mt-2">
+      <button class="btn btn-outline-secondary btn-sm me-2" (click)="goBack()">
+        <i class="fas fa-arrow-left me-1"></i>Kembali
+      </button>
+      <button class="btn btn-primary btn-sm" (click)="refreshData()">
+        <i class="fas fa-sync-alt me-1"></i>Coba Lagi
+      </button>
+    </div>
+  </div>
+
+  <!-- ✅ Quiz result content - fokus hanya pada review jawaban -->
+  <div *ngIf="!loading && !errorMsg && quizResult" class="quiz-review-container">
+
+    <!-- ✅ Questions review list -->
+    <div class="questions-list">
+      <div *ngFor="let question of quizResult.questions; let i = index" class="question-card mb-4">
+        <div class="question-header">
+          <div class="question-number">{{ i + 1 }}</div>
+          
+          <!-- Question text -->
+          <div class="question-content">
+            <div *ngIf="hasHtmlContent(question.question); else plainQuestionText" 
+                 class="question-text" 
+                 [innerHTML]="question.questionHtml">
+            </div>
+            
+            <ng-template #plainQuestionText>
+              <div class="question-text">{{ question.question }}</div>
+            </ng-template>
+          </div>
+          
+          <div class="score-indicator" [ngClass]="getScoreBadgeClass(question)">
+            <i *ngIf="question.isCorrect === true" class="fas fa-check"></i>
+            <i *ngIf="question.isCorrect === false" class="fas fa-times"></i>
+            <i *ngIf="question.isCorrect === null" class="fas fa-minus"></i>
+          </div>
+        </div>
+        
+        <!-- Multiple choice options -->
+        <div *ngIf="question.type === 'multiple-choice'" class="options-container">
+          <div *ngFor="let option of question.options; let optionIndex = index" 
+              class="option-row"
+              [ngClass]="getOptionRowClass(question, optionIndex)">
+            
+            <div class="option-label">{{ getLetter(optionIndex) }}.</div>
+            
+            <div class="option-content">
+              <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
+                  [innerHTML]="question.optionsHtml[optionIndex]">
+              </div>
+              
+              <ng-template #plainOptionText>
+                <span>{{ getCleanOption(option) }}</span>
+              </ng-template>
+            </div>
+
+            <div class="option-status">
+              <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check text-success" title="Jawaban benar"></i>
+              <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times text-danger" title="Jawaban siswa (salah)"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benar/Salah options -->
+        <div *ngIf="question.type === 'benar-salah'" class="benar-salah-container">
+          <div *ngFor="let option of question.options; let optionIndex = index" 
+              class="benar-salah-row"
+              [ngClass]="getOptionRowClass(question, optionIndex)">
+            
+            <div class="benar-salah-content">
+              <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
+                  [innerHTML]="question.optionsHtml[optionIndex]">
+              </div>
+              
+              <ng-template #plainOptionText>
+                <span class="benar-salah-text" 
+                      [ngClass]="getBenarSalahTextClass(option)">
+                  {{ getBenarSalahOptionText(option) }}
+                </span>
+              </ng-template>
+            </div>
+
+            <div class="option-status">
+              <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check text-success" title="Jawaban benar"></i>
+              <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times text-danger" title="Jawaban siswa (salah)"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Short answer -->
+        <div *ngIf="question.type === 'short-answer'" class="short-answer-container">
+          <div class="answer-section">
+            <label class="answer-label">Jawaban Siswa:</label>
+            <div class="answer-content">{{ question.userAnswer || 'Tidak dijawab' }}</div>
+          </div>
+          <div class="answer-section">
+            <label class="answer-label">Jawaban Benar:</label>
+            <div class="answer-content correct-answer-text">{{ question.correctAnswer }}</div>
+          </div>
+          <div class="grading-info">
+            <small class="text-muted">
+              <i class="fas fa-info-circle"></i>
+              Jawaban isian singkat dinilai secara otomatis oleh sistem
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Stats footer -->
+    <div class="stats-footer mt-4">
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Total soal: {{ quizResult.totalQuestions }} | 
+        Benar: {{ getCorrectAnswersCount() }} | 
+        Salah: {{ getIncorrectAnswersCount() }} | 
+        Nilai akhir: {{ quizResult.score }}
+      </small>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>

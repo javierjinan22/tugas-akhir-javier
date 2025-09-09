@@ -1,5 +1,33 @@
 <div class="view-material-container">
-  <div class="row">
+  
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="loading-text">Memuat materi pembelajaran...</p>
+      <small class="text-muted">Tunggu sebentar ya!</small>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="text-center py-5">
+      <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle mb-2 fa-2x"></i>
+        <h5>Oops! Ada masalah</h5>
+        <p>{{ error }}</p>
+        <button class="btn btn-primary btn-sm mt-2" (click)="loadMaterial()">
+          <i class="fas fa-redo me-1"></i>
+          Coba Lagi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content - Only show when not loading and no error -->
+  <div *ngIf="!loading && !error && material" class="row">
     <!-- Main content area -->
     <div class="col-md-8">
       <div class="material-content-card">
@@ -10,17 +38,31 @@
           <h4 class="material-title">{{ material?.title }}</h4>
         </div>
 
-        <div class="material-content">
+        <!-- Content Loading State (untuk page loading) -->
+        <div *ngIf="pageLoading" class="page-loading-container">
+          <div class="text-center py-4">
+            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="small text-muted mb-0">Memuat halaman...</p>
+          </div>
+        </div>
+
+        <div *ngIf="!pageLoading" class="material-content">
           <!-- Render current page content -->
           <div class="material-page" [innerHTML]="currentPageContent"></div>
         </div>
 
         <div class="pagination-controls">
-          <button class="btn btn-icon" [disabled]="currentPageIndex === 0" (click)="previousPage()">
+          <button class="btn btn-icon" 
+                  [disabled]="currentPageIndex === 0 || pageLoading" 
+                  (click)="previousPage()">
             <i class="fas fa-chevron-left"></i>
           </button>
-          <span class="page-indicator">{{ currentPageIndex + 1 }} / {{ material.pages.length }}</span>
-          <button class="btn btn-icon" [disabled]="currentPageIndex === material.pages.length - 1" (click)="nextPage()">
+          <span class="page-indicator">{{ currentPageIndex + 1 }} / {{ material?.pages?.length || 0 }}</span>
+          <button class="btn btn-icon" 
+                  [disabled]="currentPageIndex === (material?.pages?.length - 1) || pageLoading" 
+                  (click)="nextPage()">
             <i class="fas fa-chevron-right"></i>
           </button>
         </div>
@@ -32,23 +74,29 @@
       <div class="progress-sidebar">
         <div class="progress-section">
           <div class="progress-header">
-            <span>{{ material.progress }}% Selesai</span>
+            <!-- ✅ UPDATE: Gunakan method dynamic -->
+            <span>{{ getProgressPercentage() }}% Selesai</span>
           </div>
           <div class="progress-bar-wrapper">
-            <div class="progress-bar" [style.width.%]="material.progress"></div>
+            <!-- ✅ UPDATE: Gunakan method dynamic -->
+            <div class="progress-bar" [style.width.%]="getProgressPercentage()"></div>
+          </div>
+          <!-- ✅ TAMBAH: Status completion -->
+          <div class="progress-status mt-2">
+            <span class="completion-status">{{ getCompletionStatus() }}</span>
           </div>
         </div>
 
         <div class="status-section">
           <!-- Status Materi (keseluruhan) -->
           <div class="status-item">
-            <div class="status-circle" [ngClass]="{'checked': material.isRead}">
-              <i *ngIf="material.isRead" class="fas fa-check"></i>
+            <div class="status-circle" [ngClass]="{'checked': material?.isRead}">
+              <i *ngIf="material?.isRead" class="fas fa-check"></i>
             </div>
             <span class="status-text">Materi</span>
           </div>
           
-          <!-- ✅ TAMBAH: Daftar Bab dengan title -->
+          <!-- Daftar Bab dengan title -->
           <div class="bab-list-section" *ngIf="material?.pages && material.pages.length > 0">
             <div class="bab-header">
               <span class="bab-title">Daftar Bab:</span>
@@ -56,10 +104,13 @@
             
             <div class="bab-item" 
                  *ngFor="let page of material.pages; let i = index" 
-                 [ngClass]="{'current-bab': i === currentPageIndex}"
-                 (click)="loadPage(i)">
+                 [ngClass]="{'current-bab': i === currentPageIndex, 'loading-bab': pageLoading && i === currentPageIndex}"
+                 (click)="!pageLoading ? loadPage(i) : null">
               <div class="status-circle small" [ngClass]="{'checked': page.isRead}">
                 <i *ngIf="page.isRead" class="fas fa-check"></i>
+                <div *ngIf="pageLoading && i === currentPageIndex" class="spinner-border spinner-border-sm" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
               </div>
               <span class="bab-text" [title]="page.title">
                 {{ i + 1 }}. {{ page.title | slice:0:30 }}{{ page.title.length > 30 ? '...' : '' }}
@@ -67,17 +118,19 @@
             </div>
           </div>
           
-          <!-- Status Kuis -->
+          <!-- ✅ PERBAIKAN: Status Kuis - hanya centang jika benar-benar lulus -->
           <div class="status-item">
-            <div class="status-circle" [ngClass]="{'checked': material.quizCompleted}">
-              <i *ngIf="material.quizCompleted" class="fas fa-check"></i>
+            <div class="status-circle" [ngClass]="{'checked': isQuizCompleted()}">
+              <i *ngIf="isQuizCompleted()" class="fas fa-check"></i>
             </div>
             <span class="status-text">Kuis Latihan</span>
           </div>
         </div>
 
         <div class="action-section mt-auto">
-          <button [class]="getQuizButtonClass()" [disabled]="!canTakeQuiz()" (click)="takeQuiz()">
+          <button [class]="getQuizButtonClass()" 
+                  [disabled]="!canTakeQuiz() || pageLoading" 
+                  (click)="takeQuiz()">
             <span>{{ getQuizButtonText() }}</span>
             <i class="fas fa-arrow-right"></i>
           </button>

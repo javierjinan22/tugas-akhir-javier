@@ -1,0 +1,192 @@
+<div class="learning-history-container">
+  <!-- Enhanced Header Section -->
+  <div class="history-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h2 class="history-title">Capaian Belajar</h2>
+        <p class="history-subtitle">Lihat medali dan pencapaianmu di setiap kategori</p>
+      </div>
+      <div class="header-right">
+        <div class="achievement-summary">
+          <div class="summary-item">
+            <span class="summary-count">{{ getTotalMedals() }}</span>
+            <span class="summary-label">Total Medali</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-count">{{ getCurrentRank() }}</span>
+            <span class="summary-label">Peringkat Kamu</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p>Memuat riwayat belajar...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <div class="text-center py-5">
+      <div class="alert alert-danger" role="alert">
+        <i class="fas fa-exclamation-triangle mb-2"></i>
+        <p>{{ error }}</p>
+        <button class="btn btn-primary btn-sm" (click)="loadAllData()">Coba Lagi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error" class="history-content">
+    
+    <!-- Left Section: Medals -->
+    <div class="medals-section">
+      <div class="section-header">
+        <h3 class="section-title">Medalimu pada tiap kategori</h3>
+      </div>
+
+      <div class="medals-grid">
+        <!-- Loop through medal categories -->
+        <div *ngFor="let kategori of medalCategories" 
+             class="medal-card" 
+             [ngClass]="getCategoryClass(kategori)">
+          <div class="medal-icon-container">
+            <img [src]="getMedalIcon(getMedalByCategory(kategori)?.medal_level || 'none')" 
+                 [alt]="'Medal ' + kategori" 
+                 class="medal-icon">
+          </div>
+          <div class="medal-content">
+            <h4 class="medal-title">{{ kategori }}</h4>
+            <p class="medal-description">
+              {{ getMedalDescription(kategori, getMedalByCategory(kategori)!) }}
+            </p>
+            <div class="medal-stats" *ngIf="getMedalByCategory(kategori)">
+              <span class="completion-rate">
+                {{ getMedalByCategory(kategori)!.completed_materi }}/{{ getMedalByCategory(kategori)!.total_materi }} materi selesai
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback Section -->
+      <div class="feedback-section">
+        <div class="section-header">
+          <img src="assets/img/feedback.png" alt="Feedback" class="feedback-icon-img">
+          <h3 class="section-title">Feedback dari guru</h3>
+        </div>
+
+        <div class="feedback-list" *ngIf="feedbacks.length > 0; else noFeedback">
+          <div *ngFor="let feedback of feedbacks" class="feedback-card">
+            <div class="feedback-header">
+              <h4 class="feedback-title">{{ feedback.judul_materi }}</h4>
+              <span class="feedback-category" 
+                    [style.background-color]="getCategoryColor(feedback.kategori_materi)">
+                {{ feedback.kategori_materi }}
+              </span>
+            </div>
+            <p class="feedback-description">{{ feedback.feedback_text }}</p>
+            <div class="feedback-meta">
+              <span class="feedback-teacher">{{ feedback.guru_name }}</span>
+              <span class="feedback-date">{{ formatDate(feedback.created_at) }}</span>
+            </div>
+            <div class="feedback-actions">
+              <button class="btn-go-to-material" (click)="viewMaterial(feedback)">
+                Lihat Materi
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noFeedback>
+          <div class="no-feedback">
+            <i class="fas fa-comment-slash fa-2x mb-3 text-muted"></i>
+            <p>Belum ada feedback dari guru</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Right Section: Rankings -->
+    <div class="rankings-section">
+      <!-- Section title di luar -->
+      <h3 class="section-title-outside">Peringkat di Kelasmu</h3>
+      
+      <div class="rankings-card">
+        <!-- <div class="rankings-header">
+          <div class="category-filter">
+            <div class="custom-select-container">
+              <select [(ngModel)]="selectedCategory" 
+                      (change)="onCategoryChange()"
+                      class="custom-select">
+                <option *ngFor="let category of categories" [value]="category.value">
+                  {{ category.label }}
+                </option>
+              </select>
+              <div class="select-arrow">
+                <i class="fas fa-chevron-down"></i>
+              </div>
+            </div>
+          </div>
+        </div> -->
+
+        <div class="rankings-header">
+        <div class="category-filter">
+            <div class="custom-select-container">
+            <ngx-select 
+                [(ngModel)]="selectedCategory" 
+                (ngModelChange)="onCategoryChange()"
+                [items]="categories"
+                optionValueField="value"
+                optionTextField="label"
+                [multiple]="false"
+                [allowClear]="false"
+                [disabled]="false"
+                placeholder="Pilih Kategori">
+            </ngx-select>
+            </div>
+        </div>
+        </div>
+
+        <div class="rankings-list">
+          <div *ngFor="let ranking of rankings; let i = index" 
+               class="ranking-item" 
+               [ngClass]="{
+                 'top-rank': ranking.rank <= 3,
+                 'rank-1': ranking.rank === 1,
+                 'rank-2': ranking.rank === 2,
+                 'rank-3': ranking.rank === 3
+               }">
+            
+            <div class="rank-badge-container">
+              <img *ngIf="ranking.rank <= 3" 
+                   [src]="getRankBadge(ranking.rank)" 
+                   [alt]="'Badge rank ' + ranking.rank" 
+                   class="rank-badge">
+              <span *ngIf="ranking.rank > 3" class="rank-number">{{ ranking.rank }}</span>
+            </div>
+            
+            <div class="student-info">
+              <div class="student-name">
+                {{ ranking.nama_siswa }}
+                <span *ngIf="ranking.student_id === currentStudent?.student_id" class="you-label">(Kamu)</span>
+              </div>
+            </div>
+            
+            <div class="score-display">
+              <span class="score-value">{{ ranking.score }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

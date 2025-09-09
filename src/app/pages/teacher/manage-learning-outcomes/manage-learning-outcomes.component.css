@@ -5,29 +5,23 @@
   color: #212121;
   vertical-align: middle;
 }
+
 .table td, .table th {
   vertical-align: middle !important;
 }
+
 .table {
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
 }
 
-/* Tambahan style agar tombol/aksi tetap konsisten dengan desain sebelumnya */
-.aksi-cell a {
-  color: #242424;
-  text-decoration: underline;
-  margin: 0 4px;
-  font-weight: 500;
-  font-size: 1rem;
-  cursor: pointer;
-}
-.aksi-separator {
-  display: inline-block;
-  margin: 0 2px;
+/* Custom styling untuk manage learning outcomes */
+.custom-class-container {
+  font-family: 'Poppins', sans-serif;
 }
 
+/* Search bar styling */
 .search-bar {
   border: 2px solid #1cc4cc;
   border-radius: 2rem;
@@ -35,6 +29,7 @@
   background: #fff;
   height: 45px;
 }
+
 .search-bar input {
   border: none;
   outline: none;
@@ -42,12 +37,191 @@
   background: transparent;
   font-size: 1rem;
 }
+
 .search-bar input::placeholder {
   color: #cfcfcf;
   font-weight: 300;
 }
+
 .search-icon {
   color: #ffd700;
   font-size: 1.5rem;
   margin-left: -36px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.search-icon:hover {
+  color: #1BB6C1;
+}
+
+/* Button styling sesuai manage-class */
+.btn-outline-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,123,255,0.2);
+}
+
+.btn-outline-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(108,117,125,0.2);
+}
+
+.btn-outline-danger:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(220,53,69,0.2);
+}
+
+/* Transition for smooth effects */
+.btn {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Table row hover effect */
+.table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Stats cards styling */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-body i {
+  transition: transform 0.2s ease;
+}
+
+.card:hover .card-body i {
+  transform: scale(1.1);
+}
+
+/* Badge styling */
+.badge {
+  font-size: 0.75em;
+  padding: 0.4em 0.6em;
+  border-radius: 0.375rem;
+}
+
+/* Sort icons */
+th[style*="cursor: pointer"]:hover {
+  background-color: rgba(27, 182, 193, 0.1);
+}
+
+th i {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+th:hover i {
+  opacity: 1;
+}
+
+/* Loading spinner */
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Alert styling */
+.alert {
+  border-radius: 0.5rem;
+  border: none;
+}
+
+.alert-info {
+  background-color: rgba(27, 182, 193, 0.1);
+  color: #0c5460;
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: #721c24;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .search-bar input {
+    width: 200px !important;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+  
+  .btn {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .card-body h4 {
+    font-size: 1.5rem;
+  }
+  
+  .stats-info {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .search-bar {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .search-bar input {
+    width: 180px !important;
+  }
+  
+  .d-flex.justify-content-end {
+    justify-content: center !important;
+  }
+}
+
+/* Custom progress colors */
+.progress-sangat-baik {
+  background-color: #28a745;
+}
+
+.progress-baik {
+  background-color: #17a2b8;
+}
+
+.progress-cukup {
+  background-color: #ffc107;
+}
+
+.progress-kurang {
+  background-color: #fd7e14;
+}
+
+.progress-tidak-ada {
+  background-color: #dc3545;
+}
+
+/* Tooltip styling */
+.tooltip-inner {
+  background-color: #333;
+  color: white;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+/* Table header sorting styling */
+.table thead th[style*="cursor: pointer"] {
+  user-select: none;
+  position: relative;
+}
+
+.table thead th[style*="cursor: pointer"]:hover {
+  background-color: rgba(27, 182, 193, 0.1) !important;
 }

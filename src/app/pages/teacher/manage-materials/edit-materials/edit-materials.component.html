@@ -75,6 +75,83 @@
           </div>
         </div>
 
+        <!-- ✅ TAMBAH: Row untuk kategori dan header gambar -->
+        <div class="row">
+          <!-- Kategori materi -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Kategori materi <span class="text-danger">*</span></label>
+            
+            <!-- Loading state -->
+            <div *ngIf="isLoadingKategori" class="text-muted mb-2">
+              <i class="fas fa-spinner fa-spin me-2"></i>
+              Memuat kategori...
+            </div>
+            
+            <!-- Select dropdown -->
+            <select 
+              class="form-select custom-select" 
+              formControlName="kategori"
+              [class.is-invalid]="materialForm.get('kategori')?.invalid && materialForm.get('kategori')?.touched"
+              [disabled]="isLoadingKategori"
+              *ngIf="!isLoadingKategori">
+              <option value="">Pilih kategori materi</option>
+              <option *ngFor="let kategori of kategoriList; trackBy: trackByKategori" [value]="kategori.nama">
+                {{ kategori.nama }}
+              </option>
+            </select>
+            
+            <!-- Debug info -->
+            <small class="text-muted mt-1" *ngIf="kategoriList.length > 0">
+              {{ kategoriList.length }} kategori tersedia
+            </small>
+            
+            <!-- Error message -->
+            <div *ngIf="materialForm.get('kategori')?.invalid && materialForm.get('kategori')?.touched" class="text-danger small">
+              <i class="fas fa-exclamation-circle me-1"></i>Kategori materi wajib dipilih
+            </div>
+          </div>
+
+          <!-- Header gambar -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Header gambar</label>
+            
+            <!-- Current image display -->
+            <div *ngIf="currentHeaderImageUrl && !headerImagePreview" class="mb-2">
+              <div class="current-image-container">
+                <img [src]="currentHeaderImageUrl" alt="Header gambar saat ini" class="current-image">
+                <small class="text-muted d-block mt-1">Gambar header saat ini</small>
+              </div>
+            </div>
+            
+            <!-- File input -->
+            <div class="file-upload-wrapper">
+              <input 
+                type="file" 
+                class="form-control custom-file-input" 
+                id="headerImageInput"
+                accept="image/*"
+                (change)="onHeaderImageSelected($event)">
+              <label for="headerImageInput" class="file-upload-label">
+                <i class="fas fa-cloud-upload-alt me-2"></i>
+                {{ selectedHeaderImage ? selectedHeaderImage.name : (currentHeaderImageUrl ? 'Ganti gambar header' : 'Pilih gambar header') }}
+              </label>
+            </div>
+            
+            <!-- Preview new image -->
+            <div *ngIf="headerImagePreview" class="mt-2">
+              <div class="image-preview-container">
+                <img [src]="headerImagePreview" alt="Preview" class="image-preview">
+                <button type="button" class="btn-remove-image" (click)="removeHeaderImage()">
+                  <i class="fas fa-times"></i>
+                </button>
+                <small class="text-muted d-block mt-1">Gambar header baru</small>
+              </div>
+            </div>
+            
+            <small class="text-muted">Format: JPG, PNG, GIF. Maksimal 5MB.</small>
+          </div>
+        </div>
+
         <!-- Kelas yang ditautkan -->
         <div class="mb-4">
           <label class="form-label fw-semibold">Kelas yang ditautkan <span class="text-danger">*</span></label>
@@ -291,28 +368,20 @@
                       </label>
                       <label class="radio-label">
                         <input type="radio"
+                          [checked]="questions.at(arrayIndex).value.tipeSoal === 'benar_salah'"
+                          (change)="onTipeSoalChange(arrayIndex, 'benar_salah')">
+                        <span class="radio-custom"></span>
+                        <span class="ms-2">Benar/Salah</span>
+                      </label>
+                      <!-- <label class="radio-label">
+                        <input type="radio"
                           [checked]="questions.at(arrayIndex).value.tipeSoal === 'isian_singkat'"
                           (change)="onTipeSoalChange(arrayIndex, 'isian_singkat')">
                         <span class="radio-custom"></span>
                         <span class="ms-2">Isian singkat</span>
-                      </label>
+                      </label> -->
                     </div>
                   </div>
-
-                  <!-- Soal -->
-                  <!-- <div class="mb-3">
-                    <label class="form-label fw-semibold">Soal <span class="text-danger">*</span></label>
-                    <textarea 
-                      class="form-control custom-input" 
-                      rows="4" 
-                      formControlName="soal" 
-                      placeholder="Tulis soal di sini..."
-                      [class.is-invalid]="shouldShowSoalError(arrayIndex)"></textarea>
-                   
-                    <div *ngIf="shouldShowSoalError(arrayIndex)" class="text-danger small">
-                      <i class="fas fa-exclamation-circle me-1"></i>Soal wajib diisi
-                    </div>
-                  </div> -->
 
                   <!-- Soal -->
                   <div class="mb-3">
@@ -336,13 +405,26 @@
                   <ng-container *ngIf="questions.at(arrayIndex).value.tipeSoal === 'pilihan_ganda'">
                     <div class="mb-3">
                       <div class="jawaban-kunci-header">
-                        <div class="jawaban-header">Jawaban <span class="text-danger">*</span></div>
+                        <div class="jawaban-header">
+                          Jawaban <span class="text-danger">*</span>
+                          <small class="text-muted">({{ getJawabanArray(arrayIndex).length }} jawaban)</small>
+                        </div>
                         <div class="kunci-header">Kunci jawaban <span class="text-danger">*</span></div>
+                        <div class="action-header">
+                          <button type="button" 
+                                  class="btn btn-sm btn-outline-primary me-1"
+                                  (click)="addAnswer(arrayIndex)"
+                                  [disabled]="getJawabanArray(arrayIndex).length >= 6">
+                            <i class="fas fa-plus"></i>
+                          </button>
+                        </div>
                       </div>
                       
                       <div formArrayName="jawaban">
-                        <div class="row align-items-center mb-2" *ngFor="let ctrl of getJawabanArray(arrayIndex).controls; let j = index">
-                          <div class="col-auto fw-semibold">{{ 'ABCD'[j] }}.</div>
+                        <div class="row align-items-center mb-2" 
+                             *ngFor="let ctrl of getJawabanArray(arrayIndex).controls; let j = index">
+                          <!-- ✅ PERBAIKAN: Gunakan helper method -->
+                          <div class="col-auto fw-semibold">{{ getAnswerLabel(j) }}.</div>
                           <div class="col">
                             <input type="text" 
                                    [formControlName]="j" 
@@ -360,13 +442,60 @@
                               <span class="ms-1">Benar</span>
                             </label>
                           </div>
+                          <div class="col-auto">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger"
+                                    (click)="removeAnswer(arrayIndex, j)"
+                                    [disabled]="getJawabanArray(arrayIndex).length <= 2">
+                              <i class="fas fa-minus"></i>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       
-                      <!-- ✅ Validation feedback with touch check -->
+                      <!-- Validation feedback -->
                       <div *ngIf="hasEmptyAnswers(arrayIndex)" class="text-danger small">
                         <i class="fas fa-exclamation-circle me-1"></i>Semua pilihan jawaban harus diisi
                       </div>
+                      <div *ngIf="hasNoSelectedKey(arrayIndex)" class="text-danger small">
+                        <i class="fas fa-exclamation-circle me-1"></i>Pilih kunci jawaban yang benar
+                      </div>
+                    </div>
+                  </ng-container>
+
+                  <!-- ✅ TAMBAH: Benar/Salah -->
+                  <ng-container *ngIf="questions.at(arrayIndex).value.tipeSoal === 'benar_salah'">
+                    <div class="mb-3">
+                      <div class="jawaban-kunci-header">
+                        <div class="jawaban-header">Pilihan Jawaban</div>
+                        <div class="kunci-header">Kunci jawaban <span class="text-danger">*</span></div>
+                      </div>
+                      
+                      <div formArrayName="jawaban">
+                        <div class="row align-items-center mb-2" 
+                             *ngFor="let ctrl of getJawabanArray(arrayIndex).controls; let j = index">
+                          <!-- ✅ PERBAIKAN: Gunakan helper method -->
+                          <div class="col-auto fw-semibold">{{ getAnswerLabel(j) }}.</div>
+                          <div class="col">
+                            <input type="text" 
+                                   [formControlName]="j" 
+                                   class="form-control custom-input" 
+                                   readonly
+                                   [value]="getTrueFalseOption(j)">
+                          </div>
+                          <div class="col-auto">
+                            <label class="radio-label">
+                              <input type="radio"
+                                [checked]="questions.at(arrayIndex).value.kunci === j"
+                                (change)="questions.at(arrayIndex).get('kunci')?.setValue(j); questions.at(arrayIndex).get('kunci')?.markAsTouched()"
+                                [name]="'kunci-'+arrayIndex">
+                              <span class="radio-custom"></span>
+                              <span class="ms-1">Benar</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      
                       <div *ngIf="hasNoSelectedKey(arrayIndex)" class="text-danger small">
                         <i class="fas fa-exclamation-circle me-1"></i>Pilih kunci jawaban yang benar
                       </div>

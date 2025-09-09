@@ -1,25 +1,181 @@
 <div class="materials-container">
-  <div *ngFor="let material of completedMaterials; let last = last">
-    <div class="material-item">
-      <div class="d-flex justify-content-between align-items-center">
-        <h5 class="material-title">{{ material.judul_materi }}</h5>
-        <div class="button-group">
-          <button 
-            *ngIf="material.izinkan_unduh === 1"
-            class="btn btn-download" 
-            (click)="downloadMaterial(material)"
-            title="Download Materi">
-            <i class="fas fa-download"></i>
-          </button>
-          <button class="btn btn-view" (click)="viewMaterial(material)">Lihat</button>
-        </div>
-      </div>
+  <!-- Loading state -->
+  <div *ngIf="loading" class="text-center p-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
-    <hr *ngIf="!last" class="material-divider">
+    <p class="mt-2">Memuat materi...</p>
+  </div>
+
+  <!-- ✅ PERBAIKAN: Header hanya muncul jika ada data -->
+  <div class="d-flex justify-content-between align-items-center mb-3" 
+       *ngIf="!loading && !error && ((materialCategories.length > 0 && viewMode === 'category') || (completedMaterials.length > 0 && viewMode === 'list'))">
+    <button class="btn btn-sm btn-outline-secondary" (click)="toggleViewMode()">
+      <i class="fas" [ngClass]="viewMode === 'category' ? 'fa-list' : 'fa-layer-group'"></i>
+      {{ viewMode === 'category' ? 'Tampilkan Semua List' : 'Tampilan Kategori' }}
+    </button>
   </div>
   
-  <!-- Empty state when no materials are available -->
-  <div *ngIf="completedMaterials.length === 0" class="empty-state text-center p-5">
-    <p>Belum ada materi yang diselesaikan</p>
+  <!-- Error state -->
+  <div *ngIf="error && !loading" class="alert alert-danger">
+    {{ error }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="loadCompletedMaterials()">
+      Coba Lagi
+    </button>
+  </div>
+
+  <!-- ✅ CATEGORY VIEW -->
+  <div *ngIf="!loading && !error && viewMode === 'category'">
+    <!-- ✅ PERBAIKAN: Tampilkan kategori hanya jika ada data -->
+    <div *ngIf="materialCategories.length > 0">
+      <div *ngFor="let category of materialCategories; let lastCategory = last" class="category-section">
+        <!-- Category Header -->
+        <div class="category-header">
+          <div class="d-flex align-items-center">
+            <div class="category-icon" [style.background-color]="getCategoryColor(category.name)">
+              <i class="fas" [ngClass]="getCategoryIcon(category.name)"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="category-title mb-1">Kategori {{ category.name }}</h6>
+              <small class="text-muted">
+                {{ category.materials.length }} materi • 
+                {{ category.summary.completed || category.materials.length }} selesai
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Materials in this category -->
+        <div class="materials-in-category">
+          <div *ngFor="let material of category.materials; let last = last">
+            <div class="material-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="material-info">
+                  <h5 class="material-title">{{ material.judul_materi }}</h5>
+                  
+                  <div class="material-meta">
+                    <small class="text-muted d-block">
+                      {{ getBabProgress(material) }}
+                      <span *ngIf="hasQuiz(material)" class="ms-2">
+                        • {{ material.total_soal }} soal kuis
+                      </span>
+                    </small>
+                    
+                    <!-- Quiz score jika ada -->
+                    <div *ngIf="hasQuiz(material)" class="mt-1">
+                      <small class="text-success" *ngIf="getQuizScore(material)">
+                        <i class="fas fa-trophy"></i> {{ getQuizScoreText(material) }}
+                      </small>
+                      
+                      <!-- Tanggal selesai -->
+                      <small class="text-muted ms-2" *ngIf="material.completed_at">
+                        Selesai {{ getCompletedDateText(material) }}
+                      </small>
+                    </div>
+                    
+                    <!-- Tanggal selesai untuk materi tanpa kuis -->
+                    <div *ngIf="!hasQuiz(material) && material.completed_at" class="mt-1">
+                      <small class="text-muted">
+                        Selesai {{ getCompletedDateText(material) }}
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="button-group">
+                  <button 
+                    *ngIf="canDownload(material)"
+                    class="btn-download" 
+                    (click)="downloadMaterial(material)"
+                    title="Download Materi">
+                    <i class="fas fa-download"></i>
+                  </button>
+                  
+                  <button class="btn-view" (click)="viewMaterial(material)">
+                    Pelajari lagi
+                  </button>
+                </div>
+              </div>
+            </div>
+            <hr *ngIf="!last" class="material-divider">
+          </div>
+        </div>
+        
+        <hr *ngIf="!lastCategory" class="category-divider">
+      </div>
+    </div>
+
+    <!-- ✅ EMPTY STATE untuk category view -->
+    <div *ngIf="materialCategories.length === 0" class="empty-state text-center p-5">
+      <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+      <h5>Belum ada materi yang diselesaikan</h5>
+      <p class="text-muted">Materi yang sudah Anda selesaikan akan muncul di sini</p>
+    </div>
+  </div>
+
+  <!-- ✅ LIST VIEW -->
+  <div *ngIf="!loading && !error && viewMode === 'list'">
+    <!-- ✅ PERBAIKAN: Tampilkan list hanya jika ada data -->
+    <div *ngIf="completedMaterials.length > 0">
+      <div *ngFor="let material of completedMaterials; let last = last">
+        <div class="material-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div class="material-info">
+              <h5 class="material-title">{{ material.judul_materi }}</h5>
+              
+              <div class="material-meta">
+                <small class="text-muted d-block">
+                  {{ getBabProgress(material) }}
+                  <span *ngIf="hasQuiz(material)" class="ms-2">
+                    • {{ material.total_soal }} soal kuis
+                  </span>
+                </small>
+                
+                <!-- Quiz score jika ada -->
+                <div *ngIf="hasQuiz(material)" class="mt-1">
+                  <small class="text-success" *ngIf="getQuizScore(material)">
+                    <i class="fas fa-trophy"></i> {{ getQuizScoreText(material) }}
+                  </small>
+                  
+                  <!-- ✅ TAMBAH: Tanggal selesai -->
+                  <small class="text-muted ms-2" *ngIf="material.completed_at">
+                    Selesai {{ getCompletedDateText(material) }}
+                  </small>
+                </div>
+                
+                <!-- ✅ TAMBAH: Tanggal selesai untuk materi tanpa kuis -->
+                <div *ngIf="!hasQuiz(material) && material.completed_at" class="mt-1">
+                  <small class="text-muted">
+                    Selesai {{ getCompletedDateText(material) }}
+                  </small>
+                </div>
+              </div>
+            </div>
+            
+            <div class="button-group">
+              <button 
+                *ngIf="canDownload(material)"
+                class="btn-download" 
+                (click)="downloadMaterial(material)"
+                title="Download Materi">
+                <i class="fas fa-download"></i>
+              </button>
+              
+              <button class="btn-view" (click)="viewMaterial(material)">
+                Pelajari lagi
+              </button>
+            </div>
+          </div>
+        </div>
+        <hr *ngIf="!last" class="material-divider">
+      </div>
+    </div>
+    
+    <!-- ✅ EMPTY STATE untuk list view -->
+    <div *ngIf="completedMaterials.length === 0" class="empty-state text-center p-5">
+      <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+      <h5>Belum ada materi yang diselesaikan</h5>
+      <p class="text-muted">Materi yang sudah Anda selesaikan akan muncul di sini</p>
+    </div>
   </div>
 </div>

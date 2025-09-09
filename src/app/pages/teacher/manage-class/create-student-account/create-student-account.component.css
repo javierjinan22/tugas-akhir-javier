@@ -9,56 +9,98 @@
 label {
   font-size: 14px;
   font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
-/* .btn-primary-custom {
-  background-color: #1BB6C1;
-  color: #fff;
-  border: none;
-  border-radius: 15px;
+/* ✅ SELARASKAN: Password input dengan proper padding */
+.password-input {
+  border-radius: 8px;
+  padding-right: 50px !important; /* Tambah space untuk eye icon */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  height: calc(1.5em + 0.75rem + 2px);
+  line-height: 1.5;
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
 }
 
-.btn-primary-custom:hover {
-  background-color: #17a2b8;
-} */
+.password-input:focus {
+  border-color: #1BB6C1;
+  box-shadow: 0 0 0 0.2rem rgba(27, 182, 193, 0.25);
+}
 
+/* ✅ SELARASKAN: Password toggle icon positioning yang tepat */
 .toggle-password-icon {
-  position: absolute;
-  top: 50%;
-  right: 15px;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #6c757d;
-  transition: color 0.2s ease-in-out;
+  position: absolute !important;
+  right: 15px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #6c757d !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  transition: color 0.2s ease !important;
+  z-index: 100 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
 }
 
 .toggle-password-icon:hover {
-  color: #1BB6C1;
+  color: #1BB6C1 !important;
 }
 
-a {
-  color: #1BB6C1;
-  text-decoration: none;
+/* ✅ TAMBAH: Spesific styling untuk fa-icon */
+.toggle-password-icon fa-icon {
+  width: 100% !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-a:hover {
-  text-decoration: underline;
+.toggle-password-icon fa-icon svg {
+  width: 16px !important;
+  height: 16px !important;
 }
 
-.form-control {
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  padding: 10px 15px;
-  transition: all 0.2s ease-in-out;
+/* ✅ SELARASKAN: Custom styling untuk valid inputs TANPA checkmark */
+.form-control.is-valid {
+  border-color: #28a745;
+  /* No background-image checkmark */
 }
 
-.form-control:focus {
-  border-color: #1BB6C1;
-  box-shadow: 0 0 0 2px rgba(27, 182, 193, 0.25);
+.form-control.is-valid:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* ✅ SELARASKAN: Password input valid tanpa checkmark dan padding normal */
+.password-input.is-valid {
+  padding-right: 45px !important; /* Kembali ke padding normal untuk eye icon saja */
+}
+
+/* ✅ SELARASKAN: Override untuk menghilangkan semua checkmark dari Bootstrap */
+.form-control.is-valid,
+.was-validated .form-control:valid {
+  background-image: none !important;
+}
+
+input.form-control.is-valid,
+textarea.form-control.is-valid,
+select.form-control.is-valid {
+  background-image: none !important;
+  padding-right: 0.75rem; /* Default Bootstrap padding */
+}
+
+/* ✅ TAMBAH: Khusus untuk password input, tetap gunakan padding untuk eye icon */
+input.password-input.is-valid {
+  padding-right: 45px !important; /* Space untuk eye icon */
 }
 
 .btn-outline-primary,
@@ -96,6 +138,21 @@ a:hover {
 .btn-primary:hover {
   background-color: #17a2b8;
   border-color: #17a2b8;
+}
+
+/* ✅ TAMBAH: Button disabled state */
+.btn-primary:disabled,
+.btn-outline-primary:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary:disabled:hover,
+.btn-outline-primary:disabled:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
 }
 
 /* Back button icon styling - sama seperti ClassArchived */
@@ -143,59 +200,69 @@ a:hover {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Form control styling */
-.form-control {
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  padding: 10px 15px;
-  transition: all 0.2s ease-in-out;
-  height: 45px; /* Fixed height for consistent positioning */
-}
-
-.form-control:focus {
-  border-color: #1BB6C1;
-  box-shadow: 0 0 0 2px rgba(27, 182, 193, 0.25);
-}
-
-/* ✅ PERBAIKAN POSISI TOGGLE PASSWORD ICON */
+/* ✅ SELARASKAN: Position relative untuk password container */
 .position-relative {
-  position: relative;
+  position: relative !important;
+  display: block !important;
 }
 
-.toggle-password-icon {
-  position: absolute;
-  top: calc(100% - 22.5px); /* Posisi dari bottom form-control */
-  right: 15px;
-  cursor: pointer;
-  color: #6c757d;
-  transition: color 0.2s ease-in-out;
-  font-size: 1rem;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
+/* ✅ SELARASKAN: Styling untuk error messages yang consistent */
+.text-danger {
+  color: #dc3545 !important;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
-.toggle-password-icon:hover {
-  color: #1BB6C1;
+.text-success {
+  color: #28a745 !important;
+  font-size: 0.875rem;
+  font-weight: 500;
 }
 
-/* Alternative approach - using bottom positioning */
-.toggle-password-icon-alt {
-  position: absolute;
-  bottom: 12.5px; /* Half of form-control height minus half of icon height */
-  right: 15px;
-  cursor: pointer;
-  color: #6c757d;
-  transition: color 0.2s ease-in-out;
-  font-size: 1rem;
-  z-index: 10;
+.text-muted {
+  color: #6c757d !important;
+  font-size: 0.875rem;
 }
 
-.toggle-password-icon-alt:hover {
-  color: #1BB6C1;
+/* ✅ TAMBAH: Styling untuk suggestions yang selaras */
+.btn-suggestion {
+  background: linear-gradient(135deg, #1BB6C1 0%, #17a2b8 100%);
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(27, 182, 193, 0.2);
+}
+
+.btn-suggestion:hover {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(27, 182, 193, 0.3);
+}
+
+.btn-suggestion:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(27, 182, 193, 0.2);
+}
+
+/* ✅ TAMBAH: Animation untuk suggestions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-suggestion {
+  animation: fadeInUp 0.3s ease forwards;
 }
 
 /* Alert styling */
@@ -230,6 +297,64 @@ a:hover {
   color: #0c5460;
 }
 
+/* ✅ SELARASKAN: Toast styling */
+.toast-container {
+  z-index: 1061;
+}
+
+.toast-success {
+  background-color: #28a745;
+}
+
+.toast-error {
+  background-color: #dc3545;
+}
+
+.toast-info {
+  background-color: #17a2b8;
+}
+
+.toast-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.toast.show {
+  display: block;
+  opacity: 1;
+}
+
+.toast.hide {
+  display: none;
+  opacity: 0;
+}
+
+/* ✅ TAMBAH: Icon coloring yang selaras */
+.fas.fa-check-circle {
+  color: #28a745;
+}
+
+.fas.fa-exclamation-circle {
+  color: #dc3545;
+}
+
+.fas.fa-info-circle {
+  color: #17a2b8;
+}
+
+.fas.fa-exclamation-triangle {
+  color: #ffc107;
+}
+
+.fas.fa-lightbulb {
+  color: #1BB6C1;
+}
+
+/* ✅ TAMBAH: Loading state styling */
+.fa-spinner.fa-spin {
+  color: #1BB6C1;
+}
+
 /* Gap for form sections */
 .d-flex.gap-2 {
   gap: 1rem;
@@ -245,6 +370,22 @@ label {
   margin-bottom: 0.5rem;
   display: block;
   color: #333;
+}
+
+/* ✅ SELARASKAN: Ensure proper spacing dalam password container */
+.mb-3 label {
+  position: relative;
+  z-index: 1;
+}
+
+.mb-3 .form-control {
+  position: relative;
+  z-index: 2;
+}
+
+.mb-3 .toggle-password-icon {
+  position: absolute;
+  z-index: 3;
 }
 
 /* Responsive adjustments */
@@ -287,9 +428,36 @@ label {
     text-align: center;
   }
   
-  /* Responsive toggle icon */
+  /* ✅ SELARASKAN: Responsive toggle icon */
   .toggle-password-icon {
-    top: calc(100% - 22.5px);
-    right: 12px;
+    right: 12px !important;
+    font-size: 16px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .toggle-password-icon fa-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .password-input {
+    padding-right: 45px !important;
+  }
+  
+  .password-input.is-valid {
+    padding-right: 45px !important;
+  }
+  
+  .text-danger,
+  .text-success,
+  .text-muted {
+    font-size: 0.8rem;
+  }
+  
+  .btn-suggestion {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    margin-bottom: 5px;
   }
 }

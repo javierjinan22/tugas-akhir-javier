@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDownloadComponent } from '../modal-download/modal-download.component';
-import { StudentProgressService, MaterialSummary } from '../../../../service/student-progress.service';
+import { StudentProgressService, MaterialSummary, MaterialCategory } from '../../../../service/student-progress.service';
 
 @Component({
   selector: 'app-material-finished',
@@ -10,9 +10,11 @@ import { StudentProgressService, MaterialSummary } from '../../../../service/stu
   styleUrls: ['./material-finished.component.css']
 })
 export class MaterialFinishedComponent implements OnInit {
+  materialCategories: MaterialCategory[] = [];
   completedMaterials: MaterialSummary[] = [];
   loading: boolean = false;
   error: string = '';
+  viewMode: 'category' | 'list' = 'category';
 
   constructor(
     private router: Router,
@@ -31,6 +33,7 @@ export class MaterialFinishedComponent implements OnInit {
     this.studentProgressService.getMateriWithProgress().subscribe({
       next: (response) => {
         if (response.success) {
+          this.materialCategories = this.studentProgressService.getCompletedMaterialsByCategory(response);
           this.completedMaterials = this.studentProgressService.getCompletedMaterials(response);
         } else {
           this.error = 'Gagal memuat materi';
@@ -45,9 +48,33 @@ export class MaterialFinishedComponent implements OnInit {
     });
   }
 
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'category' ? 'list' : 'category';
+  }
+
   viewMaterial(material: MaterialSummary): void {
     console.log(`Viewing completed material: ${material.judul_materi}`);
     this.router.navigate(['/siswa/materi/lihat-materi', material._id]);
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    switch (categoryName) {
+      case 'Etika Digital': return 'fa-shield-alt';
+      case 'Budaya Digital': return 'fa-laptop';
+      case 'Cakap Digital': return 'fa-cogs';
+      case 'Keamanan Digital': return 'fa-lock';
+      default: return 'fa-folder';
+    }
+  }
+
+  getCategoryColor(categoryName: string): string {
+    switch (categoryName) {
+      case 'Etika Digital': return '#28a745';
+      case 'Budaya Digital': return '#007bff';
+      case 'Cakap Digital': return '#6f42c1';
+      case 'Keamanan Digital': return '#dc3545';
+      default: return '#6c757d';
+    }
   }
 
   downloadMaterial(material: MaterialSummary): void {
@@ -69,6 +96,52 @@ export class MaterialFinishedComponent implements OnInit {
     });
   }
 
+  getBabProgress(material: MaterialSummary): string {
+    return `${material.completed_babs_count || material.total_bab} dari ${material.total_bab} bab`;
+  }
+
+  getLastAccessedText(material: MaterialSummary): string {
+    if (!material.last_accessed) return '';
+    
+    const lastAccessed = new Date(material.last_accessed);
+    const now = new Date();
+    
+    // Hitung perbedaan dalam milidetik
+    const diffMs = now.getTime() - lastAccessed.getTime();
+    
+    // Konversi ke menit
+    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+    
+    if (diffMinutes < 1) return 'Baru saja';
+    if (diffMinutes < 60) return `${diffMinutes} menit lalu`;
+    
+    // Konversi ke jam
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours} jam lalu`;
+    
+    // Konversi ke hari
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return 'Kemarin';
+    if (diffDays < 7) return `${diffDays} hari lalu`;
+    
+    // Untuk lebih dari seminggu, tampilkan tanggal
+    return lastAccessed.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'short'
+    });
+  }
+
+  getCompletedDateText(material: MaterialSummary): string {
+    if (!material.completed_at) return '';
+    
+    const completedDate = new Date(material.completed_at);
+    return completedDate.toLocaleDateString('id-ID', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
   getCompletedDate(material: MaterialSummary): Date | null {
     return material.completed_at ? new Date(material.completed_at) : null;
   }
@@ -77,11 +150,7 @@ export class MaterialFinishedComponent implements OnInit {
     return material.quiz_best_score || null;
   }
 
-  // ✅ TAMBAHKAN HELPER METHODS INI DI SINI:
-  
-  // Helper method to check if material can be downloaded
   canDownload(material: MaterialSummary): boolean {
-    // Check if download is allowed (you can adjust this logic)
     return material.flag_unduh === true || material.izinkan_unduh === 1;
   }
 

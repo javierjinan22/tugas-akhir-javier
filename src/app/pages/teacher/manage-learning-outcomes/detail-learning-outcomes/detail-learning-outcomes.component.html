@@ -1,79 +1,176 @@
 <div class="container-fluid mt-4 custom-materi-container">
-  <h2 class="fw-bold mb-4" style="font-size: 24px;">Daftar hasil belajar - materi</h2>
-
-  <!-- Action buttons and search -->
-  <div class="row">
-
-    <div class="col-md-2 mb-3">
-      <label class="mb-2">Kelas</label>
-      <ngx-select
-        [items]="classes"
-        placeholder="Pilih kelas"
-        optionValueField="id"
-        optionTextField="nama_kelas"
-        [(ngModel)]="selectedClass"
-        (ngModelChange)="onClassChange()"
-        [allowClear]="false">
-      </ngx-select>
-    </div>
-
-    <div class="col-md-2 mb-3">
-      <label class="mb-2">Tahun Ajaran</label>
-      <ngx-select
-        [items]="academicYears"
-        placeholder="Pilih tahun ajaran"
-        optionValueField="id"
-        optionTextField="nama"
-        [(ngModel)]="selectedAcademicYear"
-        (ngModelChange)="onYearChange()"
-        [allowClear]="false">
-      </ngx-select>
+  <!-- ✅ TAMBAH: Back button dan header -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToManageLearningOutcomes()" title="Kembali ke hasil belajar">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    
+    <!-- Class info header -->
+    <div *ngIf="classInfo">
+      <h2 class="fw-bold mb-0" style="font-size: 24px;">
+        Daftar materi - {{ classInfo.nama_kelas }}
+      </h2>
+      <p class="text-muted mb-0" style="font-size: 14px;">
+        <i class="fas fa-school me-1"></i>{{ classInfo.nama_sekolah }} | 
+        <i class="fas fa-calendar me-1"></i>{{ classInfo.tahun_ajaran }} | 
+        <i class="fas fa-users me-1"></i>{{ classInfo.total_siswa }} siswa
+      </p>
     </div>
     
-    <div class="d-flex justify-content-end align-items-center mb-3">
-    <div class="search-bar d-flex align-items-center">
-      <input 
-        #searchInput
-        type="text"
-        class="form-control rounded-pill me-2"
-        placeholder="Cari"
-        [(ngModel)]="keyword"
-        (keydown.enter)="onSearch()"
-        style="width: 230px;" />
-
-      <span class="search-icon" (click)="onSearch()">
-        <i class="fa fa-search"></i>
-      </span>
-    </div>
-    </div>
-
+    <!-- Default header jika classInfo belum tersedia -->
+    <h2 *ngIf="!classInfo && !loading" class="fw-bold mb-0" style="font-size: 24px;">
+      Daftar materi
+    </h2>
   </div>
 
-  <!-- Students table -->
-  <div class="table-responsive">
+  <!-- ✅ TAMBAH: Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-4" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat data materi...</p>
+    </div>
+  </div>
+
+  <!-- ✅ TAMBAH: Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshData()">
+      <i class="fas fa-sync-alt me-1"></i>Coba Lagi
+    </button>
+  </div>
+
+  <!-- ✅ FIXED: Filters dan search -->
+  <div class="row mb-3" *ngIf="!loading && getTotalMaterialsCount() > 0">
+    <!-- Kategori filter -->
+    <div class="col-md-3 mb-3">
+      <label class="mb-2 fw-medium">Kategori Materi</label>
+      <ngx-select
+        [items]="kategoriOptions"
+        optionValueField="value"
+        optionTextField="label"
+        [(ngModel)]="selectedKategori"
+        (ngModelChange)="onKategoriChange()"
+        [allowClear]="false"
+        placeholder="Pilih kategori">
+      </ngx-select>
+    </div>
+
+    <!-- Search bar -->
+    <div class="col-md-9 d-flex justify-content-end align-items-end">
+      <div class="search-bar d-flex align-items-center">
+        <input 
+          type="text"
+          class="form-control rounded-pill me-2"
+          placeholder="Cari judul materi, kategori"
+          [(ngModel)]="keyword"
+          (keydown.enter)="onSearch()"
+          (input)="onSearch()"
+          [disabled]="loading"
+          style="width: 280px;" />
+
+        <span class="search-icon" (click)="onSearch()" style="cursor: pointer;">
+          <i class="fa fa-search"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ FIXED: Materials table -->
+  <div class="table-responsive" *ngIf="!loading && !errorMsg">
     <table class="table align-middle table-bordered text-center">
-      <thead>
+      <thead class="table-light">
         <tr>
           <th>No.</th>
-          <th>Judul materi</th>
-          <th>Diselesaikan</th>
+          <th>
+            Judul Materi
+          </th>
+          <th>Kategori</th>
+          <th>
+            Diselesaikan
+          </th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let materi of filteredMateri; let i = index">
+        <tr *ngFor="let material of filteredMaterials; let i = index">
           <td>{{ i + 1 }}.</td>
-          <td>{{ materi.judul_materi }}</td>
-          <td>{{ materi.jml_diselesaikan }} / {{ materi.total_siswa }}</td>
+          <td>
+            <div class="text-start">
+              <span class="fw-medium">{{ material.judul_materi }}</span>
+            </div>
+          </td>
+          <td>
+            <span class="fw-medium">
+              {{ material.kategori_materi }}
+            </span>
+          </td>
+          <td>
+            <div class="text-center">
+              <div class="fw-medium mb-1">{{ material.siswa_selesai }} / {{ material.total_siswa }} Siswa</div>
+              <div class="progress" style="height: 8px;">
+                <div class="progress-bar" 
+                     [style.width.%]="material.persentase_selesai"
+                     [style.background-color]="getProgressColor(material.persentase_selesai)">
+                </div>
+              </div>
+              <small class="text-muted">{{ material.persentase_selesai }}%</small>
+            </div>
+          </td>
           <td class="aksi-cell">
-            <a [routerLink]="" (click)="lihatDetail(materi); $event.preventDefault()">Lihat detail</a>
+   
+              <button 
+                class="btn btn-sm btn-outline-primary" 
+                (click)="lihatDetail(material)"
+                [title]="'Lihat detail siswa untuk ' + material.judul_materi"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top">
+                <i class="fas fa-eye"></i>
+              </button>
+            
           </td>
         </tr>
-        <tr *ngIf="filteredMateri.length === 0">
-          <td colspan="3" class="text-center text-secondary py-4">Data tidak ditemukan.</td>
+        
+        <!-- ✅ FIXED: No data rows -->
+        <tr *ngIf="getFilteredMaterialsCount() === 0 && hasFiltersApplied() && !loading">
+          <td colspan="8" class="text-center text-secondary py-4">
+            <i class="fas fa-search me-2"></i>
+            Tidak ditemukan materi dengan filter yang dipilih
+            <br>
+            <button class="btn btn-sm btn-outline-secondary mt-2" (click)="resetFilters()">
+              <i class="fas fa-times me-1"></i>Reset Filter
+            </button>
+          </td>
+        </tr>
+        
+        <tr *ngIf="getTotalMaterialsCount() === 0 && !loading">
+          <td colspan="8" class="text-center text-secondary py-4">
+            <i class="fas fa-book me-2"></i>
+            Belum ada materi yang terkait dengan kelas ini.
+            <br>
+            <small class="text-muted mt-1">
+              Mulai dengan membuat materi pembelajaran dan tautkan ke kelas ini.
+            </small>
+          </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ✅ FIXED: Stats info -->
+  <div *ngIf="!loading && !errorMsg && getTotalMaterialsCount() > 0" class="mt-3">
+    <small class="text-muted">
+      <i class="fas fa-info-circle me-1"></i>
+      Total: {{ getTotalMaterialsCount() }} materi
+      <span *ngIf="getFilteredMaterialsCount() !== getTotalMaterialsCount()">
+        (menampilkan {{ getFilteredMaterialsCount() }} materi)
+      </span>
+      • 
+      Progress rata-rata: {{ getAverageProgress() }}%
+      • 
+      Total penyelesaian: {{ getTotalStudentsCompleted() }}
+    </small>
   </div>
 </div>
 

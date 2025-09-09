@@ -38,50 +38,61 @@
 
   <!-- ✅ SIMPLIFIED Material Info Card -->
   <div *ngIf="!isLoading && !errorMsg && material" class="material-info-card mb-4">
-    <div class="material-header-content">
-      <div class="material-main-info">
-        <h3 class="material-title">{{ material.title }}</h3>
-        <p class="material-description" *ngIf="material.description">{{ material.description }}</p>
-        <p class="material-description" *ngIf="!material.description">Tidak ada deskripsi</p>
+  <div class="material-header-content">
+    <div class="material-main-info">
+      <h3 class="material-title">{{ material.title }}</h3>
+      <p class="material-description" *ngIf="material.description">{{ material.description }}</p>
+      <p class="material-description" *ngIf="!material.description">Tidak ada deskripsi</p>
+    </div>
+    
+    <div class="material-meta-info">
+      <div class="meta-row">
+        <div class="meta-item">
+          <i class="fas fa-calendar-alt"></i>
+          <span>{{ formatDate(material.createdAt) }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="badge" [ngClass]="getStatusClass()">{{ getStatusText() }}</span>
+        </div>
       </div>
       
-      <div class="material-meta-info">
-        <div class="meta-row">
-          <div class="meta-item">
-            <i class="fas fa-calendar-alt"></i>
-            <span>{{ formatDate(material.createdAt) }}</span>
-          </div>
-          <div class="meta-item">
-            <span class="badge" [ngClass]="getStatusClass()">{{ getStatusText() }}</span>
-          </div>
+      <!-- ✅ TAMBAH: Row untuk kategori -->
+      <div class="meta-row" *ngIf="material.kategori">
+        <div class="meta-item">
+          <i class="fas" [ngClass]="getKategoriIcon(material.kategori)"></i>
+          <span>{{ material.kategori }}</span>
         </div>
-        
-        <div class="meta-row">
-          <div class="meta-item">
-            <i class="fas fa-users"></i>
-            <span *ngIf="material.kelasNames.length > 0">{{ material.kelasNames.join(', ') }}</span>
-            <span *ngIf="material.kelasNames.length === 0" class="text-muted">Tidak ada kelas</span>
-          </div>
-          <div class="meta-item">
-            <i class="fas" [ngClass]="material.flagUnduh ? 'fa-download' : 'fa-download-slash'"></i>
-            <span>{{ material.flagUnduh ? 'Dapat diunduh' : 'Tidak dapat diunduh' }}</span>
-          </div>
+        <div class="meta-item" *ngIf="material.headerGambar">
+          <i class="fas fa-image"></i>
+          <span>Ada gambar header</span>
         </div>
+      </div>
+      
+      <div class="meta-row">
+        <div class="meta-item">
+          <i class="fas fa-users"></i>
+          <span *ngIf="material.kelasNames.length > 0">{{ material.kelasNames.join(', ') }}</span>
+          <span *ngIf="material.kelasNames.length === 0" class="text-muted">Tidak ada kelas</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas" [ngClass]="material.flagUnduh ? 'fa-download' : 'fa-download-slash'"></i>
+          <span>{{ material.flagUnduh ? 'Dapat diunduh' : 'Tidak dapat diunduh' }}</span>
+        </div>
+      </div>
 
-        <div class="meta-row" *ngIf="getTotalQuestions() > 0">
-          <div class="meta-item">
-            <i class="fas fa-clock"></i>
-            <span>Waktu pengerjaan: {{ formatWaktuPengerjaan() }}</span>
-          </div>
-          <div class="meta-item">
-            <i class="fas fa-question-circle"></i>
-            <span>{{ getTotalQuestions() }} soal kuis</span>
-          </div>
+      <div class="meta-row" *ngIf="getTotalQuestions() > 0">
+        <div class="meta-item">
+          <i class="fas fa-clock"></i>
+          <span>Waktu pengerjaan: {{ formatWaktuPengerjaan() }}</span>
         </div>
-        
+        <div class="meta-item">
+          <i class="fas fa-question-circle"></i>
+          <span>{{ getTotalQuestions() }} soal kuis</span>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
   <!-- Tabset Navigation -->
   <div *ngIf="!isLoading && !errorMsg && material" class="wizard-container mb-4">
@@ -198,7 +209,7 @@
             <div class="question-number">{{ getQuestionNumber() }}</div>
             <div class="ms-2">
               <span class="badge badge-jenis-soal">
-                {{ getCurrentQuestion().jenis_soal === 'pilihan_ganda' ? 'Pilihan Ganda' : 'Isian Singkat' }}
+                {{ getJenisSoalText(getCurrentQuestion().jenis_soal) }}
               </span>
             </div>
           </div>
@@ -236,6 +247,35 @@
               </div>
             </div>
           </ng-container>
+
+          <!-- isian singkat -->
+
+          <ng-container *ngIf="getCurrentQuestion().jenis_soal === 'benar_salah'">
+          <div class="mb-3">
+            <div class="jawaban-kunci-header">
+              <div class="jawaban-header">Pilihan Jawaban</div>
+            </div>
+            
+            <div class="answer-options">
+              <div *ngFor="let jawaban of getCurrentQuestion().jawaban; let j = index" 
+                   class="row align-items-center mb-2">
+                <div class="col-auto fw-semibold">{{ jawaban.label }}.</div>
+                <div class="col">
+                  <div class="answer-text" 
+                       [ngClass]="{'correct-answer': getCurrentQuestion().kunci_jawaban === jawaban.text}">
+                    {{ jawaban.text }}
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <span *ngIf="getCurrentQuestion().kunci_jawaban === jawaban.text" 
+                        class="badge bg-success">
+                    <i class="fas fa-check me-1"></i>Benar
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
 
           <!-- Isian Singkat -->
           <ng-container *ngIf="getCurrentQuestion().jenis_soal === 'isian_singkat'">

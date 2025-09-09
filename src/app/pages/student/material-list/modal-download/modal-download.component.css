@@ -1,14 +1,20 @@
+.modal-content-wrapper {
+  position: relative;
+}
+
 .modal-body {
   font-family: 'Poppins', sans-serif;
-  padding: 2.2rem 1rem;
+  padding: 2.5rem 1.5rem 1.5rem;
   border-radius: 20px;
   width: 100%;
-  max-width: auto;
+  max-width: 480px;
   margin: 0 auto;
   background: #fff;
   box-sizing: border-box;
+  position: relative;
 }
 
+/* ✅ Icon Warning - posisi dan warna tetap sama */
 .icon-warning-wrapper {
   position: absolute;
   top: -35px;
@@ -21,6 +27,8 @@
   align-items: center;
   width: 70px;
   height: 70px;
+  box-shadow: 0 4px 15px rgba(239, 229, 27, 0.3);
+  z-index: 10;
 }
 
 .icon-warning-wrapper fa-icon {
@@ -29,120 +37,352 @@
   font-weight: 900;
 }
 
+/* ✅ Header Section */
+.modal-header-section {
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+}
+
 .modal-title {
   font-weight: 600;
-  font-size: 16px;
-  margin-top: 1rem;
+  font-size: 18px;
   color: #333;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
 }
 
 .modal-subtitle {
   font-size: 14px;
   color: #666;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* ✅ Download Options Cards */
+.download-options-section {
+  margin-bottom: 2rem;
+}
+
+.download-option-card {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  border: 2px solid #f0f0f0;
+  border-radius: 15px;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #ffffff;
+}
+
+.download-option-card:hover {
+  border-color: #1BB6C1;
+  background: #f8feff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(27, 182, 193, 0.15);
+}
+
+.download-option-card:last-child {
   margin-bottom: 0;
 }
 
-label {
-  font-size: 14px;
-  display: block;
-}
-
-.input-rounded {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.form-control:focus {
-  box-shadow: none;
-  border-color: #1BB6C1;
-}
-
-/* Button Layout */
-.d-flex.justify-content-between.mt-4.px-3 {
-  gap: 8px;
-}
-
-.d-flex.justify-content-between.mt-4.px-3 > button {
-  height: 42px;
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600;
-  font-size: 14px;
-  border-radius: 15px;
-  padding: 0 12px;
+.option-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #1BB6C1, #17a2b8);
+  border-radius: 12px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  border: 2px solid;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.option-icon i {
+  color: #fff;
+  font-size: 20px;
+}
+
+.option-content {
+  flex: 1;
+}
+
+.option-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.option-description {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.option-arrow {
+  width: 35px;
+  height: 35px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: all 0.3s ease;
 }
 
-.button-group-download {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  margin-top: 2rem;
+.download-option-card:hover .option-arrow {
+  background: #1BB6C1;
 }
 
-.button-group-download > button {
-  flex: none; /* Semua tombol membagi ruang secara rata */
-  max-width: 230px; /* biar tidak terlalu lebar pada layar sangat besar */
+.download-option-card:hover .option-arrow i {
+  color: #fff;
+}
+
+.option-arrow i {
+  color: #1BB6C1;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+/* ✅ Action Buttons */
+.action-buttons {
   display: flex;
-  align-items: center;
   justify-content: center;
-  border-radius: 15px;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn {
+  border: none;
+  border-radius: 12px;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
-  font-size: 15px;
-  height: 46px;
-  padding: 0 20px;
-  white-space: nowrap;
-  box-sizing: border-box;
-  transition: all 0.3s;
+  font-size: 14px;
+  height: 45px;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
 }
 
-
-.btn-outline-primary {
-  color: #1BB6C1;
-  border: 2px solid #1BB6C1;
+.btn-cancel {
   background: transparent;
+  color: #666;
+  border: 2px solid #e0e0e0;
+  min-width: 120px;
 }
 
-.btn-outline-primary:hover {
+.btn-cancel:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+  color: #333;
+}
+
+.btn-cancel i {
+  font-size: 12px;
+}
+
+/* ✅ Loading State */
+.download-option-card.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.download-option-card.loading .option-arrow {
   background: #1BB6C1;
+}
+
+.download-option-card.loading .option-arrow i {
   color: #fff;
+  animation: spin 1s linear infinite;
 }
 
-.btn-primary {
-  background: #1BB6C1;
-  border: 2px solid #1BB6C1;
-  color: #fff;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-.btn-primary:hover {
-  background: #17a2b8;
-  border-color: #17a2b8;
-}
-
-.btn-primary i {
-  font-size: 16px;
-  margin-right: 10px;
-}
-
+/* ✅ Responsive Design */
 @media (max-width: 768px) {
   .modal-body {
-    max-width: 98vw;
-    padding: 1.2rem 0.7rem;
+    max-width: 95vw;
+    padding: 2rem 1rem 1.25rem;
+    margin: 0 0.5rem;
   }
-  .button-group-download {
-    flex-direction: column;
-    gap: 14px;
+  
+  .modal-title {
+    font-size: 16px;
   }
-  .button-group-download > button {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-    padding: 0 10px;
+  
+  .download-option-card {
+    padding: 1rem;
+  }
+  
+  .option-icon {
+    width: 45px;
+    height: 45px;
+    margin-right: 0.75rem;
+  }
+  
+  .option-icon i {
+    font-size: 18px;
+  }
+  
+  .option-title {
     font-size: 15px;
   }
+  
+  .option-description {
+    font-size: 12px;
+  }
+  
+  .option-arrow {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .option-arrow i {
+    font-size: 12px;
+  }
+  
+  .btn {
+    font-size: 13px;
+    height: 42px;
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-body {
+    padding: 1.75rem 0.75rem 1rem;
+  }
+  
+  .download-option-card {
+    padding: 0.875rem;
+  }
+  
+  .modal-title {
+    font-size: 15px;
+  }
+  
+  .modal-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* ✅ TAMBAH: Custom Toast Styles */
+.toast-container {
+  z-index: 1055 !important; /* Higher than modal z-index */
+}
+
+.toast {
+  min-width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.toast.show {
+  animation: slideInRight 0.3s ease;
+}
+
+.toast.hide {
+  animation: slideOutRight 0.3s ease;
+}
+
+/* ✅ Toast Success - dengan warna #1BB6C1 */
+.toast-success {
+  background-color: #1BB6C1 !important;
+  border-left: 4px solid #17a2b8;
+}
+
+/* ✅ Toast Error */
+.toast-error {
+  background-color: #dc3545 !important;
+  border-left: 4px solid #c82333;
+}
+
+.toast-body {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.toast-body i {
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.btn-close-white:hover {
+  opacity: 1;
+}
+
+/* ✅ Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* ✅ Responsive toast */
+@media (max-width: 768px) {
+  .toast-container {
+    position: fixed !important;
+    top: 1rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+  }
+  
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .toast-body {
+    font-size: 13px;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* ✅ Ensure toast is above modal */
+.modal {
+  z-index: 1050;
+}
+
+.toast-container {
+  z-index: 1060;
 }

@@ -1,51 +1,138 @@
-<div class="container-fluid mt-4 custom-materi-container">
+<div class="container-fluid mt-4 custom-class-container">
   <h2 class="fw-bold mb-4" style="font-size: 24px;">Lihat hasil belajar</h2>
- 
-    <div class="d-flex justify-content-end align-items-center mb-3">
+
+  <!-- ✅ TAMBAH: School and teacher info -->
+  <div *ngIf="sekolahInfo && guruInfo" class="alert alert-info mb-4">
+    <i class="fas fa-school me-2"></i>
+    <strong>{{ sekolahInfo.nama }}</strong> ({{ sekolahInfo.npsn }})
+    <small class="d-block text-muted mt-1">
+      <i class="fas fa-user me-1"></i>{{ guruInfo.nama }}
+    </small>
+  </div>
+
+  <!-- ✅ TAMBAH: Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshData()">
+      <i class="fas fa-sync-alt me-1"></i>Coba Lagi
+    </button>
+  </div>
+
+  <!-- ✅ TAMBAH: Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-3" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat data hasil belajar...</p>
+    </div>
+  </div>
+
+  <!-- ✅ UPDATED: Search bar dengan style sesuai manage-class -->
+  <div class="d-flex justify-content-end align-items-center mb-3" *ngIf="!loading && getTotalClassesCount() > 0">
     <div class="search-bar d-flex align-items-center">
       <input 
-        #searchInput
         type="text"
         class="form-control rounded-pill me-2"
-        placeholder="Cari"
-        [(ngModel)]="keyword"
+        placeholder="Cari nama kelas"
+        [(ngModel)]="keyword"  
         (keydown.enter)="onSearch()"
-        style="width: 230px;" />
+        (input)="onSearch()"
+        style="width: 280px;" />
 
-      <span class="search-icon" (click)="onSearch()">
+      <span class="search-icon" (click)="onSearch()" style="cursor: pointer;">
         <i class="fa fa-search"></i>
       </span>
     </div>
-    </div>
+  </div>
 
-  <!-- Students table -->
-  <div class="table-responsive">
+  <!-- ✅ UPDATED: Classes table dengan style manage-class -->
+  <div class="table-responsive" *ngIf="!loading && !errorMsg">
     <table class="table align-middle table-bordered text-center">
-      <thead>
+      <thead class="table-light">
         <tr>
           <th>No.</th>
-          <th>Kelas</th>
-          <th>Jumlah siswa</th>
-          <th>Materi tertaut</th>
+          <th style="cursor: pointer;" (click)="sortClasses('name')">
+            Kelas
+          </th>
+          <th>Tahun Ajaran</th>
+          <th style="cursor: pointer;" (click)="sortClasses('students')">
+            Jumlah Siswa
+          </th>
+          <th style="cursor: pointer;" (click)="sortClasses('materials')">
+            Materi Tertaut
+          </th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let kelas of filteredKelas; let i = index">
           <td>{{ i + 1 }}.</td>
-          <td>{{ kelas.nama }}</td>
-          <td>{{ kelas.jumlah_siswa}}</td>
-          <td>{{ kelas.jumlah_materi }}</td>
-          <td class="aksi-cell">
-            <a [routerLink]="['/guru/hasil-belajar/detail-hasil-belajar']"(click)="lihatKelas(kelas); $event.preventDefault()">Lihat detail</a>
-            <span class="aksi-separator"></span>
+          <td>
+            <span class="fw-medium">{{ kelas.nama_kelas }}</span>
+          </td>
+          <td>
+            <small class="text-muted">{{ kelas.tahun_ajaran || '-' }}</small>
+          </td>
+          <td>
+            <span class="fw-medium">{{ kelas.jumlah_siswa }} Siswa</span>
+          </td>
+          <td>
+            <span class="fw-medium">{{ kelas.materi_tertaut }} Materi</span>
+          </td>
+          <td>
+            <div class="btn-group" role="group" aria-label="Aksi kelas">
+              <!-- Lihat Detail -->
+              <button 
+                class="btn btn-sm btn-outline-primary" 
+                (click)="lihatKelas(kelas)" 
+                [title]="'Lihat detail kelas ' + kelas.nama_kelas"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
           </td>
         </tr>
-        <tr *ngIf="filteredKelas.length === 0">
-          <td colspan="3" class="text-center text-secondary py-4">Data tidak ditemukan.</td>
+        
+        <!-- ✅ TAMBAH: No data rows -->
+        <tr *ngIf="getFilteredClassesCount() === 0 && keyword.trim() && !loading">
+          <td colspan="7" class="text-center text-secondary py-4">
+            <i class="fas fa-search me-2"></i>
+            Tidak ditemukan kelas dengan kata kunci "{{ keyword }}"
+            <br>
+            <button class="btn btn-sm btn-outline-secondary mt-2" (click)="keyword = ''; onSearch()">
+              <i class="fas fa-times me-1"></i>Hapus Filter
+            </button>
+          </td>
+        </tr>
+        
+        <tr *ngIf="getTotalClassesCount() === 0 && !keyword.trim() && !loading">
+          <td colspan="7" class="text-center text-secondary py-4">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Belum ada kelas dengan materi yang terkait.
+            <br>
+            <small class="text-muted mt-1">
+              Mulai dengan membuat materi pembelajaran dan tautkan ke kelas Anda.
+            </small>
+          </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ✅ TAMBAH: Stats info -->
+  <div *ngIf="!loading && !errorMsg && getTotalClassesCount() > 0" class="mt-3">
+    <small class="text-muted">
+      <i class="fas fa-info-circle me-1"></i>
+      Total: {{ getTotalClassesCount() }} kelas
+      <span *ngIf="getFilteredClassesCount() !== getTotalClassesCount()">
+        (menampilkan {{ getFilteredClassesCount() }} kelas)
+      </span>
+      • 
+      Siswa: {{ getTotalStudentsCount() }} 
+      • 
+      Materi tertaut: {{ getTotalMaterialsCount() }}
+    </small>
   </div>
 </div>
 

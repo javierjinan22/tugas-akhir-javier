@@ -1,3 +1,25 @@
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0" 
+       [class.show]="showToast" 
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert" 
+       aria-live="assertive" 
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button" 
+              class="btn-close btn-close-white me-2 m-auto" 
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-header">
   <h5 class="modal-title">Daftar sebagai siswa</h5>
   <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
@@ -5,72 +27,195 @@
 
 <div class="modal-body">
   <form [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()">
+    <!-- ✅ NAMA LENGKAP dengan friendly error messages -->
     <div class="mb-3">
       <label>Nama Lengkap <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" formControlName="nama_lengkap" />
+      <input type="text" 
+             class="form-control" 
+             formControlName="nama_lengkap"
+             placeholder="Masukkan nama lengkap"
+             [class.is-invalid]="registerForm.get('nama_lengkap')?.invalid && registerForm.get('nama_lengkap')?.touched"
+             [class.is-valid]="registerForm.get('nama_lengkap')?.valid && registerForm.get('nama_lengkap')?.value" />
+      
+      <!-- ✅ PERBAIKAN: Error message yang lebih friendly -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('nama_lengkap')?.invalid && registerForm.get('nama_lengkap')?.touched">
+        {{ getFirstErrorMessage('nama_lengkap') }}
+      </small>
     </div>
 
+    <!-- ✅ USERNAME dengan styling yang selaras -->
     <div class="mb-3">
       <label>Username <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" formControlName="username" />
+      <input type="text" 
+             class="form-control" 
+             formControlName="username"
+             placeholder="Masukkan username unik (3-20 karakter)"
+             [class.is-invalid]="(registerForm.get('username')?.invalid && registerForm.get('username')?.touched) || usernameError"
+             [class.is-valid]="registerForm.get('username')?.valid && registerForm.get('username')?.value && !usernameError" />
+      
+      <!-- ✅ PERBAIKAN: Error message yang friendly -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched && !usernameError">
+        {{ getFirstErrorMessage('username') }}
+      </small>
+      
+      <!-- Username taken error -->
+      <small class="text-danger d-block mt-1" *ngIf="usernameError">
+        <i class="fas fa-exclamation-circle me-1"></i>{{ usernameError }}
+      </small>
+      
+      <!-- ✅ PERBAIKAN: Username suggestions dengan styling selaras -->
+      <div *ngIf="usernameSuggestions.length > 0" class="mt-2">
+        <small class="text-muted d-block mb-2">
+          <i class="fas fa-lightbulb me-1" style="color: #1BB6C1;"></i>Saran username:
+        </small>
+        <div class="d-flex flex-wrap gap-2">
+          <button *ngFor="let suggestion of usernameSuggestions" 
+                  type="button"
+                  class="btn btn-suggestion"
+                  (click)="useSuggestedUsername(suggestion)">
+            {{ suggestion }}
+          </button>
+        </div>
+      </div>
+      
+      <!-- Success indicator -->
+      <small class="text-success d-block mt-1" *ngIf="registerForm.get('username')?.valid && registerForm.get('username')?.value && !usernameError && validationDataLoaded">
+        <i class="fas fa-check-circle me-1"></i>Username tersedia
+      </small>
+      
+      <!-- Loading indicator for validation -->
+      <small class="text-muted d-block mt-1" *ngIf="!validationDataLoaded">
+        <i class="fas fa-spinner fa-spin me-1"></i>Memuat data validasi...
+      </small>
     </div>
 
-    <div class="mb-3 position-relative">
+    <!-- ✅ PERBAIKAN: PASSWORD tanpa icon exclamation -->
+    <div class="mb-3">
       <label>Password <span class="text-danger">*</span></label>
-      <input
-        [type]="passwordVisible ? 'text' : 'password'"
-        class="form-control"
-        formControlName="password"
-      />
-      <fa-icon
-        [icon]="passwordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="togglePasswordVisibility()"
-      ></fa-icon>
+      <div class="position-relative">
+        <input
+          [type]="passwordVisible ? 'text' : 'password'"
+          class="form-control password-input"
+          formControlName="password"
+          placeholder="Minimal 6 karakter"
+          [class.is-valid]="registerForm.get('password')?.valid && registerForm.get('password')?.value"
+        />
+        <fa-icon
+          [icon]="passwordVisible ? faEyeSlash : faEye"
+          class="toggle-password-icon"
+          (click)="togglePasswordVisibility()"
+        ></fa-icon>
+      </div>
+      
+      <!-- ✅ PERBAIKAN: Error message tanpa invalid class pada input -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+        {{ getFirstErrorMessage('password') }}
+      </small>
     </div>
 
-    <div class="mb-3 position-relative">
+    <!-- ✅ PERBAIKAN: KONFIRMASI PASSWORD tanpa icon exclamation -->
+    <div class="mb-3">
       <label>Konfirmasi Password <span class="text-danger">*</span></label>
-      <input
-        [type]="confirmPasswordVisible ? 'text' : 'password'"
-        class="form-control"
-        formControlName="konfirmasi_password"
-      />
-      <fa-icon
-        [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="toggleConfirmPasswordVisibility()"
-      ></fa-icon>
+      <div class="position-relative">
+        <input
+          [type]="confirmPasswordVisible ? 'text' : 'password'"
+          class="form-control password-input"
+          formControlName="konfirmasi_password"
+          placeholder="Ulangi password"
+          [class.is-valid]="registerForm.get('konfirmasi_password')?.valid && registerForm.get('konfirmasi_password')?.value"
+        />
+        <fa-icon
+          [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
+          class="toggle-password-icon"
+          (click)="toggleConfirmPasswordVisibility()"
+        ></fa-icon>
+      </div>
+      
+      <!-- ✅ PERBAIKAN: Error message tanpa invalid class pada input -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('konfirmasi_password')?.invalid && registerForm.get('konfirmasi_password')?.touched">
+        {{ getFirstErrorMessage('konfirmasi_password') }}
+      </small>
     </div>
 
+    <!-- SEKOLAH dropdown -->
     <div class="mb-3 flex-fill">
       <label>Sekolah <span class="text-danger">*</span></label>
+      
+      <div *ngIf="loadingSchools" class="text-center py-2 mb-2">
+        <i class="fas fa-spinner fa-spin me-2"></i>
+        <small class="text-muted">Memuat daftar sekolah...</small>
+      </div>
+      
       <ngx-select
         formControlName="sekolah"
         [items]="schools"
         optionValueField="_id"
         optionTextField="nama"
         placeholder="Pilih sekolah"
-        [allowClear]="false"
-      ></ngx-select>
+        [allowClear]="true"
+        noResultsFound="Tidak ada sekolah ditemukan"
+        [disabled]="loadingSchools">
+      </ngx-select>
+      
+      <small class="text-muted d-block mt-1" *ngIf="!loadingSchools && schools.length === 0">
+        <i class="fas fa-exclamation-triangle me-1"></i>Belum ada data sekolah
+      </small>
+      
+      <!-- ✅ PERBAIKAN: Error message yang friendly -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('sekolah')?.invalid && registerForm.get('sekolah')?.touched">
+        {{ getFirstErrorMessage('sekolah') }}
+      </small>
     </div>
 
+    <!-- KELAS dropdown -->
     <div class="mb-3 flex-fill">
       <label>Kelas <span class="text-danger">*</span></label>
+      
+      <div *ngIf="loadingClasses" class="text-center py-2 mb-2">
+        <i class="fas fa-spinner fa-spin me-2"></i>
+        <small class="text-muted">Memuat daftar kelas...</small>
+      </div>
+      
       <ngx-select
         formControlName="kelas"
         [items]="classes"
         optionValueField="_id"
         optionTextField="nama_kelas"
         placeholder="Pilih kelas"
-        [allowClear]="false"
-      ></ngx-select>
+        [allowClear]="true"
+        noResultsFound="Tidak ada kelas tersedia"
+        [disabled]="loadingClasses || !registerForm.get('sekolah')?.value">
+      </ngx-select>
+      
+      <small class="text-muted d-block mt-1" *ngIf="!registerForm.get('sekolah')?.value && !loadingSchools && !loadingClasses">
+        <i class="fas fa-info-circle me-1"></i>Pilih sekolah terlebih dahulu
+      </small>
+      
+      <small class="text-muted d-block mt-1" *ngIf="registerForm.get('sekolah')?.value && !loadingClasses && classes.length === 0">
+        <i class="fas fa-exclamation-triangle me-1"></i>Sekolah ini belum memiliki kelas aktif
+      </small>
+      
+      <small class="text-success d-block mt-1" *ngIf="!loadingClasses && classes.length > 0">
+        <i class="fas fa-check-circle me-1"></i>{{ classes.length }} kelas tersedia
+      </small>
+      
+      <!-- ✅ PERBAIKAN: Error message yang friendly -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('kelas')?.invalid && registerForm.get('kelas')?.touched">
+        {{ getFirstErrorMessage('kelas') }}
+      </small>
     </div>
 
-    <small *ngIf="errorMsg" class="text-danger d-block mb-2">{{ errorMsg }}</small>
+    <!-- Error message -->
+    <small *ngIf="errorMsg && !showToast" class="text-danger d-block mb-2">{{ errorMsg }}</small>
 
-    <button type="submit" class="btn btn-primary-custom w-100" [disabled]="registerForm.invalid || loading">
-      {{ loading ? 'Mendaftar...' : 'Daftar' }}
+    <!-- Submit button -->
+    <button type="submit" 
+            class="btn btn-primary-custom w-100" 
+            [disabled]="registerForm.invalid || loading || loadingSchools || loadingClasses || usernameError || !validationDataLoaded">
+      <span *ngIf="loading">
+        <i class="fas fa-spinner fa-spin me-2"></i>Mendaftar...
+      </span>
+      <span *ngIf="!loading">Daftar</span>
     </button>
   </form>
 </div>

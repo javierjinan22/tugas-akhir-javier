@@ -37,22 +37,19 @@
 }
 
 .btn-download {
-  background-color: #F9D349;
-  color: #6C613B;
-  border: none;
-  border-radius: 12px;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  font-size: 14px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #6c757d;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
 }
 
 .btn-download:hover {
-  background-color: #f0c926;
+  background: #e9ecef;
+  color: #495057;
+  transform: translateY(-1px);
 }
 
 .material-divider {
@@ -60,7 +57,182 @@
   opacity: 0.6;
 }
 
+/* ✅ TAMBAH: Status badge dengan warna sesuai gambar */
+.status-badge {
+  background-color: #E8F4FD;
+  color: #1976D2;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* ✅ TAMBAH: Progress bar dengan warna cyan sesuai gambar */
+.progress {
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  overflow: hidden;
+  height: 6px;
+}
+
+.progress-bar {
+  background-color: #00BCD4; /* Cyan color sesuai gambar */
+  transition: width 0.3s ease;
+}
+
+/* ✅ TAMBAH: Material info styling */
+.material-info {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.material-meta {
+  margin-top: 8px;
+  margin-bottom: 12px;
+}
+
+/* ✅ TAMBAH: Empty state styling */
 .empty-state {
   color: #757575;
   font-style: italic;
+  padding: 3rem 1rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+  margin: 2rem 0;
+}
+
+.empty-state i {
+  opacity: 0.5;
+}
+
+.empty-state i.fa-check-circle {
+  opacity: 0.6;
+}
+
+.empty-state h5 {
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+/* ✅ TAMBAH: Responsive design */
+@media (max-width: 768px) {
+  .material-item {
+    padding: 12px 0;
+  }
+  
+  .material-info {
+    margin-right: 0.5rem;
+  }
+  
+  .button-group {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .btn-view {
+    font-size: 14px;
+    padding: 6px 16px;
+  }
+  
+  .btn-download {
+    width: 35px;
+    height: 35px;
+    font-size: 12px;
+  }
+  
+  .empty-state {
+    padding: 2rem 1rem !important;
+    margin: 1rem 0;
+  }
+  
+  .empty-state i.fa-check-circle {
+    font-size: 2rem !important;
+  }
+  
+  .empty-state h5 {
+    font-size: 1.1rem;
+  }
+}
+
+/* ✅ TAMBAH: Styling untuk completed status */
+.status-badge.completed {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* ✅ SUCCESS BADGE untuk quiz score */
+.badge.bg-success {
+  font-size: 0.75rem;
+}
+
+/* ✅ Pastikan CSS category sudah ada (copy dari material-studied) */
+.category-view {
+  margin-top: 1rem;
+}
+
+.category-section {
+  margin-bottom: 2rem;
+}
+
+.category-header {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #28a745; /* Hijau untuk completed */
+}
+
+.category-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+}
+
+.category-title {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.materials-in-category {
+  padding-left: 1rem;
+  border-left: 2px solid #e9ecef;
+  margin-left: 20px;
+}
+
+.category-divider {
+  margin: 2rem 0;
+  border-color: #dee2e6;
+  opacity: 0.5;
+}
+
+.category-view .material-item {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.category-view .material-item:hover {
+  border-color: #28a745;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
 }

@@ -1,68 +1,25 @@
-<!-- <div class="modal-header">
-  <h5 class="modal-title">Daftar sebagai guru</h5>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0" 
+       [class.show]="showToast" 
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert" 
+       aria-live="assertive" 
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button" 
+              class="btn-close btn-close-white me-2 m-auto" 
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
 </div>
 
-<div class="modal-body">
-  <form (ngSubmit)="onSubmitRegister()">
-    <div class="mb-3">
-      <label>Nama Lengkap <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" required [(ngModel)]="fullName" name="fullName" />
-    </div>
-
-    <div class="mb-3">
-      <label>Email <span class="text-danger">*</span></label>
-      <input type="email" class="form-control" required [(ngModel)]="email" name="email" />
-    </div>
-
-    <div class="mb-3 position-relative">
-    <label>Password <span class="text-danger">*</span></label>
-    <input
-        [type]="passwordVisible ? 'text' : 'password'"
-        class="form-control"
-        required
-        [(ngModel)]="password"
-        name="password"
-    />
-    <fa-icon
-        [icon]="passwordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="togglePasswordVisibility()"
-    ></fa-icon>
-    </div>
-
-    <div class="mb-3 position-relative">
-    <label>Konfirmasi password <span class="text-danger">*</span></label>
-    <input
-        [type]="confirmPasswordVisible ? 'text' : 'password'"
-        class="form-control"
-        required
-        [(ngModel)]="confirmPassword"
-        name="confirmPassword"
-    />
-    <fa-icon
-        [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="toggleConfirmPasswordVisibility()"
-    ></fa-icon>
-    </div>
-
-
-
-    <div class="mb-3 d-flex gap-2">
-      <div class="flex-fill">
-        <label>NUPTK <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" required [(ngModel)]="nuptk" name="nuptk" />
-      </div>
-      <div class="flex-fill">
-        <label>Instansi <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" required [(ngModel)]="instansi" name="instansi" />
-      </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary-custom w-100">Daftar</button>
-  </form>
-</div> -->
 <div class="modal-header">
   <h5 class="modal-title">Daftar sebagai guru</h5>
   <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
@@ -70,60 +27,208 @@
 
 <div class="modal-body">
   <form [formGroup]="registerForm" (ngSubmit)="onSubmitRegister()">
+    <!-- ✅ NAMA LENGKAP dengan friendly error messages -->
     <div class="mb-3">
       <label>Nama Lengkap <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" formControlName="nama_lengkap" />
+      <input type="text" 
+             class="form-control" 
+             formControlName="nama_lengkap"
+             placeholder="Masukkan nama lengkap"
+             [class.is-invalid]="registerForm.get('nama_lengkap')?.invalid && registerForm.get('nama_lengkap')?.touched"
+             [class.is-valid]="registerForm.get('nama_lengkap')?.valid && registerForm.get('nama_lengkap')?.value" />
+      
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('nama_lengkap')?.invalid && registerForm.get('nama_lengkap')?.touched">
+        {{ getFirstErrorMessage('nama_lengkap') }}
+      </small>
     </div>
 
+    <!-- ✅ EMAIL dengan validation -->
     <div class="mb-3">
       <label>Email <span class="text-danger">*</span></label>
-      <input type="email" class="form-control" formControlName="email" />
+      <input type="email" 
+             class="form-control" 
+             formControlName="email"
+             placeholder="Masukkan alamat email"
+             [class.is-invalid]="(registerForm.get('email')?.invalid && registerForm.get('email')?.touched) || emailError"
+             [class.is-valid]="registerForm.get('email')?.valid && registerForm.get('email')?.value && !emailError" />
+      
+      <!-- Basic validation error -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched && !emailError">
+        {{ getFirstErrorMessage('email') }}
+      </small>
+      
+      <!-- Email taken error -->
+      <small class="text-danger d-block mt-1" *ngIf="emailError">
+        <i class="fas fa-exclamation-circle me-1"></i>{{ emailError }}
+      </small>
+      
+      <!-- Email suggestions -->
+      <div *ngIf="emailSuggestions.length > 0" class="mt-2">
+        <small class="text-muted d-block mb-2">
+          <i class="fas fa-lightbulb me-1" style="color: #1BB6C1;"></i>Saran email:
+        </small>
+        <div class="d-flex flex-wrap gap-2">
+          <button *ngFor="let suggestion of emailSuggestions" 
+                  type="button"
+                  class="btn btn-suggestion"
+                  (click)="useSuggestedEmail(suggestion)">
+            {{ suggestion }}
+          </button>
+        </div>
+      </div>
+      
+      <!-- Success indicator -->
+      <small class="text-success d-block mt-1" *ngIf="registerForm.get('email')?.valid && registerForm.get('email')?.value && !emailError && validationDataLoaded">
+        <i class="fas fa-check-circle me-1"></i>Email tersedia
+      </small>
+      
+      <!-- Loading indicator -->
+      <small class="text-muted d-block mt-1" *ngIf="!validationDataLoaded">
+        <i class="fas fa-spinner fa-spin me-1"></i>Memuat data validasi...
+      </small>
     </div>
 
+    <!-- ✅ USERNAME dengan validation -->
     <div class="mb-3">
       <label>Username <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" formControlName="username" />
+      <input type="text" 
+             class="form-control" 
+             formControlName="username"
+             placeholder="Masukkan username unik (3-20 karakter)"
+             [class.is-invalid]="(registerForm.get('username')?.invalid && registerForm.get('username')?.touched) || usernameError"
+             [class.is-valid]="registerForm.get('username')?.valid && registerForm.get('username')?.value && !usernameError" />
+      
+      <!-- Basic validation error -->
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched && !usernameError">
+        {{ getFirstErrorMessage('username') }}
+      </small>
+      
+      <!-- Username taken error -->
+      <small class="text-danger d-block mt-1" *ngIf="usernameError">
+        <i class="fas fa-exclamation-circle me-1"></i>{{ usernameError }}
+      </small>
+      
+      <!-- Username suggestions -->
+      <div *ngIf="usernameSuggestions.length > 0" class="mt-2">
+        <small class="text-muted d-block mb-2">
+          <i class="fas fa-lightbulb me-1" style="color: #1BB6C1;"></i>Saran username:
+        </small>
+        <div class="d-flex flex-wrap gap-2">
+          <button *ngFor="let suggestion of usernameSuggestions" 
+                  type="button"
+                  class="btn btn-suggestion"
+                  (click)="useSuggestedUsername(suggestion)">
+            {{ suggestion }}
+          </button>
+        </div>
+      </div>
+      
+      <!-- Success indicator -->
+      <small class="text-success d-block mt-1" *ngIf="registerForm.get('username')?.valid && registerForm.get('username')?.value && !usernameError && validationDataLoaded">
+        <i class="fas fa-check-circle me-1"></i>Username tersedia
+      </small>
     </div>
 
-    <div class="mb-3 position-relative">
+    <!-- ✅ PASSWORD tanpa icon exclamation -->
+    <div class="mb-3">
       <label>Password <span class="text-danger">*</span></label>
-      <input
-        [type]="passwordVisible ? 'text' : 'password'"
-        class="form-control"
-        formControlName="password"
-      />
-      <fa-icon
-        [icon]="passwordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="togglePasswordVisibility()"
-      ></fa-icon>
+      <div class="position-relative">
+        <input
+          [type]="passwordVisible ? 'text' : 'password'"
+          class="form-control password-input"
+          formControlName="password"
+          placeholder="Minimal 6 karakter"
+          [class.is-valid]="registerForm.get('password')?.valid && registerForm.get('password')?.value"
+        />
+        <fa-icon
+          [icon]="passwordVisible ? faEyeSlash : faEye"
+          class="toggle-password-icon"
+          (click)="togglePasswordVisibility()"
+        ></fa-icon>
+      </div>
+      
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+        {{ getFirstErrorMessage('password') }}
+      </small>
     </div>
 
-    <div class="mb-3 position-relative">
+    <!-- ✅ KONFIRMASI PASSWORD tanpa icon exclamation -->
+    <div class="mb-3">
       <label>Konfirmasi Password <span class="text-danger">*</span></label>
-      <input
-        [type]="confirmPasswordVisible ? 'text' : 'password'"
-        class="form-control"
-        formControlName="konfirmasi_password"
-      />
-      <fa-icon
-        [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
-        class="toggle-password-icon"
-        (click)="toggleConfirmPasswordVisibility()"
-      ></fa-icon>
+      <div class="position-relative">
+        <input
+          [type]="confirmPasswordVisible ? 'text' : 'password'"
+          class="form-control password-input"
+          formControlName="konfirmasi_password"
+          placeholder="Ulangi password"
+          [class.is-valid]="registerForm.get('konfirmasi_password')?.valid && registerForm.get('konfirmasi_password')?.value"
+        />
+        <fa-icon
+          [icon]="confirmPasswordVisible ? faEyeSlash : faEye"
+          class="toggle-password-icon"
+          (click)="toggleConfirmPasswordVisibility()"
+        ></fa-icon>
+      </div>
+      
+      <small class="text-danger d-block mt-1" *ngIf="registerForm.get('konfirmasi_password')?.invalid && registerForm.get('konfirmasi_password')?.touched">
+        {{ getFirstErrorMessage('konfirmasi_password') }}
+      </small>
     </div>
 
+    <!-- ✅ NUPTK dan INSTANSI dengan validation -->
     <div class="mb-3 d-flex gap-2">
       <div class="flex-fill">
         <label>NUPTK <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" formControlName="nuptk" />
+        <input type="text" 
+               class="form-control" 
+               formControlName="nuptk"
+               placeholder="xxxx-xxxx-xxxx-xxxx"
+               maxlength="19"
+               [class.is-invalid]="(registerForm.get('nuptk')?.invalid && registerForm.get('nuptk')?.touched) || nuptkError"
+               [class.is-valid]="registerForm.get('nuptk')?.valid && registerForm.get('nuptk')?.value && !nuptkError" />
+        
+        <!-- Basic validation error -->
+        <small class="text-danger d-block mt-1" *ngIf="registerForm.get('nuptk')?.invalid && registerForm.get('nuptk')?.touched && !nuptkError">
+          {{ getFirstErrorMessage('nuptk') }}
+        </small>
+        
+        <!-- NUPTK taken error -->
+        <small class="text-danger d-block mt-1" *ngIf="nuptkError">
+          <i class="fas fa-exclamation-circle me-1"></i>{{ nuptkError }}
+        </small>
+        
+        <!-- Success indicator -->
+        <small class="text-success d-block mt-1" *ngIf="registerForm.get('nuptk')?.valid && registerForm.get('nuptk')?.value && !nuptkError && validationDataLoaded">
+          <i class="fas fa-check-circle me-1"></i>NUPTK valid
+        </small>
       </div>
+      
       <div class="flex-fill">
         <label>Instansi <span class="text-danger">*</span></label>
-        <input type="text" class="form-control" formControlName="instansi" />
+        <input type="text" 
+               class="form-control" 
+               formControlName="instansi"
+               placeholder="Nama sekolah/instansi"
+               [class.is-invalid]="registerForm.get('instansi')?.invalid && registerForm.get('instansi')?.touched"
+               [class.is-valid]="registerForm.get('instansi')?.valid && registerForm.get('instansi')?.value" />
+        
+        <small class="text-danger d-block mt-1" *ngIf="registerForm.get('instansi')?.invalid && registerForm.get('instansi')?.touched">
+          {{ getFirstErrorMessage('instansi') }}
+        </small>
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary-custom w-100" [disabled]="registerForm.invalid">Daftar</button>
+    <!-- Error message -->
+    <small *ngIf="errorMsg && !showToast" class="text-danger d-block mb-2">{{ errorMsg }}</small>
+
+    <!-- Submit button -->
+    <button type="submit" 
+            class="btn btn-primary-custom w-100" 
+            [disabled]="registerForm.invalid || loading || usernameError || emailError || nuptkError || !validationDataLoaded">
+      <span *ngIf="loading">
+        <i class="fas fa-spinner fa-spin me-2"></i>Mendaftar...
+      </span>
+      <span *ngIf="!loading">Daftar</span>
+    </button>
   </form>
 </div>

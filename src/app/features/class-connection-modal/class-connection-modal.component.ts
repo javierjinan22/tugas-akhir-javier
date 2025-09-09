@@ -18,14 +18,19 @@ export class ClassConnectionModalComponent implements OnInit {
 
   faExclamation = faExclamation;
 
-  school: any;  // Data sekolah yang diterima dari modal sebelumnya
-  isMandatory: boolean = false; // Whether class creation is mandatory
-  isFromLogin: boolean = false; // Whether opened from login flow
-  classForm!: FormGroup;  // FormGroup untuk menangani data kelas
-  isFormInitialized = false; // Flag to check if form is ready
-  isSubmitting = false; // Loading state for form submission
-  submitError = ''; // Error message for submission
-  classesCreated = 0; // Track how many classes were successfully created
+  school: any;
+  isMandatory: boolean = false;
+  isFromLogin: boolean = false;
+  classForm!: FormGroup;
+  isFormInitialized = false;
+  isSubmitting = false;
+  submitError = '';
+  classesCreated = 0;
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
 
   academicYears: AcademicYear[] = [
     { id: 1, name: '2023/2024' },
@@ -55,12 +60,10 @@ export class ClassConnectionModalComponent implements OnInit {
     }, 0);
   }
 
-  // Getter untuk mengakses FormArray dengan type yang benar
   get classFormArray(): FormArray {
     return this.classForm?.get('classes') as FormArray;
   }
 
-  // Getter untuk mendapatkan array of FormGroup untuk template
   get classFormControls(): FormGroup[] {
     if (!this.classFormArray) {
       return [];
@@ -68,7 +71,6 @@ export class ClassConnectionModalComponent implements OnInit {
     return this.classFormArray.controls as FormGroup[];
   }
 
-  // Fungsi untuk menambah kelas baru
   onAdd() {
     if (!this.classForm) {
       return;
@@ -79,10 +81,9 @@ export class ClassConnectionModalComponent implements OnInit {
       tahun_ajaran: ['', Validators.required]
     });
 
-    this.classFormArray.push(classGroup);  // Menambahkan FormGroup untuk kelas
+    this.classFormArray.push(classGroup);
   }
 
-  // Fungsi untuk menghapus kelas berdasarkan index yang dipilih
   onRemove(event: any) {
     const index = event.index; // Ambil index yang diterima dari event
     if (this.classFormArray && this.classFormArray.length > 1) {
@@ -90,7 +91,6 @@ export class ClassConnectionModalComponent implements OnInit {
     }
   }
 
-  // Method untuk mendapatkan FormGroup pada index tertentu
   getFormGroupAtIndex(index: number): FormGroup | null {
     if (!this.classFormArray || index < 0 || index >= this.classFormArray.length) {
       return null;
@@ -100,30 +100,26 @@ export class ClassConnectionModalComponent implements OnInit {
 
   onCancelClicked() {
     if (this.isMandatory) {
-      // If class creation is mandatory, show confirmation message
       if (confirm('Anda harus membuat minimal satu kelas untuk melanjutkan. Yakin ingin membatalkan?')) {
-        // User confirmed cancellation - this shouldn't happen in mandatory flow
-        // But if it does, we don't close the modal
         return;
       }
     } else {
-      // Normal cancellation for non-mandatory flow
       this.activeModal.hide();
     }
   }
 
   onSubmitClicked() {
     if (!this.classForm || this.classForm.invalid) {
-      // Mark all fields as touched to show validation errors
+      this.showErrorToast('Mohon lengkapi semua field yang wajib diisi');
       this.markAllFieldsAsTouched();
-      return;  // Jangan lanjutkan jika form tidak valid
+      return;
     }
 
-    // Ambil nilai dari FormArray
     const token = localStorage.getItem('token');
     const classes = this.classForm.value.classes;
 
     if (!classes || classes.length === 0) {
+      this.showErrorToast('Minimal harus membuat satu kelas');
       return;
     }
 
@@ -131,22 +127,25 @@ export class ClassConnectionModalComponent implements OnInit {
     this.submitError = '';
     this.classesCreated = 0;
 
-    // Counter untuk track berapa kelas yang sudah diproses
+    this.showInfoToast(`Sedang membuat ${classes.length} kelas...`);
+
     let processedCount = 0;
     const totalClasses = classes.length;
 
-    // Kirim data kelas termasuk ID sekolah yang diteruskan dari modal sebelumnya
     classes.forEach((kelas: any, index: number) => {
       this.classService.addClass({
         nama_kelas: kelas.nama_kelas,
         tahun_ajaran: kelas.tahun_ajaran,
-        id_sekolah: this.school?._id  // Use optional chaining
+        id_sekolah: this.school?._id
       }, token!).subscribe({
         next: (response) => {
           this.classesCreated++;
           processedCount++;
-          
-          // Check if all classes have been processed
+
+          if (this.classesCreated === 1) {
+            this.showSuccessToast(`Kelas "${kelas.nama_kelas}" berhasil dibuat!`);
+          }
+
           if (processedCount === totalClasses) {
             this.handleSubmissionComplete();
           }
@@ -154,11 +153,12 @@ export class ClassConnectionModalComponent implements OnInit {
         error: (err) => {
           console.error(`❌ Failed to create class ${index + 1}:`, err);
           processedCount++;
-          
-          // Set error message
-          this.submitError = `Gagal membuat kelas "${kelas.nama_kelas}": ${err?.error?.message || 'Terjadi kesalahan'}`;
-          
-          // Check if all classes have been processed
+
+          const errorMsg = err?.error?.message || 'Terjadi kesalahan';
+          this.showErrorToast(`Gagal membuat kelas "${kelas.nama_kelas}": ${errorMsg}`);
+
+          this.submitError = `Gagal membuat kelas "${kelas.nama_kelas}": ${errorMsg}`;
+
           if (processedCount === totalClasses) {
             this.handleSubmissionComplete();
           }
@@ -179,20 +179,81 @@ export class ClassConnectionModalComponent implements OnInit {
     this.isSubmitting = false;
 
     if (this.classesCreated > 0) {
-      
-      // If at least one class was created successfully, close modal
+      const successMsg = this.classesCreated > 1
+        ? `Berhasil membuat ${this.classesCreated} kelas!`
+        : 'Kelas berhasil dibuat!';
+      this.showSuccessToast(successMsg);
+
+      if (this.school && !localStorage.getItem('schoolId')) {
+        localStorage.setItem('schoolId', this.school._id);
+        localStorage.setItem('schoolName', this.school.nama);
+      }
+
       setTimeout(() => {
         this.activeModal.hide();
-      }, 1000); // Short delay to show success message
+      }, 2500);
     } else {
-      
-      // If no classes were created and it's mandatory, don't close modal
+      this.showErrorToast('Tidak ada kelas yang berhasil dibuat');
+
       if (this.isMandatory) {
-        // Form will remain open with error message
       } else {
-        // For non-mandatory flow, close modal even if creation failed
         this.activeModal.hide();
       }
+    }
+  }
+
+  private showSuccessToast(message: string): void {
+    this.hideToast(); 
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 3000);
+    }, 100);
+  }
+
+  private showErrorToast(message: string): void {
+    this.hideToast(); 
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 4000);
+    }, 100);
+  }
+
+  private showInfoToast(message: string): void {
+    this.hideToast(); 
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-info';
+      this.toastIcon = 'fas fa-info-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 3000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
     }
   }
 }

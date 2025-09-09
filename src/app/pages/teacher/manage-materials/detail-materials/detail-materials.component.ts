@@ -12,6 +12,8 @@ interface ProcessedMaterial {
   id: string;
   title: string;
   description: string;
+  kategori?: string; 
+  headerGambar?: string;
   pages: MaterialPage[];
   progress: number;
   isRead: boolean;
@@ -100,87 +102,120 @@ export class DetailMaterialsComponent implements OnInit {
   }
 
   processMaterialData(data: any): void {
-    // Get class names
-    this.materialService.getClassNamesByIds(data.kelas_ditautkan || [], this.token).subscribe({
-      next: (classMap) => {
-        const kelasNames = data.kelas_ditautkan?.map((classId: string) => 
-          classMap[classId] || `Kelas ID: ${classId}`
-        ) || [];
+  // Get class names
+  this.materialService.getClassNamesByIds(data.kelas_ditautkan || [], this.token).subscribe({
+    next: (classMap) => {
+      const kelasNames = data.kelas_ditautkan?.map((classId: string) => 
+        classMap[classId] || `Kelas ID: ${classId}`
+      ) || [];
 
-        // Process BAB list to pages
-        const pages: MaterialPage[] = [];
-        
-        if (data.babList && Array.isArray(data.babList)) {
-          data.babList.forEach((bab: any) => {
-            if (bab.judulBab || bab.isiBab) {
-              const content = `
-                <h5>${bab.judulBab || 'BAB Tanpa Judul'}</h5>
-                <div>${bab.isiBab || ''}</div>
-              `;
-              pages.push({
-                content: content,
-                isRead: false
-              });
-            }
-          });
-        }
-
-        // If no pages from babList, create from isian_materi
-        if (pages.length === 0 && data.isian_materi) {
-          pages.push({
-            content: `
-              <h5>${data.judul_materi}</h5>
-              <div>${data.isian_materi}</div>
-            `,
-            isRead: false
-          });
-        }
-
-        const waktuPengerjaan = data.waktu_pengerjaan || null;
-
-        // Create processed material
-        this.material = {
-          id: data._id,
-          title: data.judul_materi || 'Materi Tanpa Judul',
-          description: data.deskripsi_singkat || '',
-          pages: pages,
-          progress: 100, // Set 100% untuk preview
-          isRead: true, // Set true untuk preview
-          quizCompleted: false,
-          quizQuestions: data.soal || [],
-          kelasNames: kelasNames,
-          createdAt: data.created_at,
-          flagUnduh: data.flag_unduh || false,
-          isActive: data.is_active,
-          waktuPengerjaan: waktuPengerjaan
-        };
-
-        // Load first page if material tab is active
-        if (this.currentTab === 'materi' && this.material.pages.length > 0) {
-          this.loadPage(0);
-        }
-      },
-      error: (error) => {
-        console.error('Error getting class names:', error);
-        // Continue without class names
-        this.material = {
-          id: data._id,
-          title: data.judul_materi || 'Materi Tanpa Judul',
-          description: data.deskripsi_singkat || '',
-          pages: [],
-          progress: 100,
-          isRead: true,
-          quizCompleted: false,
-          quizQuestions: data.soal || [],
-          kelasNames: data.kelas_ditautkan || [],
-          createdAt: data.created_at,
-          flagUnduh: data.flag_unduh || false,
-          isActive: data.is_active,
-          waktuPengerjaan: data.soal && data.soal.length > 0 ? data.soal[0].waktu_pengerjaan : null
-        };
+      // Process BAB list to pages
+      const pages: MaterialPage[] = [];
+      
+      if (data.babList && Array.isArray(data.babList)) {
+        data.babList.forEach((bab: any) => {
+          if (bab.judulBab || bab.isiBab) {
+            const content = `
+              <h5>${bab.judulBab || 'BAB Tanpa Judul'}</h5>
+              <div>${bab.isiBab || ''}</div>
+            `;
+            pages.push({
+              content: content,
+              isRead: false
+            });
+          }
+        });
       }
-    });
+
+      // If no pages from babList, create from isian_materi
+      if (pages.length === 0 && data.isian_materi) {
+        pages.push({
+          content: `
+            <h5>${data.judul_materi}</h5>
+            <div>${data.isian_materi}</div>
+          `,
+          isRead: false
+        });
+      }
+
+      // ✅ FIX: Get waktu_pengerjaan from root level, not from soal
+      const waktuPengerjaan = data.waktu_pengerjaan || null;
+
+      // Create processed material
+      this.material = {
+        id: data._id,
+        title: data.judul_materi || 'Materi Tanpa Judul',
+        description: data.deskripsi_singkat || '',
+        kategori: data.kategori_materi || null, // ✅ TAMBAH: Kategori
+        headerGambar: data.header_gambar || null, // ✅ TAMBAH: Header gambar
+        pages: pages,
+        progress: 100, // Set 100% untuk preview
+        isRead: true, // Set true untuk preview
+        quizCompleted: false,
+        quizQuestions: data.soal || [],
+        kelasNames: kelasNames,
+        createdAt: data.created_at,
+        flagUnduh: data.flag_unduh || false,
+        isActive: data.is_active,
+        waktuPengerjaan: waktuPengerjaan
+      };
+
+      // Load first page if material tab is active
+      if (this.currentTab === 'materi' && this.material.pages.length > 0) {
+        this.loadPage(0);
+      }
+    },
+    error: (error) => {
+      console.error('Error getting class names:', error);
+      // Continue without class names
+      this.material = {
+        id: data._id,
+        title: data.judul_materi || 'Materi Tanpa Judul',
+        description: data.deskripsi_singkat || '',
+        kategori: data.kategori_materi || null, // ✅ TAMBAH: Kategori
+        headerGambar: data.header_gambar || null, // ✅ TAMBAH: Header gambar
+        pages: [],
+        progress: 100,
+        isRead: true,
+        quizCompleted: false,
+        quizQuestions: data.soal || [],
+        kelasNames: data.kelas_ditautkan || [],
+        createdAt: data.created_at,
+        flagUnduh: data.flag_unduh || false,
+        isActive: data.is_active,
+        waktuPengerjaan: data.waktu_pengerjaan || null // ✅ FIX: Root level waktu_pengerjaan
+      };
+    }
+  });
+}
+
+getJenisSoalText(jenisSoal: string): string {
+  switch (jenisSoal) {
+    case 'pilihan_ganda':
+      return 'Pilihan Ganda';
+    case 'benar_salah':
+      return 'Benar/Salah';
+    case 'isian_singkat':
+      return 'Isian Singkat';
+    default:
+      return jenisSoal;
   }
+}
+
+getKategoriIcon(kategori: string): string {
+  switch (kategori) {
+    case 'Budaya Digital':
+      return 'fa-laptop';
+    case 'Etika Digital':
+      return 'fa-shield-alt';
+    case 'Keamanan Digital':
+      return 'fa-lock';
+    case 'Keterampilan Digital':
+      return 'fa-cogs';
+    default:
+      return 'fa-folder';
+  }
+}
 
   formatWaktuPengerjaan(): string {
   if (!this.material?.waktuPengerjaan) {

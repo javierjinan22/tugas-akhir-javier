@@ -1,49 +1,94 @@
-<!-- <div class="modal-header">
-  <h5 class="modal-title modal-title-custom">Login</h5>
-  <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0" 
+       [class.show]="showToast" 
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert" 
+       aria-live="assertive" 
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button" 
+              class="btn-close btn-close-white me-2 m-auto" 
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
 </div>
-
-<div class="modal-body">
-  <form (ngSubmit)="onSubmitLogin()">
-    <div class="mb-3">
-      <label class="form-label-custom">Email <span class="text-danger">*</span></label>
-      <input type="email" class="form-control" required [(ngModel)]="email" name="email" />
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label-custom">Password <span class="text-danger">*</span></label>
-      <input type="password" class="form-control" required [(ngModel)]="password" name="password" />
-    </div>
-
-    <p class="mb-3">Belum punya akun? <a (click)="onButtonRegistrationClicked()" class="link-daftar">Daftar</a></p>
-    <button type="submit" class="btn btn-primary btn-login w-100">Masuk</button>
-  </form>
-</div> -->
 
 <div class="modal-header">
-  <h5 class="modal-title modal-title-custom">Login</h5>
+  <h5 class="modal-title">Login</h5>
   <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.hide()"></button>
 </div>
 
 <div class="modal-body">
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmitLogin()">
+  <!-- ✅ TAMBAH: Success message display -->
+  <div *ngIf="successMessage" class="alert alert-success text-center mb-3">
+    <i class="fas fa-check-circle me-2"></i>{{ successMessage }}
+  </div>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <!-- ✅ USERNAME dengan styling selaras -->
     <div class="mb-3">
-      <label class="form-label-custom">Username <span class="text-danger">*</span></label>
-      <input type="text" class="form-control" required formControlName="username" />
+      <label>Username <span class="text-danger">*</span></label>
+      <input type="text" 
+             class="form-control" 
+             formControlName="username" 
+             placeholder="Masukkan username"
+             [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+             [class.is-valid]="loginForm.get('username')?.valid && loginForm.get('username')?.value" />
+      
+      <small class="text-danger d-block mt-1" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+        Username harus diisi
+      </small>
     </div>
 
+    <!-- ✅ PASSWORD dengan eye icon -->
     <div class="mb-3">
-      <label class="form-label-custom">Password <span class="text-danger">*</span></label>
-      <input type="password" class="form-control" required formControlName="password" />
+      <label>Password <span class="text-danger">*</span></label>
+      <div class="position-relative">
+        <input
+          [type]="passwordVisible ? 'text' : 'password'"
+          class="form-control password-input"
+          formControlName="password"
+          placeholder="Masukkan password"
+          [class.is-valid]="loginForm.get('password')?.valid && loginForm.get('password')?.value"
+        />
+        <fa-icon
+          [icon]="passwordVisible ? faEyeSlash : faEye"
+          class="toggle-password-icon"
+          (click)="togglePasswordVisibility()"
+        ></fa-icon>
+      </div>
+      
+      <!-- ✅ Error message tanpa icon exclamation -->
+      <small class="text-danger d-block mt-1" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        Password harus diisi
+      </small>
     </div>
 
-    <div *ngIf="errorMsg" class="alert alert-danger text-center mb-2">
-      {{ errorMsg }}
+    <!-- Error message -->
+    <div *ngIf="errorMsg && !showToast" class="alert alert-danger text-center mb-3">
+      <i class="fas fa-exclamation-circle me-2"></i>{{ errorMsg }}
     </div>
 
-    <p class="mb-3">Belum punya akun? 
+    <!-- Registration link -->
+    <p class="mb-3 text-center">Belum punya akun? 
       <a (click)="onButtonRegistrationClicked()" class="link-daftar">Daftar</a>
     </p>
-    <button type="submit" class="btn btn-primary btn-login w-100" [disabled]="loginForm.invalid">Masuk</button>
+    
+    <!-- Submit button -->
+    <button type="submit" 
+            class="btn btn-primary-custom w-100" 
+            [disabled]="loginForm.invalid || isSubmitting">
+      <span *ngIf="isSubmitting">
+        <i class="fas fa-spinner fa-spin me-2"></i>Memproses...
+      </span>
+      <span *ngIf="!isSubmitting">Masuk</span>
+    </button>
   </form>
 </div>

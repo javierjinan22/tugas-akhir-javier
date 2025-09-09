@@ -224,21 +224,26 @@
 /* ✅ FORM STYLING */
 .custom-input {
   border: 1.5px solid #15b2c4;
-  border-radius: 12px;
-  min-height: 48px;
-  font-size: 1rem;
+  border-radius: 8px; /* Sesuaikan dengan dropdown */
+  min-height: 40px !important; /* Sesuaikan dengan tinggi dropdown */
+  max-height: 40px !important;
+  height: 40px !important;
+  font-size: 0.95rem; /* Sesuaikan dengan dropdown */
+  line-height: 1.4;
+  padding: 8px 16px !important; /* Sesuaikan dengan dropdown */
   box-shadow: none;
-  padding-left: 18px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  background-color: #fff;
 }
 
 .custom-input:focus {
-  border-color: #15b2c4;
-  outline: none;
-  box-shadow: none;
+  border-color: #15b2c4 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 0.2rem rgba(21, 178, 196, 0.25) !important;
 }
 
 .custom-input.is-invalid {
-  border-color: #dc3545;
+  border-color: #dc3545 !important;
 }
 
 /* ✅ CHECKBOX STYLING */
@@ -251,7 +256,7 @@
 .kelas-checkbox {
   display: flex;
   align-items: center;
-  font-size: 16px;
+  font-size: 0.95rem; /* Sedikit adjust font size */
   font-weight: 500;
   cursor: pointer !important;
   user-select: none;
@@ -263,12 +268,13 @@
 }
 
 .custom-check {
-  width: 24px;
-  height: 24px;
+  width: 22px; /* Sedikit lebih kecil */
+  height: 22px;
   border: 2px solid #15b2c4;
   margin-right: 9px;
   background: #fff;
   position: relative;
+  border-radius: 4px; /* Tambah sedikit radius */
 }
 
 .kelas-checkbox input[type="checkbox"]:checked + .custom-check {
@@ -310,8 +316,8 @@
 }
 
 .radio-custom {
-  width: 20px;
-  height: 20px;
+  width: 18px; /* Sedikit lebih kecil */
+  height: 18px;
   border: 2px solid #15b2c4;
   border-radius: 50%;
   margin-right: 8px;
@@ -340,33 +346,163 @@
 /* ✅ BUTTON STYLING DARI CREATE-NEW-CLASS */
 .btn-rounded {
   border-radius: 25px;
-  padding: 12px 24px;
+  padding: 10px 20px;
   font-weight: 600;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
 }
 
-.btn-primary.btn-rounded {
-  background-color: #1BB6C1;
-  border-color: #1BB6C1;
-}
-
-.btn-primary.btn-rounded:hover {
-  background-color: #0891b2;
-  border-color: #0891b2;
-  transform: translateY(-1px);
-}
-
-.btn-outline-primary.btn-rounded {
-  color: #1BB6C1;
-  border-color: #1BB6C1;
-}
-
-.btn-outline-primary.btn-rounded:hover {
-  background-color: #1BB6C1;
-  border-color: #1BB6C1;
+.btn-primary {
+  background-color: #15b2c4; 
+  border-color: #15b2c4;
   color: white;
-  transform: translateY(-1px);
+}
+
+.btn-primary:hover {
+  background-color: #0e8ba0;
+  border-color: #0e8ba0;
+}
+
+.btn-primary:disabled,
+.btn-primary.disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.65;
+}
+
+.btn-outline-primary {
+  color: #15b2c4;
+  border-color: #15b2c4;
+  background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+  color: white;
+  background-color: #15b2c4;
+  border-color: #15b2c4;
+}
+
+.btn-outline-primary:disabled,
+.btn-outline-primary.disabled {
+  color: #6c757d;
+  border-color: #6c757d;
+  background-color: transparent;
+  opacity: 0.65;
+}
+
+/* ✅ PERTAHANKAN: Button secondary (abu-abu) - existing styling */
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+  border-color: #545b62;
+}
+
+/* ✅ PERTAHANKAN: Form input styling yang sudah diperbaiki */
+.custom-input,
+.form-control {
+  border: 1.5px solid #15b2c4;
+  border-radius: 8px;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  height: 40px !important;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  padding: 8px 16px !important;
+  box-shadow: none;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  background-color: #fff;
+}
+
+.custom-input:focus,
+.form-control:focus {
+  border-color: #15b2c4 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 0.2rem rgba(21, 178, 196, 0.25) !important;
+}
+
+.custom-input.is-invalid,
+.form-control.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.custom-input::placeholder,
+.form-control::placeholder {
+  color: #6c757d;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+/* ✅ PERTAHANKAN: File upload styling yang sudah diperbaiki */
+.file-upload-wrapper {
+  position: relative;
+}
+
+.custom-file-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-upload-label {
+  display: block;
+  padding: 8px 16px;
+  height: 40px !important;
+  border: 1.5px dashed #15b2c4;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6c757d;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-upload-label:hover {
+  background-color: #e9ecef;
+  border-color: #128a9b;
+}
+
+.file-upload-wrapper:has(.custom-file-input:focus) .file-upload-label {
+  border-color: #15b2c4;
+  box-shadow: 0 0 0 0.2rem rgba(21, 178, 196, 0.25);
+}
+
+/* ✅ PERTAHANKAN: Semua styling lainnya tetap sama */
+/* Checkbox, radio, wizard, dll tetap menggunakan styling yang ada */
+
+/* ✅ Responsive untuk button - tanpa mengubah warna */
+@media (max-width: 768px) {
+  .btn-rounded {
+    min-height: 36px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .btn-rounded {
+    min-height: 34px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
+  }
 }
 
 /* ✅ CKEDITOR STYLING */
@@ -380,9 +516,9 @@
 }
 
 ::ng-deep .ck-editor__editable[role="textbox"] {
-  min-height: 350px !important;
-  padding-left: 8px;
-  resize: vertical;
+  min-height: 300px !important; /* Sedikit adjust tinggi editor */
+  padding: 12px;
+  font-size: 0.95rem;
 }
 
 /* ✅ Add to your existing CSS */
@@ -395,9 +531,8 @@
 
 /* CKEditor untuk soal - sedikit lebih kecil dari materi */
 .question-item .custom-ckeditor .ck-editor__editable {
-  min-height: 120px !important; /* Lebih kecil dari editor materi */
-  max-height: 300px !important;
-  overflow-y: auto;
+  min-height: 100px !important;
+  max-height: 250px !important;
 }
 
 /* Responsive untuk CKEditor soal */
@@ -415,8 +550,8 @@
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 50px;
-  height: 28px;
+  width: 45px; /* Sedikit lebih kecil */
+  height: 24px;
   margin-right: 8px;
   vertical-align: middle;
 }
@@ -439,8 +574,8 @@
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 22px;
-  width: 22px;
+  height: 18px;
+  width: 18px;
   left: 3px;
   bottom: 3px;
   background: white;
@@ -454,7 +589,7 @@
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
-  transform: translateX(22px);
+  transform: translateX(21px);
 }
 
 /* ✅ ITEM STYLING */
@@ -558,55 +693,30 @@
 /* ✅ CSS Grid Layout untuk Jawaban dan Kunci Jawaban */
 .jawaban-kunci-header {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 15px;
-  margin-bottom: 10px;
-  /* padding: 0 5px; */
-}
-
-.jawaban-header {
-  /* grid-column: 2; */
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
   font-weight: 600;
-  font-size: 16px;
   color: #333;
+  font-size: 14px;
 }
 
-.kunci-header {
-  grid-column: 3;
-  font-weight: 600;
-  font-size: 16px;
-  color: #333;
-}
-
-.jawaban-kunci-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 15px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.option-label {
-  font-weight: 600;
-  font-size: 16px;
-  color: #333;
-  min-width: 20px;
-}
-
-
-
-.option-radio {
+.action-header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 80px;
+  gap: 0.25rem;
 }
 
 /* ✅ Responsive adjustments */
 @media (max-width: 768px) {
   .jawaban-kunci-header {
-    grid-template-columns: auto 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  
+  .action-header {
+    justify-content: center;
   }
   
   .kunci-header {
@@ -626,5 +736,297 @@
     grid-column: 1 / -1;
     justify-content: flex-start;
     margin-top: 8px;
+  }
+}
+
+/* ✅ TAMBAH: Styling untuk header image yang konsisten dengan form fields */
+
+/* Current image styling */
+.current-image-container {
+  position: relative;
+  display: inline-block;
+}
+
+.current-image {
+  max-width: 200px;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #dee2e6;
+}
+
+/* Image preview styling */
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview {
+  max-width: 200px;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #15b2c4;
+}
+
+.btn-remove-image {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px; /* Sedikit lebih kecil */
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background-color: #dc3545;
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ✅ PERBAIKAN: File upload wrapper dengan tinggi yang konsisten */
+.file-upload-wrapper {
+  position: relative;
+}
+
+.custom-file-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-upload-label {
+  display: block;
+  padding: 8px 16px; /* ✅ SAMA dengan input fields */
+  height: 40px !important; /* ✅ SAMA dengan dropdown ngx-select */
+  border: 1.5px dashed #15b2c4;
+  border-radius: 8px; /* ✅ SAMA dengan dropdown */
+  background-color: #f8f9fa;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #6c757d;
+  font-size: 0.95rem; /* ✅ SAMA dengan dropdown */
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-upload-label:hover {
+  background-color: #e9ecef;
+  border-color: #128a9b;
+}
+
+/* Focus state untuk file input */
+.file-upload-wrapper:has(.custom-file-input:focus) .file-upload-label {
+  border-color: #15b2c4;
+  box-shadow: 0 0 0 0.2rem rgba(21, 178, 196, 0.25);
+}
+
+
+/* ✅ Button styling tetap konsisten */
+.btn-rounded {
+  border-radius: 25px;
+  padding: 10px 20px; /* Sedikit adjust padding */
+  font-weight: 600;
+  min-height: 40px; /* Konsisten dengan input fields */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+
+/* ✅ Checkbox dan radio button tetap seperti semula */
+.kelas-checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.kelas-checkbox {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem; /* Sedikit adjust font size */
+  font-weight: 500;
+  cursor: pointer !important;
+  user-select: none;
+  margin-right: 12px;
+}
+
+.custom-check {
+  width: 22px; /* Sedikit lebih kecil */
+  height: 22px;
+  border: 2px solid #15b2c4;
+  margin-right: 9px;
+  background: #fff;
+  position: relative;
+  border-radius: 4px; /* Tambah sedikit radius */
+}
+
+/* ✅ Radio button styling adjust */
+.radio-custom {
+  width: 18px; /* Sedikit lebih kecil */
+  height: 18px;
+  border: 2px solid #15b2c4;
+  border-radius: 50%;
+  margin-right: 8px;
+  background: #fff;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview {
+  max-width: 180px; 
+  max-height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #15b2c4;
+}
+
+.btn-remove-image {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 22px; /* Sedikit lebih kecil */
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background-color: #dc3545;
+  color: white;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove-image:hover {
+  background-color: #c82333;
+}
+
+/* ✅ Form label styling */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 6px; /* Sedikit adjust spacing */
+  color: #495057;
+  font-size: 0.9rem; /* Sedikit lebih kecil */
+}
+
+.form-label.fw-semibold {
+  font-weight: 600;
+}
+
+/* ✅ Small text consistency */
+.text-muted {
+  color: #6c757d !important;
+  font-size: 0.8rem; /* Sedikit lebih kecil */
+}
+
+/* ✅ Validation feedback */
+.text-danger.small {
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+}
+
+/* ✅ Loading state */
+.text-muted.mb-2 {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+}
+
+/* ✅ Consistent spacing */
+.row .col-md-6 {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.mb-3 {
+  margin-bottom: 1.2rem !important; /* Sedikit adjust spacing */
+}
+
+.mb-4 {
+  margin-bottom: 1.8rem !important;
+}
+
+/* ✅ Responsive adjustments untuk mobile */
+@media (max-width: 768px) {
+  .custom-input,
+  .form-control {
+    min-height: 36px !important;
+    height: 36px !important;
+    padding: 6px 14px !important;
+    font-size: 0.9rem;
+  }
+
+  .file-upload-label {
+    height: 36px !important;
+    padding: 6px 14px;
+    font-size: 0.9rem;
+  }
+
+  .btn-rounded {
+    min-height: 36px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+
+  .image-preview {
+    max-width: 160px;
+    max-height: 90px;
+  }
+
+  .form-label {
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+  }
+
+  .custom-check {
+    width: 20px;
+    height: 20px;
+  }
+
+  .radio-custom {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ✅ Extra small mobile */
+@media (max-width: 576px) {
+  .custom-input,
+  .form-control {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 5px 12px !important;
+    font-size: 0.85rem;
+  }
+
+  .file-upload-label {
+    height: 34px !important;
+    padding: 5px 12px;
+    font-size: 0.85rem;
+  }
+
+  .btn-rounded {
+    min-height: 34px;
+    padding: 6px 14px;
+    font-size: 0.85rem;
   }
 }

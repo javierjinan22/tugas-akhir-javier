@@ -7,22 +7,22 @@ import { MaterialService, Material } from '../../../../service/material.service'
 const ClassicEditor = require('@ckeditor/ckeditor5-build-classic');
 
 class Base64UploadAdapter {
-  constructor(private loader: any) {}
+  constructor(private loader: any) { }
 
   upload(): Promise<any> {
     return this.loader.file.then((file: File) => new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = () => {
         resolve({
           default: reader.result
         });
       };
-      
+
       reader.onerror = () => {
         reject(reader.error);
       };
-      
+
       reader.readAsDataURL(file);
     }));
   }
@@ -37,6 +37,11 @@ interface KelasOption {
   nama: string;
 }
 
+interface KategoriOption {
+  id: string;
+  nama: string;
+}
+
 @Component({
   selector: 'app-edit-materials',
   templateUrl: './edit-materials.component.html',
@@ -45,7 +50,7 @@ interface KelasOption {
 export class EditMaterialsComponent implements OnInit {
 
   public Editor = ClassicEditor;
-   public editorConfig = {
+  public editorConfig = {
     placeholder: 'Tulis materi di sini...',
     toolbar: [
       'heading', '|', 'bold', 'italic', 'link',
@@ -88,14 +93,20 @@ export class EditMaterialsComponent implements OnInit {
   isSubmitting: boolean = false;
   isLoadingClasses: boolean = false;
   isLoadingMaterial: boolean = false;
+  isLoadingKategori: boolean = false;
   errorMsg: string = '';
   materialId: string = '';
 
   kelasList: KelasOption[] = [];
+  kategoriList: KategoriOption[] = [];
   originalMaterial: any | null = null;
   userProfile: any = null;
   token: string = '';
   schoolId: string = '';
+
+  selectedHeaderImage: File | undefined = undefined;
+  headerImagePreview: string | undefined = undefined;
+  currentHeaderImageUrl: string | undefined = undefined;
 
   materialForm: FormGroup;
   quizForm: FormGroup;
@@ -110,6 +121,7 @@ export class EditMaterialsComponent implements OnInit {
     this.materialForm = this.fb.group({
       judul: ['', [Validators.required, Validators.minLength(2)]],
       deskripsi: ['', [Validators.required, Validators.minLength(2)]],
+      kategori: ['', Validators.required], 
       kelas: [[], Validators.required],
       babList: this.fb.array([this.createBabGroup()]),
       izinkanUnduh: [false]
@@ -157,8 +169,82 @@ export class EditMaterialsComponent implements OnInit {
       return;
     }
 
+    // Load kategori list
+    this.loadKategoriList();
     this.loadActiveClasses();
     this.loadMaterialData();
+  }
+
+  // Method untuk load kategori
+  loadKategoriList() {
+    this.isLoadingKategori = true;
+
+    this.materialService.getKategoriList(this.token).subscribe({
+      next: (response) => {
+        this.isLoadingKategori = false;
+
+        if (response && response.success && response.data && Array.isArray(response.data)) {
+          this.kategoriList = response.data.map((kategoriNama: string, index: number) => ({
+            id: kategoriNama,
+            nama: kategoriNama
+          }));
+        } else {
+          console.warn('Invalid kategori response structure:', response);
+          this.kategoriList = [];
+        }
+      },
+      error: (error) => {
+        console.error('Error loading kategori:', error);
+        this.isLoadingKategori = false;
+        this.kategoriList = [];
+      }
+    });
+  }
+
+  getAnswerLabel(index: number): string {
+    return String.fromCharCode(65 + index); 
+  }
+
+  getTrueFalseOption(index: number): string {
+    return index === 0 ? 'Benar' : 'Salah';
+  }
+
+  onHeaderImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      // Validasi tipe file
+      if (!file.type.match(/image\/(jpeg|jpg|png|gif)/)) {
+        this.errorMsg = 'Format file tidak didukung. Gunakan JPG, PNG, atau GIF.';
+        return;
+      }
+
+      // Validasi ukuran file (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        this.errorMsg = 'Ukuran file terlalu besar. Maksimal 5MB.';
+        return;
+      }
+
+      this.selectedHeaderImage = file;
+      this.errorMsg = '';
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.headerImagePreview = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeHeaderImage(): void {
+    this.selectedHeaderImage = undefined;
+    this.headerImagePreview = undefined;
+
+    const fileInput = document.getElementById('headerImageInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
   loadMaterialData() {
@@ -201,12 +287,16 @@ export class EditMaterialsComponent implements OnInit {
     this.materialForm.patchValue({
       judul: this.originalMaterial.judul_materi || '',
       deskripsi: this.originalMaterial.deskripsi_singkat || '',
+      kategori: this.originalMaterial.kategori_materi || '', 
       kelas: this.originalMaterial.kelas_ditautkan || [],
       izinkanUnduh: this.originalMaterial.flag_unduh || false
     });
 
-    this.populateBabList();
+    if (this.originalMaterial.header_gambar) {
+      this.currentHeaderImageUrl = this.originalMaterial.header_gambar;
+    }
 
+    this.populateBabList();
     this.populateQuizForm();
   }
 
@@ -218,7 +308,6 @@ export class EditMaterialsComponent implements OnInit {
     }
 
     if (this.originalMaterial.babList && Array.isArray(this.originalMaterial.babList) && this.originalMaterial.babList.length > 0) {
-
       this.originalMaterial.babList.forEach((bab: any) => {
         const babGroup = this.createBabGroup();
         babGroup.patchValue({
@@ -256,20 +345,34 @@ export class EditMaterialsComponent implements OnInit {
         questionGroup.patchValue({
           tipeSoal: 'pilihan_ganda',
           soal: soal.soal || '',
-          jawaban: jawabanTexts,
-          kunci: kunciIndex,
           jawabanSingkat: ''
         });
+
+        questionGroup.setControl('jawaban', this.fb.array(jawabanTexts));
+        questionGroup.patchValue({ kunci: kunciIndex });
+
+      } else if (soal.jenis_soal === 'benar_salah') {
+
+        const kunciIndex = soal.kunci_jawaban === 'Benar' ? 0 : 1;
+
+        questionGroup.patchValue({
+          tipeSoal: 'benar_salah',
+          soal: soal.soal || '',
+          jawabanSingkat: ''
+        });
+
+        questionGroup.setControl('jawaban', this.fb.array(['Benar', 'Salah']));
+        questionGroup.patchValue({ kunci: kunciIndex });
 
       } else if (soal.jenis_soal === 'isian_singkat') {
         questionGroup.patchValue({
           tipeSoal: 'isian_singkat',
           soal: soal.soal || '',
-          jawaban: ['', '', '', ''],
-          kunci: null,
           jawabanSingkat: soal.kunci_jawaban || ''
         });
 
+        questionGroup.setControl('jawaban', this.fb.array([]));
+        questionGroup.patchValue({ kunci: null });
       }
 
       this.questions.push(questionGroup);
@@ -282,17 +385,17 @@ export class EditMaterialsComponent implements OnInit {
     }
 
     const sortedJawaban = jawabanArray.sort((a: any, b: any) => {
-      const labelOrder = ['A', 'B', 'C', 'D'];
+      const labelOrder = ['A', 'B', 'C', 'D', 'E', 'F'];
       return labelOrder.indexOf(a.label) - labelOrder.indexOf(b.label);
     });
 
     const texts = sortedJawaban.map((jawab: any) => jawab.text || '');
 
-    while (texts.length < 4) {
+    while (texts.length < 2) {
       texts.push('');
     }
 
-    return texts.slice(0, 4);
+    return texts;
   }
 
   parseKunciJawabanFromLabel(kunciJawaban: string | undefined): number | null {
@@ -301,12 +404,12 @@ export class EditMaterialsComponent implements OnInit {
     }
 
     if (typeof kunciJawaban === 'string') {
-      const index = ['A', 'B', 'C', 'D'].indexOf(kunciJawaban.toUpperCase());
+      const index = ['A', 'B', 'C', 'D', 'E', 'F'].indexOf(kunciJawaban.toUpperCase());
       return index >= 0 ? index : null;
     }
 
     if (typeof kunciJawaban === 'number') {
-      return kunciJawaban >= 0 && kunciJawaban <= 3 ? kunciJawaban : null;
+      return kunciJawaban >= 0 && kunciJawaban <= 5 ? kunciJawaban : null;
     }
 
     return null;
@@ -325,7 +428,7 @@ export class EditMaterialsComponent implements OnInit {
           this.handleClassesResponse(response);
         },
         error: (error) => {
-          console.error('❌ getActiveClassesBySchool failed:', error);
+          console.error('getActiveClassesBySchool failed:', error);
 
           this.classService.getClassesBySchool(this.schoolId, this.token)
             .subscribe({
@@ -333,7 +436,7 @@ export class EditMaterialsComponent implements OnInit {
                 this.handleClassesResponse(response);
               },
               error: (fallbackError) => {
-                console.error('❌ Fallback getClassesBySchool also failed:', fallbackError);
+                console.error('Fallback getClassesBySchool also failed:', fallbackError);
                 this.handleClassesError(fallbackError);
               }
             });
@@ -342,7 +445,6 @@ export class EditMaterialsComponent implements OnInit {
   }
 
   private handleClassesResponse(response: any) {
-
     this.isLoadingClasses = false;
 
     if (response && response.success && response.data) {
@@ -401,10 +503,29 @@ export class EditMaterialsComponent implements OnInit {
     return this.fb.group({
       tipeSoal: ['pilihan_ganda', Validators.required],
       soal: ['', Validators.required],
-      jawaban: this.fb.array(['', '', '', ''], Validators.required),
+      jawaban: this.fb.array(['', '', '', '']), 
       kunci: [null, Validators.required],
       jawabanSingkat: ['']
     });
+  }
+
+  addAnswer(questionIndex: number) {
+    const jawabanArray = this.getJawabanArray(questionIndex);
+    if (jawabanArray.length < 6) {
+      jawabanArray.push(this.fb.control(''));
+    }
+  }
+
+  removeAnswer(questionIndex: number, answerIndex: number) {
+    const jawabanArray = this.getJawabanArray(questionIndex);
+    if (jawabanArray.length > 2) {
+      jawabanArray.removeAt(answerIndex);
+
+      const kunciControl = this.questions.at(questionIndex).get('kunci');
+      if (kunciControl && kunciControl.value !== null && kunciControl.value >= answerIndex) {
+        kunciControl.setValue(Math.max(0, (kunciControl.value || 0) - 1));
+      }
+    }
   }
 
   addQuestion(index: number) {
@@ -417,15 +538,28 @@ export class EditMaterialsComponent implements OnInit {
 
   onTipeSoalChange(i: number, tipe: string) {
     const qGroup = this.questions.at(i) as FormGroup;
-    qGroup.patchValue({
-      tipeSoal: tipe,
-      kunci: null,
-      jawaban: tipe === 'pilihan_ganda' ? ['', '', '', ''] : [],
-      jawabanSingkat: ''
-    });
 
-    if (tipe === 'pilihan_ganda' && !(qGroup.get('jawaban') as FormArray).length) {
+    if (tipe === 'benar_salah') {
+      qGroup.setControl('jawaban', this.fb.array(['Benar', 'Salah']));
+      qGroup.patchValue({
+        tipeSoal: 'benar_salah',
+        kunci: null, 
+        jawabanSingkat: ''
+      });
+    } else if (tipe === 'pilihan_ganda') {
       qGroup.setControl('jawaban', this.fb.array(['', '', '', '']));
+      qGroup.patchValue({
+        tipeSoal: 'pilihan_ganda',
+        kunci: null, 
+        jawabanSingkat: ''
+      });
+    } else if (tipe === 'isian_singkat') {
+      qGroup.setControl('jawaban', this.fb.array([])); 
+      qGroup.patchValue({
+        tipeSoal: 'isian_singkat',
+        kunci: null,
+        jawabanSingkat: ''
+      });
     }
   }
 
@@ -563,6 +697,10 @@ export class EditMaterialsComponent implements OnInit {
     return kelas.id;
   }
 
+  trackByKategori(index: number, kategori: KategoriOption): string {
+    return kategori.id;
+  }
+
   isDraftValid(): boolean {
     return this.isStep1Valid();
   }
@@ -570,10 +708,12 @@ export class EditMaterialsComponent implements OnInit {
   isStep1Valid(): boolean {
     const judul = this.materialForm.get('judul');
     const deskripsi = this.materialForm.get('deskripsi');
+    const kategori = this.materialForm.get('kategori');
     const kelas = this.materialForm.get('kelas');
 
     return !!(judul?.valid &&
       deskripsi?.valid &&
+      kategori?.valid &&
       kelas?.valid &&
       kelas?.value?.length > 0);
   }
@@ -615,9 +755,15 @@ export class EditMaterialsComponent implements OnInit {
 
       const hasValidKey = questionValue.kunci !== null &&
         questionValue.kunci >= 0 &&
-        questionValue.kunci < 4;
+        questionValue.kunci < questionValue.jawaban.length;
 
       return allAnswersFilled && hasValidKey;
+    } else if (questionValue.tipeSoal === 'benar_salah') {
+      const kunci = questionValue.kunci;
+      const hasValidKey = kunci !== null &&
+        kunci !== undefined &&
+        (kunci === 0 || kunci === 1);
+      return hasValidKey;
     } else if (questionValue.tipeSoal === 'isian_singkat') {
       return questionValue.jawabanSingkat && questionValue.jawabanSingkat.trim() !== '';
     }
@@ -629,7 +775,6 @@ export class EditMaterialsComponent implements OnInit {
     const question = this.questions.at(questionIndex);
     const questionValue = question.value;
 
-    // ✅ Handle CKEditor content validation
     if (!questionValue.soal) {
       return 'Soal wajib diisi';
     }
@@ -648,8 +793,12 @@ export class EditMaterialsComponent implements OnInit {
         return 'Semua pilihan jawaban harus diisi';
       }
 
-      if (questionValue.kunci === null || questionValue.kunci < 0 || questionValue.kunci >= 4) {
+      if (questionValue.kunci === null || questionValue.kunci < 0 || questionValue.kunci >= questionValue.jawaban.length) {
         return 'Kunci jawaban harus dipilih';
+      }
+    } else if (questionValue.tipeSoal === 'benar_salah') {
+      if (questionValue.kunci === null || (questionValue.kunci !== 0 && questionValue.kunci !== 1)) {
+        return 'Pilih jawaban Benar atau Salah';
       }
     } else if (questionValue.tipeSoal === 'isian_singkat') {
       if (!questionValue.jawabanSingkat || questionValue.jawabanSingkat.trim() === '') {
@@ -666,7 +815,7 @@ export class EditMaterialsComponent implements OnInit {
       this.errorMsg = '';
     } else {
       this.materialForm.markAllAsTouched();
-      this.errorMsg = 'Mohon lengkapi data utama: judul, deskripsi, dan pilih minimal satu kelas';
+      this.errorMsg = 'Mohon lengkapi data utama: judul, deskripsi, kategori, dan pilih minimal satu kelas';
     }
   }
 
@@ -714,24 +863,23 @@ export class EditMaterialsComponent implements OnInit {
 
     const transformedQuiz = quizData.questions.map((question: any) => {
       if (question.tipeSoal === 'pilihan_ganda') {
-        const jawabanObjects = question.jawaban.map((text: string, index: number) => ({
-          label: ['A', 'B', 'C', 'D'][index],
-          text: text || ''
-        }));
-
-        const kunciLabel = question.kunci !== null ? ['A', 'B', 'C', 'D'][question.kunci] : 'A';
-
         return {
           jenis_soal: 'pilihan_ganda',
-          soal: question.soal || '',
-          jawaban: jawabanObjects,
-          kunci_jawaban: kunciLabel
+          soal: question.soal,
+          jawaban: question.jawaban.filter((jawab: string) => jawab && jawab.trim() !== ''), 
+          kunci: question.kunci
+        };
+      } else if (question.tipeSoal === 'benar_salah') {
+        return {
+          jenis_soal: 'benar_salah',
+          soal: question.soal,
+          kunci: question.kunci 
         };
       } else {
         return {
           jenis_soal: 'isian_singkat',
-          soal: question.soal || '',
-          kunci_jawaban: question.jawabanSingkat || ''
+          soal: question.soal,
+          kunci_jawaban: question.jawabanSingkat
         };
       }
     });
@@ -745,23 +893,26 @@ export class EditMaterialsComponent implements OnInit {
     const finalData = {
       judul: materialData.judul,
       deskripsi: materialData.deskripsi,
+      kategori: materialData.kategori,
       kelas: materialData.kelas,
       babList: filteredBabList,
       izinkanUnduh: materialData.izinkanUnduh,
-      waktu_pengerjaan: quizData.waktu_pengerjaan,
       quiz: transformedQuiz,
+      waktu_pengerjaan: quizData.waktu_pengerjaan,
       sekolah: this.schoolId
     };
 
-    this.materialService.updateMaterial(this.materialId, finalData, this.token).subscribe({
+    const headerImage = this.selectedHeaderImage || undefined;
+
+    this.materialService.updateMaterial(this.materialId, finalData, headerImage, this.token).subscribe({
       next: (response) => {
         this.isSubmitting = false;
         this.backToManageMaterials();
       },
       error: (error) => {
-        console.error('❌ Error updating material with quiz:', error);
+        console.error('Error updating material with quiz:', error);
         this.isSubmitting = false;
-        this.errorMsg = 'Gagal memperbarui materi dengan kuis. Silakan coba lagi.';
+        this.errorMsg = error.error?.message || 'Gagal memperbarui materi dengan kuis. Silakan coba lagi.';
       }
     });
   }

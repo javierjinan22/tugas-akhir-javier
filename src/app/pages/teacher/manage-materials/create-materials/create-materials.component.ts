@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ClassService } from '../../../../service/class.service'; 
-import { MaterialService } from '../../../../service/material.service'; 
+import { ClassService } from '../../../../service/class.service';
+import { MaterialService } from '../../../../service/material.service';
 
 const ClassicEditor = require('@ckeditor/ckeditor5-build-classic');
 
@@ -11,23 +11,28 @@ interface KelasOption {
   nama: string;
 }
 
+interface KategoriOption {
+  id: string;
+  nama: string;
+}
+
 class Base64UploadAdapter {
-  constructor(private loader: any) {}
+  constructor(private loader: any) { }
 
   upload(): Promise<any> {
     return this.loader.file.then((file: File) => new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = () => {
         resolve({
           default: reader.result
         });
       };
-      
+
       reader.onerror = () => {
         reject(reader.error);
       };
-      
+
       reader.readAsDataURL(file);
     }));
   }
@@ -44,13 +49,14 @@ class Base64UploadAdapter {
   styleUrls: ['./create-materials.component.css']
 })
 export class CreateMaterialsComponent implements OnInit {
-  
+
+
   public Editor = ClassicEditor;
 
   public editorConfig = {
     placeholder: 'Tulis materi di sini...',
     toolbar: [
-      'heading', '|', 'bold', 'italic', 'link', 
+      'heading', '|', 'bold', 'italic', 'link',
       'bulletedList', 'numberedList', 'blockQuote', 'insertTable',
       'imageUpload', 'mediaEmbed', 'sourceEditing', 'undo', 'redo'
     ],
@@ -71,7 +77,6 @@ export class CreateMaterialsComponent implements OnInit {
     mediaEmbed: {
       previewsInData: true
     },
-    // ✅ Khusus untuk soal, kita batasi beberapa fitur agar lebih fokus
     heading: {
       options: [
         { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
@@ -80,30 +85,32 @@ export class CreateMaterialsComponent implements OnInit {
     }
   };
 
-  // ✅ Method untuk setup upload adapter (existing - no change needed)
+  // Method untuk setup upload adapter 
   onEditorReady(editor: any): void {
     editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
       return new Base64UploadAdapter(loader);
     };
   }
 
-  // ✅ STEP WIZARD PROPERTIES
   currentStep: number = 1;
   maxSteps: number = 2;
 
-  // ✅ STATE MANAGEMENT
   isSubmitting: boolean = false;
   isLoadingClasses: boolean = false;
   errorMsg: string = '';
 
   kelasList: KelasOption[] = [];
-  userProfile: any = null; 
+  userProfile: any = null;
   token: string = '';
   schoolId: string = '';
 
-  // ✅ FORMS
   materialForm: FormGroup;
   quizForm: FormGroup;
+
+  kategoriList: KategoriOption[] = [];
+  isLoadingKategori: boolean = false;
+  selectedHeaderImage: File | null = null;
+  headerImagePreview: string | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -111,10 +118,10 @@ export class CreateMaterialsComponent implements OnInit {
     private classService: ClassService,
     private materialService: MaterialService
   ) {
-    // ✅ Form structure sesuai backend payload
     this.materialForm = this.fb.group({
       judul: ['', [Validators.required, Validators.minLength(2)]],
       deskripsi: ['', [Validators.required, Validators.minLength(2)]],
+      kategori: ['', Validators.required],
       kelas: [[], Validators.required],
       babList: this.fb.array([this.createBabGroup()]),
       izinkanUnduh: [false]
@@ -136,7 +143,7 @@ export class CreateMaterialsComponent implements OnInit {
     this.token = localStorage.getItem('token') || '';
     this.schoolId = localStorage.getItem('schoolId') || '';
     const userProfileStr = localStorage.getItem('userProfile');
-    
+
     if (userProfileStr) {
       try {
         this.userProfile = JSON.parse(userProfileStr);
@@ -156,6 +163,68 @@ export class CreateMaterialsComponent implements OnInit {
     }
 
     this.loadActiveClasses();
+    this.loadKategoriList();
+  }
+
+  loadKategoriList() {
+    this.isLoadingKategori = true;
+
+    this.materialService.getKategoriList(this.token).subscribe({
+      next: (response) => {
+        this.isLoadingKategori = false;
+
+        if (response && response.success && response.data) {
+          this.kategoriList = response.data.map((kategoriNama: string, index: number) => ({
+            id: kategoriNama,
+            nama: kategoriNama
+          }));
+        } else {
+          this.kategoriList = [];
+        }
+      },
+      error: (error) => {
+        console.error('Error loading kategori:', error);
+        this.isLoadingKategori = false;
+        this.kategoriList = [];
+      }
+    });
+  }
+
+  onHeaderImageSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      const maxSize = 5 * 1024 * 1024;
+
+      if (!allowedTypes.includes(file.type)) {
+        this.errorMsg = 'Format file tidak didukung. Gunakan JPG, JPEG, atau PNG.';
+        return;
+      }
+
+      if (file.size > maxSize) {
+        this.errorMsg = 'Ukuran file terlalu besar. Maksimal 5MB.';
+        return;
+      }
+
+      this.selectedHeaderImage = file;
+      this.errorMsg = '';
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.headerImagePreview = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeHeaderImage(): void {
+    this.selectedHeaderImage = null;
+    this.headerImagePreview = null;
+
+    const fileInput = document.getElementById('headerImageInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   }
 
   loadActiveClasses() {
@@ -169,23 +238,23 @@ export class CreateMaterialsComponent implements OnInit {
           this.handleClassesResponse(response);
         },
         error: (error) => {
-          console.error('❌ getActiveClassesBySchool failed:', error);
-          
+          console.error('getActiveClassesBySchool failed:', error);
+
           this.classService.getClassesBySchool(this.schoolId, this.token)
             .subscribe({
               next: (response) => {
                 this.handleClassesResponse(response);
               },
               error: (fallbackError) => {
-                console.error('❌ Fallback getClassesBySchool also failed:', fallbackError);
-                
+                console.error('Fallback getClassesBySchool also failed:', fallbackError);
+
                 this.classService.getClassesBySchoolWithStatus(this.schoolId, 1, this.token)
                   .subscribe({
                     next: (response) => {
                       this.handleClassesResponse(response);
                     },
                     error: (finalError) => {
-                      console.error('❌ All methods failed:', finalError);
+                      console.error('All methods failed:', finalError);
                       this.handleClassesError(finalError);
                     }
                   });
@@ -196,9 +265,9 @@ export class CreateMaterialsComponent implements OnInit {
   }
 
   private handleClassesResponse(response: any) {
-    
+
     this.isLoadingClasses = false;
-    
+
     if (response && response.success && response.data) {
       this.kelasList = response.data
         .filter((kelas: any) => kelas.flag_aktif === 1)
@@ -206,7 +275,7 @@ export class CreateMaterialsComponent implements OnInit {
           id: kelas._id,
           nama: kelas.nama_kelas
         }));
-      
+
       if (this.kelasList.length === 0) {
         this.errorMsg = 'Tidak ada kelas aktif ditemukan.';
       } else {
@@ -223,7 +292,7 @@ export class CreateMaterialsComponent implements OnInit {
     console.error('Classes loading error:', error);
     this.isLoadingClasses = false;
     this.kelasList = [];
-    
+
     if (error.status === 401) {
       this.errorMsg = 'Session expired. Silakan login ulang.';
     } else if (error.status === 403) {
@@ -240,7 +309,6 @@ export class CreateMaterialsComponent implements OnInit {
     this.loadActiveClasses();
   }
 
-  // ✅ BAB METHODS
   get babArray(): FormArray {
     return this.materialForm.get('babList') as FormArray;
   }
@@ -262,7 +330,6 @@ export class CreateMaterialsComponent implements OnInit {
     }
   }
 
-  // ✅ QUIZ METHODS
   get questions(): FormArray {
     return this.quizForm.get('questions') as FormArray;
   }
@@ -275,7 +342,7 @@ export class CreateMaterialsComponent implements OnInit {
     return this.fb.group({
       tipeSoal: ['pilihan_ganda', Validators.required],
       soal: ['', Validators.required],
-      jawaban: this.fb.array(['', '', '', ''], Validators.required),
+      jawaban: this.fb.array(['', ''], Validators.required),
       kunci: [null, Validators.required],
       jawabanSingkat: ['']
     });
@@ -291,15 +358,60 @@ export class CreateMaterialsComponent implements OnInit {
 
   onTipeSoalChange(i: number, tipe: string) {
     const qGroup = this.questions.at(i) as FormGroup;
-    qGroup.patchValue({
-      tipeSoal: tipe,
-      kunci: null,
-      jawaban: tipe === 'pilihan_ganda' ? ['', '', '', ''] : [],
-      jawabanSingkat: ''
-    });
-    
-    if (tipe === 'pilihan_ganda' && !(qGroup.get('jawaban') as FormArray).length) {
-      qGroup.setControl('jawaban', this.fb.array(['', '', '', '']));
+
+    if (tipe === 'pilihan_ganda') {
+      qGroup.patchValue({
+        tipeSoal: tipe,
+        kunci: null,
+        jawabanSingkat: ''
+      });
+      qGroup.setControl('jawaban', this.fb.array(['', '']));
+    } else if (tipe === 'benar_salah') {
+      qGroup.patchValue({
+        tipeSoal: tipe,
+        kunci: null,
+        jawabanSingkat: ''
+      });
+      qGroup.setControl('jawaban', this.fb.array(['Benar', 'Salah']));
+    } else if (tipe === 'isian_singkat') {
+      qGroup.patchValue({
+        tipeSoal: tipe,
+        kunci: null,
+        jawabanSingkat: ''
+      });
+      qGroup.setControl('jawaban', this.fb.array([]));
+    }
+  }
+
+  getAnswerLabel(index: number): string {
+    return String.fromCharCode(65 + index); // A, B, C, D, E, F
+  }
+
+  getTrueFalseOption(index: number): string {
+    return index === 0 ? 'Benar' : 'Salah';
+  }
+
+  addAnswer(questionIndex: number): void {
+    const jawabanArray = this.getJawabanArray(questionIndex);
+    const question = this.questions.at(questionIndex);
+
+    if (jawabanArray.length < 6) { // Maksimal 6 jawaban
+      jawabanArray.push(this.fb.control(''));
+    }
+  }
+
+  removeAnswer(questionIndex: number, answerIndex: number): void {
+    const jawabanArray = this.getJawabanArray(questionIndex);
+    const question = this.questions.at(questionIndex);
+
+    if (jawabanArray.length > 2) { // Minimal 2 jawaban
+      jawabanArray.removeAt(answerIndex);
+
+      // Reset kunci jawaban jika lebih besar dari jumlah jawaban
+      const currentKunci = question.get('kunci')?.value;
+      if (currentKunci !== null && currentKunci >= jawabanArray.length) {
+        question.get('kunci')?.setValue(null);
+      }
     }
   }
 
@@ -318,30 +430,27 @@ export class CreateMaterialsComponent implements OnInit {
     this.errorMsg = '';
   }
 
-  // ✅ TEMPLATE HELPER METHODS - UPDATED dengan touch validation
   hasEmptyAnswerAtIndex(questionIndex: number, answerIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const jawabanControl = question.get('jawaban') as FormArray;
     const answerControl = jawabanControl.at(answerIndex);
-    
-    // Only show error if field is touched
+
     const isTouched = answerControl?.touched || false;
     const isEmpty = !question.value.jawaban[answerIndex] || question.value.jawaban[answerIndex].trim() === '';
-    
+
     return isTouched && isEmpty;
   }
 
   hasEmptyAnswers(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const jawabanControl = question.get('jawaban') as FormArray;
-    
-    // Check if any jawaban control is touched
+
     const anyJawabanTouched = jawabanControl.controls.some(control => control.touched);
-    
+
     if (!anyJawabanTouched) {
-      return false; // Don't show error if no jawaban field is touched
+      return false;
     }
-    
+
     const jawaban = question.value.jawaban;
     return jawaban.some((jawab: string) => !jawab || jawab.trim() === '');
   }
@@ -349,58 +458,55 @@ export class CreateMaterialsComponent implements OnInit {
   hasNoSelectedKey(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const kunciControl = question.get('kunci');
-    
-    // Only show error if any form interaction happened
-    const anyFieldTouched = question.get('soal')?.touched || 
-                         kunciControl?.touched ||
-                         (question.get('jawaban') as FormArray)?.controls.some(c => c.touched);
-  
+
+    const anyFieldTouched = question.get('soal')?.touched ||
+      kunciControl?.touched ||
+      (question.get('jawaban') as FormArray)?.controls.some(c => c.touched);
+
     if (!anyFieldTouched) {
-      return false; // Don't show error if no interaction yet
+      return false;
     }
-    
+
     return question.value.kunci === null;
   }
 
-  // ✅ NEW: Check if question has validation errors and should show them
+  // Check if question has validation errors and should show them
   shouldShowQuestionErrors(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const soalTouched = question.get('soal')?.touched || false;
     const kunciTouched = question.get('kunci')?.touched || false;
     const jawabanArray = question.get('jawaban') as FormArray;
     const anyJawabanTouched = jawabanArray?.controls.some(control => control.touched) || false;
-    
+
     return soalTouched || kunciTouched || anyJawabanTouched;
   }
 
-  // ✅ NEW: Check if isian singkat should show error
+  // Check if isian singkat should show error
   shouldShowIsianSingkatError(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const jawabanSingkatControl = question.get('jawabanSingkat');
-    
+
     if (!jawabanSingkatControl?.touched) {
       return false;
     }
-    
+
     return !jawabanSingkatControl.value || jawabanSingkatControl.value.trim() === '';
   }
 
-  // ✅ NEW: Check if question soal should show error
+  // Check if question soal should show error
   shouldShowSoalError(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const soalControl = question.get('soal');
-    
+
     if (!soalControl?.touched) {
       return false;
     }
-    
-    // ✅ Handle CKEditor content - check for empty or just whitespace/HTML tags
+
     const soalValue = soalControl.value;
     if (!soalValue) {
       return true;
     }
-    
-    // ✅ Remove HTML tags and check if there's actual content
+
     const textContent = soalValue.replace(/<[^>]*>/g, '').trim();
     return textContent.length === 0;
   }
@@ -430,10 +536,10 @@ export class CreateMaterialsComponent implements OnInit {
       const idx = arr.indexOf(kelasId);
       if (idx > -1) arr.splice(idx, 1);
     }
-    
+
     this.materialForm.get('kelas')?.setValue(arr);
     this.materialForm.get('kelas')?.markAsTouched();
-    
+
   }
 
   getSelectedKelasNames(): string[] {
@@ -454,22 +560,24 @@ export class CreateMaterialsComponent implements OnInit {
   isStep1Valid(): boolean {
     const judul = this.materialForm.get('judul');
     const deskripsi = this.materialForm.get('deskripsi');
+    const kategori = this.materialForm.get('kategori');
     const kelas = this.materialForm.get('kelas');
-    
-    return !!(judul?.valid && 
-             deskripsi?.valid && 
-             kelas?.valid && 
-             kelas?.value?.length > 0);
+
+    return !!(judul?.valid &&
+      deskripsi?.valid &&
+      kategori?.valid &&
+      kelas?.valid &&
+      kelas?.value?.length > 0);
   }
 
   isStep2Valid(): boolean {
     const waktuPengerjaan = this.quizForm.get('waktu_pengerjaan');
-  if (!waktuPengerjaan?.value || waktuPengerjaan.invalid) {
-    return false;
-  }
+    if (!waktuPengerjaan?.value || waktuPengerjaan.invalid) {
+      return false;
+    }
 
     const questions = this.questions;
-    
+
     if (questions.length === 0) {
       return false;
     }
@@ -482,72 +590,73 @@ export class CreateMaterialsComponent implements OnInit {
   isQuestionValid(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const questionValue = question.value;
-    
-    // ✅ Check soal with HTML content validation
+
     if (!questionValue.soal) {
       return false;
     }
-    
-    // ✅ Remove HTML tags and check actual content
+
     const soalTextContent = questionValue.soal.replace(/<[^>]*>/g, '').trim();
     if (soalTextContent.length === 0) {
       return false;
     }
 
-    if (questionValue.tipeSoal === 'pilihan_ganda') {
-      const allAnswersFilled = questionValue.jawaban.every((jawab: string) => 
+    if (questionValue.tipeSoal === 'pilihan_ganda' || questionValue.tipeSoal === 'benar_salah') {
+
+      const nonEmptyAnswers = questionValue.jawaban.filter((jawab: string) =>
         jawab && jawab.trim() !== ''
       );
-      
-      const hasValidKey = questionValue.kunci !== null && 
-                         questionValue.kunci >= 0 && 
-                         questionValue.kunci < 4;
-      
-      return allAnswersFilled && hasValidKey;
+
+      const hasValidKey = questionValue.kunci !== null &&
+        questionValue.kunci >= 0 &&
+        questionValue.kunci < nonEmptyAnswers.length;
+
+      return nonEmptyAnswers.length >= 2 && hasValidKey;
     } else if (questionValue.tipeSoal === 'isian_singkat') {
       return questionValue.jawabanSingkat && questionValue.jawabanSingkat.trim() !== '';
     }
-    
+
     return false;
   }
 
-  // ✅ UPDATED: Error message method
+  // Error message method
   getQuestionErrorMessage(questionIndex: number): string {
     const question = this.questions.at(questionIndex);
     const questionValue = question.value;
-    
-    // ✅ Handle CKEditor content validation
+
     if (!questionValue.soal) {
       return 'Soal wajib diisi';
     }
-    
+
     const soalTextContent = questionValue.soal.replace(/<[^>]*>/g, '').trim();
     if (soalTextContent.length === 0) {
       return 'Soal wajib diisi';
     }
 
     if (questionValue.tipeSoal === 'pilihan_ganda') {
-      const emptyAnswers = questionValue.jawaban.filter((jawab: string) => 
-        !jawab || jawab.trim() === ''
+      const nonEmptyAnswers = questionValue.jawaban.filter((jawab: string) =>
+        jawab && jawab.trim() !== ''
       );
-      
-      if (emptyAnswers.length > 0) {
-        return 'Semua pilihan jawaban harus diisi';
+
+      if (nonEmptyAnswers.length < 2) {
+        return 'Minimal 2 pilihan jawaban harus diisi';
       }
-      
-      if (questionValue.kunci === null || questionValue.kunci < 0 || questionValue.kunci >= 4) {
+
+      if (questionValue.kunci === null || questionValue.kunci < 0 || questionValue.kunci >= nonEmptyAnswers.length) {
         return 'Kunci jawaban harus dipilih';
+      }
+    } else if (questionValue.tipeSoal === 'benar_salah') {
+      if (questionValue.kunci === null || (questionValue.kunci !== 0 && questionValue.kunci !== 1)) {
+        return 'Pilih jawaban Benar atau Salah';
       }
     } else if (questionValue.tipeSoal === 'isian_singkat') {
       if (!questionValue.jawabanSingkat || questionValue.jawabanSingkat.trim() === '') {
         return 'Kunci jawaban harus diisi';
       }
     }
-    
+
     return '';
   }
 
-  // ✅ FORM SUBMISSION METHODS
   onSubmitMaterial() {
     if (this.isStep1Valid()) {
       this.currentStep = 2;
@@ -570,14 +679,14 @@ export class CreateMaterialsComponent implements OnInit {
       this.onFinalSubmit();
     } else {
       this.quizForm.markAllAsTouched();
-      
+
       const invalidQuestions: number[] = [];
       this.questions.controls.forEach((questionControl, index) => {
         if (!this.isQuestionValid(index)) {
           invalidQuestions.push(index + 1);
         }
       });
-      
+
       this.errorMsg = `Mohon lengkapi soal nomor: ${invalidQuestions.join(', ')}. Semua field wajib diisi.`;
     }
   }
@@ -586,26 +695,29 @@ export class CreateMaterialsComponent implements OnInit {
     if (this.isDraftValid()) {
       this.isSubmitting = true;
       this.errorMsg = '';
-      
+
       const materialData = this.materialForm.value;
-      
+
       const filteredBabList = materialData.babList.filter((bab: any) => {
         const hasJudul = bab.judulBab && bab.judulBab.trim() !== '';
         const hasIsi = bab.isiBab && bab.isiBab.trim() !== '';
         return hasJudul || hasIsi;
       });
-      
+
       const finalData = {
         judul: materialData.judul,
         deskripsi: materialData.deskripsi,
+        kategori: materialData.kategori,
         kelas: materialData.kelas,
         babList: filteredBabList,
         izinkanUnduh: materialData.izinkanUnduh,
         quiz: [],
         sekolah: this.schoolId
       };
-      
-      this.materialService.addMaterial(finalData, this.token).subscribe({
+
+      const headerImage = this.selectedHeaderImage || undefined;
+
+      this.materialService.addMaterial(finalData, headerImage).subscribe({
         next: (response) => {
           this.isSubmitting = false;
           this.backToManageMaterials();
@@ -616,85 +728,149 @@ export class CreateMaterialsComponent implements OnInit {
           this.errorMsg = 'Gagal menyimpan draft materi. Silakan coba lagi.';
         }
       });
-      
+
     } else {
       this.materialForm.markAllAsTouched();
-      this.errorMsg = 'Mohon lengkapi minimal: judul, deskripsi, dan pilih kelas untuk menyimpan draft';
+      this.errorMsg = 'Mohon lengkapi minimal: judul, deskripsi, kategori, dan pilih kelas untuk menyimpan draft';
     }
   }
 
   onFinalSubmit() {
-    if (!this.isStep1Valid()) {
-      this.errorMsg = 'Data utama belum lengkap';
-      this.currentStep = 1;
-      return;
-    }
+  if (!this.isStep1Valid()) {
+    this.errorMsg = 'Data utama belum lengkap';
+    this.currentStep = 1;
+    return;
+  }
 
-    if (!this.isStep2Valid()) {
-      this.errorMsg = 'Kuis belum lengkap. Mohon lengkapi semua soal.';
-      return;
-    }
+  if (!this.isStep2Valid()) {
+    this.errorMsg = 'Kuis belum lengkap. Mohon lengkapi semua soal.';
+    return;
+  }
 
-    this.isSubmitting = true;
-    this.errorMsg = '';
+  this.isSubmitting = true;
+  this.errorMsg = '';
 
-    const materialData = this.materialForm.value;
-    const quizData = this.quizForm.value;
-    // const waktuPengerjaan = quizData.waktu_pengerjaan;
+  const materialData = this.materialForm.value;
+  const quizData = this.quizForm.value;
 
-    const transformedQuiz = quizData.questions.map((question: any) => {
-      if (question.tipeSoal === 'pilihan_ganda') {
-        const jawabanObjects = question.jawaban.map((text: string, idx: number) => ({
-          label: ['A', 'B', 'C', 'D'][idx],
-          text: text || ''
-        }));
-        const kunciLabel = question.kunci !== null ? ['A', 'B', 'C', 'D'][question.kunci] : 'A';
-        return {
-          jenis_soal: 'pilihan_ganda',
-          soal: question.soal,
-          jawaban: jawabanObjects,
-          kunci_jawaban: kunciLabel,
-          // waktu_pengerjaan: waktuPengerjaan 
-        };
-      } else {
-        return {
-          jenis_soal: 'isian_singkat',
-          soal: question.soal,
-          kunci_jawaban: question.jawabanSingkat,
-          // waktu_pengerjaan: waktuPengerjaan
-        };
+  // Transform quiz dengan format konsisten dan logging
+  const transformedQuiz = quizData.questions.map((question: any, index: number) => {
+    // console.log(`🔍 Processing Question ${index + 1}:`, {
+    //   tipeSoal: question.tipeSoal,
+    //   soal: question.soal?.substring(0, 50) + '...',
+    //   kunci: question.kunci,
+    //   jawaban: question.jawaban,
+    //   jawabanSingkat: question.jawabanSingkat
+    // });
+
+    if (question.tipeSoal === 'pilihan_ganda') {
+      const filteredJawaban = question.jawaban.filter((jawab: string) => jawab && jawab.trim() !== '');
+      
+      if (question.kunci === null || question.kunci === undefined) {
+        throw new Error(`Soal ${index + 1}: Kunci jawaban pilihan ganda belum dipilih`);
       }
-    });
-    
-    const filteredBabList = materialData.babList.filter((bab: any) => {
-      const hasJudul = bab.judulBab && bab.judulBab.trim() !== '';
-      const hasIsi = bab.isiBab && bab.isiBab.trim() !== '';
-      return hasJudul || hasIsi;
-    });
-    
-    const finalData = {
-      judul: materialData.judul,
-      deskripsi: materialData.deskripsi,
-      kelas: materialData.kelas,
-      babList: filteredBabList,
-      izinkanUnduh: materialData.izinkanUnduh,
-      quiz: transformedQuiz,
-      waktu_pengerjaan: quizData.waktu_pengerjaan,
-      sekolah: this.schoolId
-    };
 
-    this.materialService.addMaterial(finalData, this.token).subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        this.backToManageMaterials();
-      },
-      error: (error) => {
-        console.error('Error creating material with quiz:', error);
-        this.isSubmitting = false;
+      if (question.kunci < 0 || question.kunci >= filteredJawaban.length) {
+        throw new Error(`Soal ${index + 1}: Kunci jawaban pilihan ganda tidak valid`);
+      }
+
+      // console.log(`✅ Pilihan Ganda ${index + 1} Final:`, {
+      //   jawabanCount: filteredJawaban.length,
+      //   kunci: question.kunci,
+      //   kunciText: filteredJawaban[question.kunci]
+      // });
+
+      return {
+        jenis_soal: 'pilihan_ganda',
+        soal: question.soal,
+        jawaban: filteredJawaban,
+        kunci: question.kunci
+      };
+
+    } else if (question.tipeSoal === 'benar_salah') {
+      if (question.kunci === null || question.kunci === undefined) {
+        throw new Error(`Soal ${index + 1}: Kunci jawaban benar/salah belum dipilih`);
+      }
+
+      const kunciNumber = typeof question.kunci === 'string' ? parseInt(question.kunci) : question.kunci;
+      
+      if (kunciNumber !== 0 && kunciNumber !== 1) {
+        throw new Error(`Soal ${index + 1}: Kunci jawaban benar/salah tidak valid. Harus 0 (Benar) atau 1 (Salah)`);
+      }
+
+      return {
+        jenis_soal: 'benar_salah',
+        soal: question.soal,
+        jawaban: ['Benar', 'Salah'], 
+        kunci: kunciNumber
+      };
+
+    } else if (question.tipeSoal === 'isian_singkat') {
+      if (!question.jawabanSingkat || question.jawabanSingkat.trim() === '') {
+        throw new Error(`Soal ${index + 1}: Jawaban singkat belum diisi`);
+      }
+
+      return {
+        jenis_soal: 'isian_singkat',
+        soal: question.soal,
+        kunci_jawaban: question.jawabanSingkat.trim()
+      };
+
+    } else {
+      throw new Error(`Soal ${index + 1}: Tipe soal tidak valid: ${question.tipeSoal}`);
+    }
+  });
+
+  const filteredBabList = materialData.babList.filter((bab: any) => {
+    const hasJudul = bab.judulBab && bab.judulBab.trim() !== '';
+    const hasIsi = bab.isiBab && bab.isiBab.trim() !== '';
+    return hasJudul || hasIsi;
+  });
+
+  const finalData = {
+    judul: materialData.judul,
+    deskripsi: materialData.deskripsi,
+    kategori: materialData.kategori,
+    kelas: materialData.kelas,
+    babList: filteredBabList,
+    izinkanUnduh: materialData.izinkanUnduh,
+    quiz: transformedQuiz,
+    waktu_pengerjaan: quizData.waktu_pengerjaan,
+    sekolah: this.schoolId
+  };
+
+  const headerImage = this.selectedHeaderImage || undefined;
+
+  // console.log('🚀 Submitting material data:', {
+  //   judul: finalData.judul,
+  //   kategori: finalData.kategori,
+  //   kelasCount: finalData.kelas?.length || 0,
+  //   babCount: finalData.babList?.length || 0,
+  //   quizCount: finalData.quiz?.length || 0,
+  //   hasHeaderImage: !!headerImage
+  // });
+
+  this.materialService.addMaterial(finalData, headerImage).subscribe({
+    next: (response) => {
+      console.log('✅ Material created successfully:', response);
+      this.isSubmitting = false;
+      this.backToManageMaterials();
+    },
+    error: (error) => {
+      console.error('❌ Error creating material with quiz:', error);
+      this.isSubmitting = false;
+      
+      // ✅ PERBAIKAN: Error handling yang lebih detail
+      if (error.error?.message) {
+        this.errorMsg = error.error.message;
+      } else if (error.message) {
+        this.errorMsg = error.message;
+      } else {
         this.errorMsg = 'Gagal membuat materi dengan kuis. Silakan coba lagi.';
       }
-    });
-  }
+    }
+  });
+}
 
   onBatal() {
     if (this.currentStep > 1) {

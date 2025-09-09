@@ -6,9 +6,8 @@
 }
 
 label {
-  font-family: 'Poppins', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
 }
 
 input.form-control {
@@ -42,20 +41,331 @@ input.form-control {
   margin-bottom: 1rem;
 }
 
+a {
+  color: #1BB6C1;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ✅ TAMBAH: Styling untuk suggestions yang selaras */
+.btn-suggestion {
+  background: linear-gradient(135deg, #1BB6C1 0%, #17a2b8 100%);
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(27, 182, 193, 0.2);
+}
+
+.btn-suggestion:hover {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(27, 182, 193, 0.3);
+}
+
+.btn-suggestion:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(27, 182, 193, 0.2);
+}
+
+/* ✅ PERBAIKAN: Password container untuk proper positioning */
+.position-relative {
+  position: relative;
+}
+
+/* ✅ PERBAIKAN: Password input dengan proper padding */
+.password-input {
+  border-radius: 8px;
+  padding-right: 45px !important; /* Space for eye icon */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  height: calc(1.5em + 0.75rem + 2px); /* Standard Bootstrap input height */
+  line-height: 1.5;
+}
+
+.password-input:focus {
+  border-color: #1BB6C1;
+  box-shadow: 0 0 0 0.2rem rgba(27, 182, 193, 0.25);
+}
+
+/* ✅ PERBAIKAN: Password toggle icon positioning yang tepat */
 .toggle-password-icon {
   position: absolute;
-  margin-top: -20px;
-  right: 15px; /* jarak dari tepi kanan */
+  right: 15px;
+  top: 50%;
   transform: translateY(-50%);
+  color: #6c757d;
   cursor: pointer;
+  font-size: 16px;
+  transition: color 0.2s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 0;
+}
+
+.toggle-password-icon:hover {
   color: #1BB6C1;
-  font-size: 1rem;
+}
+
+/* ✅ TAMBAH: Styling untuk error messages yang consistent */
+.text-danger {
+  color: #dc3545 !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.text-success {
+  color: #28a745 !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.text-muted {
+  color: #6c757d !important;
+  font-size: 0.875rem;
+}
+
+/* ✅ PERBAIKAN: Custom styling untuk valid inputs TANPA checkmark */
+.form-control.is-valid {
+  border-color: #28a745;
+  /* No background-image checkmark */
+}
+
+.form-control.is-valid:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* ✅ PERBAIKAN: Password input valid tanpa checkmark dan padding normal */
+.password-input.is-valid {
+  padding-right: 45px !important; /* Kembali ke padding normal untuk eye icon saja */
+}
+
+/* ✅ TAMBAH: Animation untuk suggestions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn-suggestion {
+  animation: fadeInUp 0.3s ease forwards;
+}
+
+/* ✅ TAMBAH: Responsive styling */
+@media (max-width: 768px) {
+  .btn-suggestion {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    margin-bottom: 5px;
+  }
+  
+  .toggle-password-icon {
+    right: 12px;
+    font-size: 14px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .password-input {
+    padding-right: 40px !important;
+  }
+  
+  .password-input.is-valid {
+    padding-right: 40px !important;
+  }
+  
+  .text-danger,
+  .text-success,
+  .text-muted {
+    font-size: 0.8rem;
+  }
+  
+  /* Responsive untuk NUPTK dan Instansi */
+  .mb-3.d-flex {
+    flex-direction: column;
+  }
+  
+  .mb-3.d-flex .flex-fill {
+    margin-bottom: 1rem;
+  }
+  
+  .mb-3.d-flex .flex-fill:last-child {
+    margin-bottom: 0;
+  }
+}
+
+/* ✅ TAMBAH: Loading state styling */
+.fa-spinner.fa-spin {
+  color: #1BB6C1;
+}
+
+/* ✅ TAMBAH: Icon coloring yang selaras */
+.fas.fa-check-circle {
+  color: #28a745;
+}
+
+.fas.fa-exclamation-circle {
+  color: #dc3545;
+}
+
+.fas.fa-info-circle {
+  color: #17a2b8;
+}
+
+.fas.fa-exclamation-triangle {
+  color: #ffc107;
+}
+
+.fas.fa-lightbulb {
+  color: #1BB6C1;
+}
+
+/* ✅ TAMBAH: Fix untuk label positioning */
+label {
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* ✅ TAMBAH: Ensure proper spacing dalam password container */
+.mb-3 label {
+  position: relative;
+  z-index: 1;
+}
+
+.mb-3 .form-control {
+  position: relative;
   z-index: 2;
 }
 
-.form-control:focus {
-  box-shadow: none;
-  border-color: #1BB6C1;
+.mb-3 .toggle-password-icon {
+  position: absolute;
+  z-index: 3;
+}
+
+/* ✅ TAMBAH: Override untuk menghilangkan semua checkmark dari Bootstrap */
+.form-control.is-valid,
+.was-validated .form-control:valid {
+  background-image: none !important;
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control.is-valid:focus,
+.was-validated .form-control:valid:focus {
+  background-image: none !important;
+}
+
+input.form-control.is-valid,
+textarea.form-control.is-valid,
+select.form-control.is-valid {
+  background-image: none !important;
+  padding-right: 0.75rem; /* Default Bootstrap padding */
+}
+
+/* ✅ TAMBAH: Khusus untuk password input, tetap gunakan padding untuk eye icon */
+input.password-input.is-valid {
+  padding-right: 45px !important; /* Space untuk eye icon */
+}
+
+@media (max-width: 768px) {
+  input.password-input.is-valid {
+    padding-right: 40px !important;
+  }
+}
+
+/* ✅ TAMBAH: Toast styling */
+.toast-container {
+  z-index: 1061;
+}
+
+.toast-success {
+  background-color: #28a745;
+}
+
+.toast-error {
+  background-color: #dc3545;
+}
+
+.toast-info {
+  background-color: #17a2b8;
+}
+
+.toast-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.toast.show {
+  display: block;
+  opacity: 1;
+}
+
+.toast.hide {
+  display: none;
+  opacity: 0;
+}
+
+/* ✅ TAMBAH: NUPTK input specific styling */
+input[formControlName="nuptk"] {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+
+/* ✅ TAMBAH: Better spacing for two-column layout */
+.d-flex.gap-2 > .flex-fill:first-child {
+  margin-right: 0.5rem;
+}
+
+.d-flex.gap-2 > .flex-fill:last-child {
+  margin-left: 0.5rem;
+}
+
+/* ✅ TAMBAH: Form validation styling consistency */
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+.form-control {
+  border-radius: 8px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  padding: 0.5rem;
+}
+
+.form-control::placeholder {
+  color: #6c757d;
+  opacity: 0.8;
+}
+
+/* ✅ TAMBAH: Button disabled state */
+.btn-primary-custom:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary-custom:disabled:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
 }
 
 

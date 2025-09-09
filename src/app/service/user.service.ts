@@ -33,7 +33,7 @@ export interface UpdateClassResponse {
   student: StudentData;
 }
 
-// ✨ NEW: Interface untuk response removeStudentFromAllClasses
+// Interface untuk response removeStudentFromAllClasses
 export interface RemoveFromAllClassesResponse {
   success: boolean;
   message: string;
@@ -43,8 +43,8 @@ export interface RemoveFromAllClassesResponse {
       nama_lengkap: string;
       username: string;
       email: string;
-      kelas: any;     // null after removal
-      sekolah: any;   // null after removal
+      kelas: any;    
+      sekolah: any;  
     };
     previous_class: {
       _id: string;
@@ -53,6 +53,20 @@ export interface RemoveFromAllClassesResponse {
     } | null;
     previous_school_id: string;
   };
+}
+
+export interface UserBasicInfo {
+  _id: string;
+  username: string;
+  email?: string;
+  nuptk?: string;
+  role: string;
+}
+
+export interface AllBasicInfoResponse {
+  success: boolean;
+  data: UserBasicInfo[];
+  message?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -116,21 +130,24 @@ export class UserService {
     );
   }
 
-  // ✨ NEW: Remove student from any class they're currently in
+  // Remove student from any class they're currently in
   removeStudentFromAllClasses(studentId: string, token: string): Observable<RemoveFromAllClassesResponse> {
     const headers = this.getHeaders(token);
-    
-    // console.log('Calling removeStudentFromAllClasses API:', {
-    //   studentId,
-    //   endpoint: `${this.apiUrl}/students/${studentId}/remove-from-class`
-    // });
-    
     return this.http.delete<RemoveFromAllClassesResponse>(
       `${this.apiUrl}/students/${studentId}/remove-from-class`, 
       { headers }
     ).pipe(
       catchError(error => {
         console.error('Error in removeStudentFromAllClasses:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getAllUserBasicInfo(): Observable<AllBasicInfoResponse> {
+    return this.http.get<AllBasicInfoResponse>(`${this.apiUrl}/all-basic-info`).pipe(
+      catchError(error => {
+        console.error('Error in getAllUserBasicInfo:', error);
         return throwError(() => error);
       })
     );

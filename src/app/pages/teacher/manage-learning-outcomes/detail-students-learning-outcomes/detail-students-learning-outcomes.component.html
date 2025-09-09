@@ -1,87 +1,261 @@
 <div class="container-fluid mt-4 custom-materi-container">
-  <h2 class="fw-bold mb-4" style="font-size: 24px;">Daftar hasil belajar - siswa</h2>
-
-  <!-- Action buttons and search -->
-  <div class="row">
-
-    <div class="col-md-2 mb-3">
-      <label class="mb-2">Kelas</label>
-      <ngx-select
-        [items]="classes"
-        placeholder="Pilih kelas"
-        optionValueField="id"
-        optionTextField="nama_kelas"
-        [(ngModel)]="selectedClass"
-        (ngModelChange)="onClassChange()"
-        [allowClear]="false">
-      </ngx-select>
-    </div>
-
-    <div class="col-md-2 mb-3">
-      <label class="mb-2">Tahun Ajaran</label>
-      <ngx-select
-        [items]="academicYears"
-        placeholder="Pilih tahun ajaran"
-        optionValueField="id"
-        optionTextField="nama"
-        [(ngModel)]="selectedAcademicYear"
-        (ngModelChange)="onYearChange()"
-        [allowClear]="false">
-      </ngx-select>
+  <!-- ✅ TAMBAH: Back button dan header -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToDetailLearningOutcomes()" title="Kembali ke daftar materi">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    
+    <!-- Material info header -->
+    <div *ngIf="materiInfo">
+      <h2 class="fw-bold mb-0" style="font-size: 24px;">
+        Daftar siswa - {{ materiInfo.judul_materi }}
+      </h2>
+      <p class="text-muted mb-0" style="font-size: 14px;">
+        <i class="fas fa-tag me-1"></i>{{ materiInfo.kategori_materi }} | 
+        <i class="fas fa-book-open me-1"></i>{{ materiInfo.total_bab }} bab | 
+        <i class="fas fa-question me-1"></i>{{ materiInfo.total_soal }} soal
+      </p>
     </div>
     
-    <div class="d-flex justify-content-end align-items-center mb-3">
-    <div class="search-bar d-flex align-items-center">
-      <input 
-        #searchInput
-        type="text"
-        class="form-control rounded-pill me-2"
-        placeholder="Cari"
-        [(ngModel)]="keyword"
-        (keydown.enter)="onSearch()"
-        style="width: 230px;" />
-
-      <span class="search-icon" (click)="onSearch()">
-        <i class="fa fa-search"></i>
-      </span>
-    </div>
-    </div>
-
+    <!-- Default header jika materiInfo belum tersedia -->
+    <h2 *ngIf="!materiInfo && !loading" class="fw-bold mb-0" style="font-size: 24px;">
+      Daftar siswa
+    </h2>
   </div>
 
-  <!-- Students table -->
-  <div class="table-responsive">
+  <!-- ✅ TAMBAH: Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-4" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat data siswa...</p>
+    </div>
+  </div>
+
+  <!-- ✅ TAMBAH: Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-4">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshData()">
+      <i class="fas fa-sync-alt me-1"></i>Coba Lagi
+    </button>
+  </div>
+
+  <!-- ✅ TAMBAH: Statistics cards -->
+  <div *ngIf="!loading && !errorMsg && statistics" class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-users fa-2x text-primary mb-2"></i>
+          <h4 class="fw-bold">{{ statistics.total_siswa }}</h4>
+          <small class="text-muted">Total Siswa</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+          <h4 class="fw-bold">{{ statistics.completed }}</h4>
+          <small class="text-muted">Selesai ({{ getStatPercentage(statistics.completed) }}%)</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-play-circle fa-2x text-warning mb-2"></i>
+          <h4 class="fw-bold">{{ statistics.in_progress }}</h4>
+          <small class="text-muted">Sedang Belajar ({{ getStatPercentage(statistics.in_progress) }}%)</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <i class="fas fa-star fa-2x text-info mb-2"></i>
+          <h4 class="fw-bold">{{ statistics.avg_score || 0 }}</h4>
+          <small class="text-muted">Rata-rata Nilai</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ UPDATED: Filters dan search -->
+  <div class="row mb-3" *ngIf="!loading && getTotalStudentsCount() > 0">
+    <!-- Status filter -->
+    <div class="col-md-3 mb-3">
+      <label class="mb-2 fw-medium">Status Pembelajaran</label>
+      <ngx-select
+        [items]="statusOptions"
+        optionValueField="value"
+        optionTextField="label"
+        [(ngModel)]="selectedStatus"
+        (ngModelChange)="onStatusChange()"
+        [allowClear]="false"
+        placeholder="Pilih status">
+      </ngx-select>
+    </div>
+
+    <!-- Search bar -->
+    <div class="col-md-9 d-flex justify-content-end align-items-end">
+      <div class="search-bar d-flex align-items-center">
+        <input 
+          type="text"
+          class="form-control rounded-pill me-2"
+          placeholder="Cari nama siswa, username"
+          [(ngModel)]="keyword"
+          (keydown.enter)="onSearch()"
+          (input)="onSearch()"
+          [disabled]="loading"
+          style="width: 280px;" />
+
+        <span class="search-icon" (click)="onSearch()" style="cursor: pointer;">
+          <i class="fa fa-search"></i>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ UPDATED: Students table -->
+  <div class="table-responsive" *ngIf="!loading && !errorMsg">
     <table class="table align-middle table-bordered text-center">
-      <thead>
+      <thead class="table-light">
         <tr>
           <th>No.</th>
-          <th>Nama siswa</th>
-          <th>Status</th>
-          <th>Nilai</th>
+          <th style="cursor: pointer;" (click)="sortStudents('name')">
+            Nama Siswa
+            <i [class]="getSortIcon('name')" class="ms-1"></i>
+          </th>
+          <th>Username</th>
+          <th style="cursor: pointer;" (click)="sortStudents('status')">
+            Status
+            <i [class]="getSortIcon('status')" class="ms-1"></i>
+          </th>
+          <th style="cursor: pointer;" (click)="sortStudents('progress')">
+            Progress Bab
+            <i [class]="getSortIcon('progress')" class="ms-1"></i>
+          </th>
+          <th>Kuis</th>
+          <th style="cursor: pointer;" (click)="sortStudents('score')">
+            Nilai
+            <i [class]="getSortIcon('score')" class="ms-1"></i>
+          </th>
+          <th>Terakhir Akses</th>
           <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let siswa of filteredSiswa; let i = index">
+        <tr *ngFor="let student of filteredStudents; let i = index">
           <td>{{ i + 1 }}.</td>
-          <td>{{ siswa.nama_siswa }}</td>
           <td>
-            <span class="badge-status" [ngClass]="{'badge-selesai': siswa.status === 1, 'badge-berlangsung': siswa.status === 0}">
-                {{ getStatusText(siswa.status) }}
+            <div class="text-start">
+              <span class="fw-medium">{{ student.nama_siswa }}</span>
+            </div>
+          </td>
+          <td>
+            <small class="text-muted">{{ student.username }}</small>
+          </td>
+          <td>
+            <span [class]="getStudentStatusBadge(student.status).class">
+              {{ getStudentStatusBadge(student.status).text }}
             </span>
           </td>
-          <td>{{ siswa.nilai }}</td>
+          <td>
+            <div class="text-center">
+              <div class="fw-bold mb-1">{{ student.completed_babs }} / {{ student.total_babs }}</div>
+              <div class="progress" style="height: 6px;">
+                <div class="progress-bar" 
+                     [style.width.%]="getProgressPercentage(student)"
+                     [style.background-color]="getProgressColor(getProgressPercentage(student))">
+                </div>
+              </div>
+              <small class="text-muted">{{ getProgressPercentage(student) }}%</small>
+            </div>
+          </td>
+          <td>
+            <div *ngIf="materiInfo?.has_quiz; else noQuiz" class="text-center">
+              <div class="fw-medium">{{ getQuizInfoText(student) }}</div>
+              <!-- <small *ngIf="student.best_score" class="text-muted">Skor terbaik: {{ student.best_score }}</small> -->
+            </div>
+            <ng-template #noQuiz>
+              <small class="text-muted">-</small>
+            </ng-template>
+          </td>
+          <td>
+            <span class="fw-bold" 
+                  [class.text-success]="hasQuizScore(student)"
+                  [class.text-muted]="!hasQuizScore(student)">
+              {{ formatNilai(student.nilai) }}
+            </span>
+          </td>
+          <td>
+            <small class="text-muted">
+              {{ formatDate(student.last_accessed) }}
+            </small>
+          </td>
           <td class="aksi-cell">
-            <a [routerLink]="" (click)="koreksiJawaban(siswa); $event.preventDefault()">Koreksi</a>
-            <span class="aksi-separator"></span>
-            <a [routerLink]="" (click)="sendFeedback(siswa); $event.preventDefault()">Kirim feedback</a>
+            <button class="btn btn-sm btn-outline-primary" 
+                    (click)="sendFeedback(student)"
+                    [title]="'Kirim feedback ke ' + student.nama_siswa"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top">
+              <i class="fas fa-comment"></i>
+            </button>
+            <button *ngIf="hasQuizScore(student) && materiInfo?.has_quiz" 
+                    class="btn btn-sm btn-outline-info" 
+                    (click)="lihatDetailQuiz(student)"
+                    [title]="'Lihat detail hasil quiz ' + student.nama_siswa"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top">
+              <i class="fas fa-eye"></i>
+            </button>
           </td>
         </tr>
-        <tr *ngIf="filteredSiswa.length === 0">
-          <td colspan="3" class="text-center text-secondary py-4">Data tidak ditemukan.</td>
+        
+        <!-- ✅ TAMBAH: No data rows -->
+        <tr *ngIf="getFilteredStudentsCount() === 0 && hasFiltersApplied() && !loading">
+          <td colspan="9" class="text-center text-secondary py-4">
+            <i class="fas fa-search me-2"></i>
+            Tidak ditemukan siswa dengan filter yang dipilih
+            <br>
+            <button class="btn btn-sm btn-outline-secondary mt-2" (click)="resetFilters()">
+              <i class="fas fa-times me-1"></i>Reset Filter
+            </button>
+          </td>
+        </tr>
+        
+        <tr *ngIf="getTotalStudentsCount() === 0 && !loading">
+          <td colspan="9" class="text-center text-secondary py-4">
+            <i class="fas fa-users me-2"></i>
+            Belum ada siswa yang terdaftar untuk materi ini.
+            <br>
+            <small class="text-muted mt-1">
+              Siswa akan muncul setelah mengakses materi pembelajaran.
+            </small>
+          </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- ✅ TAMBAH: Stats info -->
+  <div *ngIf="!loading && !errorMsg && getTotalStudentsCount() > 0" class="mt-3">
+    <small class="text-muted">
+      <i class="fas fa-info-circle me-1"></i>
+      Total: {{ getTotalStudentsCount() }} siswa
+      <span *ngIf="getFilteredStudentsCount() !== getTotalStudentsCount()">
+        (menampilkan {{ getFilteredStudentsCount() }} siswa)
+      </span>
+      <span *ngIf="statistics">
+        • 
+        Selesai: {{ statistics.completed }} ({{ getStatPercentage(statistics.completed) }}%)
+        • 
+        Sedang belajar: {{ statistics.in_progress }} ({{ getStatPercentage(statistics.in_progress) }}%)
+        • 
+        Rata-rata nilai: {{ statistics.avg_score || 0 }}
+      </span>
+    </small>
   </div>
 </div>
 

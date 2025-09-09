@@ -79,29 +79,55 @@
       </div>
     </div>
 
-    <!-- Sidebar with progress -->
     <div class="col-md-4">
       <div class="progress-sidebar">
         <div class="progress-section">
           <div class="progress-header">
-            <span>{{ material.progress }}% Selesai</span>
+            <!-- ✅ EXISTING: Gunakan method dynamic -->
+            <span>{{ getProgressPercentage() }}% Selesai</span>
           </div>
           <div class="progress-bar-wrapper">
-            <div class="progress-bar" [style.width.%]="material.progress"></div>
+            <!-- ✅ EXISTING: Gunakan method dynamic -->
+            <div class="progress-bar" [style.width.%]="getProgressPercentage()"></div>
+          </div>
+          <!-- ✅ EXISTING: Status completion -->
+          <div class="progress-status mt-2">
+            <span class="completion-status">{{ getCompletionStatus() }}</span>
           </div>
         </div>
 
         <div class="status-section">
+          <!-- Status Materi -->
           <div class="status-item">
-            <div class="status-circle" [ngClass]="{'checked': material.isRead}">
-              <i *ngIf="material.isRead" class="fas fa-check"></i>
+            <div class="status-circle" [ngClass]="{'checked': material?.isRead}">
+              <i *ngIf="material?.isRead" class="fas fa-check"></i>
             </div>
             <span class="status-text">Materi</span>
           </div>
           
+          <!-- ✅ TAMBAH: Daftar Bab (sama persis seperti di view-material) -->
+          <!-- ✅ SOLUSI TERCEPAT: -->
+          <div class="bab-list-section" *ngIf="material && material.pages.length > 0">
+            <div class="bab-header">
+              <span class="bab-title">Daftar Bab:</span>
+            </div>
+            
+            <div class="bab-item" 
+                 *ngFor="let page of material.pages; let i = index" 
+                 (click)="goToMaterialPage(i)">
+              <div class="status-circle small" [ngClass]="{'checked': page.isRead}">
+                <i *ngIf="page.isRead" class="fas fa-check"></i>
+              </div>
+              <span class="bab-text" [title]="page.title">
+                {{ i + 1 }}. {{ page.title | slice:0:30 }}{{ page.title.length > 30 ? '...' : '' }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- ✅ EXISTING: Status Kuis - hanya centang jika benar-benar lulus -->
           <div class="status-item">
-            <div class="status-circle" [ngClass]="{'checked': material.quizCompleted}">
-              <i *ngIf="material.quizCompleted" class="fas fa-check"></i>
+            <div class="status-circle" [ngClass]="{'checked': isQuizCompleted()}">
+              <i *ngIf="isQuizCompleted()" class="fas fa-check"></i>
             </div>
             <span class="status-text">Kuis Latihan</span>
           </div>
@@ -115,5 +141,6 @@
         </div>
       </div>
     </div>
+
   </div>
 </div>

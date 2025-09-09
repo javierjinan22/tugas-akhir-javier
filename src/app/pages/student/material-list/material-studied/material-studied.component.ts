@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { ModalDownloadComponent } from '../modal-download/modal-download.component';
-import { StudentProgressService, MaterialSummary } from '../../../../service/student-progress.service';
+import { StudentProgressService, MaterialSummary, MaterialCategory } from '../../../../service/student-progress.service';
 
 @Component({
   selector: 'app-material-studied',
@@ -10,9 +10,12 @@ import { StudentProgressService, MaterialSummary } from '../../../../service/stu
   styleUrls: ['./material-studied.component.css']
 })
 export class MaterialStudiedComponent implements OnInit {
+  materialCategories: MaterialCategory[] = [];
   studiedMaterials: MaterialSummary[] = [];
   loading: boolean = false;
   error: string = '';
+
+  viewMode: 'category' | 'list' = 'category';
 
   constructor(
     private router: Router,
@@ -31,7 +34,7 @@ export class MaterialStudiedComponent implements OnInit {
     this.studentProgressService.getMateriWithProgress().subscribe({
       next: (response) => {
         if (response.success) {
-          // ✅ UPDATED: Ambil materi yang sedang dipelajari (not_started + in_progress)
+          this.materialCategories = this.studentProgressService.getStudiedMaterialsByCategory(response);
           this.studiedMaterials = this.studentProgressService.getStudiedMaterials(response);
         } else {
           this.error = 'Gagal memuat materi';
@@ -46,10 +49,41 @@ export class MaterialStudiedComponent implements OnInit {
     });
   }
 
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'category' ? 'list' : 'category';
+  }
+
+  getCategoryIcon(categoryName: string): string {
+    switch (categoryName) {
+      case 'Etika Digital':
+        return 'fa-shield-alt';
+      case 'Budaya Digital':
+        return 'fa-laptop';
+      case 'Cakap Digital':
+        return 'fa-cogs';
+      case 'Keamanan Digital':
+        return 'fa-lock';
+      default:
+        return 'fa-folder';
+    }
+  }
+
+   getCategoryColor(categoryName: string): string {
+    switch (categoryName) {
+      case 'Etika Digital':
+        return '#28a745';
+      case 'Budaya Digital':
+        return '#007bff';
+      case 'Cakap Digital':
+        return '#6f42c1';
+      case 'Keamanan Digital':
+        return '#dc3545';
+      default:
+        return '#6c757d';
+    }
+  }
+
   viewMaterial(material: MaterialSummary): void {
-    console.log(`Viewing material: ${material.judul_materi}`);
-    
-    // Navigate to material detail dengan ID
     this.router.navigate(['/siswa/materi/lihat-materi', material._id]);
   }
 

@@ -1,17 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/service/auth.service';
 import { SchoolService } from 'src/app/service/school.service';
 import { ClassService, ClassesBySchoolResponse } from 'src/app/service/class.service';
+import { ValidationService } from 'src/app/service/validation.service'; // ✅ TAMBAH
+import { CustomValidators } from 'src/app/validators/custom-validators'; // ✅ TAMBAH
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators'; // ✅ TAMBAH
+import { Subscription } from 'rxjs'; // ✅ TAMBAH
 
 @Component({
   selector: 'app-create-student-account',
   templateUrl: './create-student-account.component.html',
   styleUrls: ['./create-student-account.component.css']
 })
-export class CreateStudentAccountComponent implements OnInit {
+export class CreateStudentAccountComponent implements OnInit, OnDestroy {
 
   registerForm!: FormGroup;
   faEye = faEye;
@@ -31,13 +35,27 @@ export class CreateStudentAccountComponent implements OnInit {
   // Data dari route
   currentClassId: string = '';
 
+  // ✅ TAMBAH: Toast properties
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
+
+  // ✅ TAMBAH: Validation properties
+  usernameError = '';
+  usernameSuggestions: string[] = [];
+  validationDataLoaded = false;
+  private subscriptions: Subscription[] = [];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private schoolService: SchoolService,
     private classService: ClassService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private validationService: ValidationService // ✅ TAMBAH
   ) {}
 
   ngOnInit(): void {
@@ -49,19 +67,94 @@ export class CreateStudentAccountComponent implements OnInit {
       this.currentClassId = urlSegments[detailKelasIndex + 1];
     }
 
-    // Init form
+    // ✅ SELARASKAN: Init form dengan custom validators
     this.registerForm = this.fb.group({
-      nama_lengkap: ['', Validators.required],
-      username: ['', Validators.required],
-      password: ['', Validators.required],
+      nama_lengkap: ['', [Validators.required, CustomValidators.fullName()]],
+      username: ['', [Validators.required, CustomValidators.username()]],
+      password: ['', [Validators.required, CustomValidators.password()]],
       konfirmasi_password: ['', Validators.required],
       sekolah: ['', Validators.required],
       kelas: ['', Validators.required],
+    }, {
+      validators: CustomValidators.passwordMatch('password', 'konfirmasi_password')
     });
 
     // Load sekolah guru saat ini
     this.loadCurrentSchool();
     this.setupSchoolChange();
+
+    // ✅ TAMBAH: Real-time username validation
+    const usernameSub = this.registerForm.get('username')!.valueChanges
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe((username) => {
+        if (this.validationDataLoaded) {
+          this.validateUsername(username);
+        }
+      });
+    this.subscriptions.push(usernameSub);
+
+    // ✅ TAMBAH: Wait for validation data to load
+    const validationSub = this.validationService.isDataLoaded.subscribe((loaded) => {
+      this.validationDataLoaded = loaded;
+      if (loaded && this.registerForm.get('username')?.value) {
+        this.validateUsername(this.registerForm.get('username')?.value);
+      }
+    });
+    this.subscriptions.push(validationSub);
+  }
+
+  // ✅ TAMBAH: Method untuk validasi username real-time
+  private validateUsername(username: string): void {
+    this.usernameError = '';
+    this.usernameSuggestions = [];
+
+    if (!username || username.trim() === '') {
+      return;
+    }
+
+    // Check basic validation first
+    const usernameControl = this.registerForm.get('username');
+    if (usernameControl?.errors && !usernameControl.errors['usernameTaken']) {
+      return; // Don't check duplication if basic validation fails
+    }
+
+    // Check if username is taken
+    if (this.validationService.isUsernameTaken(username)) {
+      this.usernameError = 'Username sudah digunakan';
+      this.usernameSuggestions = this.validationService.getUsernameSuggestions(username);
+      
+      // Set custom error
+      usernameControl?.setErrors({ 
+        ...usernameControl.errors, 
+        usernameTaken: { message: 'Username sudah digunakan' }
+      });
+    } else {
+      // Remove usernameTaken error if exists
+      if (usernameControl?.errors) {
+        delete usernameControl.errors['usernameTaken'];
+        if (Object.keys(usernameControl.errors).length === 0) {
+          usernameControl.setErrors(null);
+        }
+      }
+    }
+  }
+
+  // ✅ TAMBAH: Method untuk use suggested username
+  useSuggestedUsername(suggestion: string): void {
+    this.registerForm.patchValue({ username: suggestion });
+    this.usernameError = '';
+    this.usernameSuggestions = [];
+  }
+
+  // ✅ TAMBAH: Method untuk get first error message
+  getFirstErrorMessage(controlName: string): string {
+    const control = this.registerForm.get(controlName);
+    if (!control || !control.errors || !control.touched) return '';
+    
+    return CustomValidators.getFirstErrorMessage(control, controlName);
   }
 
   // ✅ TAMBAH METHOD BACK TO CONNECT STUDENT
@@ -187,18 +280,22 @@ export class CreateStudentAccountComponent implements OnInit {
 
   onSubmitClicked(): void {
     if (this.registerForm.invalid) {
+      this.showErrorToast('Mohon lengkapi semua field yang wajib diisi');
       this.markFormGroupTouched();
-      this.errorMsg = 'Mohon lengkapi semua field yang diperlukan.';
       return;
     }
 
-    if (this.registerForm.value.password !== this.registerForm.value.konfirmasi_password) {
-      this.errorMsg = "Password dan konfirmasi password tidak cocok!";
+    // ✅ TAMBAH: Double-check validasi sebelum submit
+    const username = this.registerForm.value.username;
+    if (this.validationService.isUsernameTaken(username)) {
+      this.showErrorToast('Username sudah digunakan. Silakan pilih username lain.');
       return;
     }
 
     this.loading = true;
     this.errorMsg = '';
+    
+    this.showInfoToast('Sedang membuat akun siswa...');
 
     const payload = {
       nama_lengkap: this.registerForm.value.nama_lengkap,
@@ -210,28 +307,38 @@ export class CreateStudentAccountComponent implements OnInit {
       kelas: this.registerForm.value.kelas
     };
 
+    console.log('📝 Create student account payload:', payload);
+
     this.authService.register(payload).subscribe({
       next: (response) => {
+        console.log('✅ Student account created successfully:', response);
         this.loading = false;
         
-        // alert('Akun siswa berhasil dibuat!');
+        // ✅ Refresh validation data setelah registrasi berhasil
+        this.validationService.refreshUsersData();
         
-        // Navigate back to connect student page
-        this.backToConnectStudent();
+        this.showSuccessToast('Akun siswa berhasil dibuat!');
+        
+        // Navigate back to connect student page setelah delay singkat
+        setTimeout(() => {
+          this.backToConnectStudent();
+        }, 0);
       },
       error: (error) => {
-        console.error('Error creating student account:', error);
+        console.error('❌ Error creating student account:', error);
         this.loading = false;
         
         if (error.status === 400) {
-          this.errorMsg = 'Data yang dimasukkan tidak valid. Periksa kembali form Anda.';
+          this.showErrorToast('Data yang dimasukkan tidak valid. Periksa kembali form Anda.');
         } else if (error.status === 409) {
-          this.errorMsg = 'Username sudah digunakan. Silakan gunakan username lain.';
+          this.showErrorToast('Username sudah digunakan. Silakan gunakan username lain.');
         } else if (error.status === 422) {
-          this.errorMsg = 'Format data tidak sesuai. Periksa kembali input Anda.';
+          this.showErrorToast('Format data tidak sesuai. Periksa kembali input Anda.');
         } else {
-          this.errorMsg = error?.error?.message || 'Gagal membuat akun siswa. Silakan coba lagi.';
+          this.showErrorToast('Gagal membuat akun siswa. Silakan coba lagi.');
         }
+        
+        this.errorMsg = error?.error?.message || 'Gagal membuat akun siswa. Silakan coba lagi.';
       }
     });
   }
@@ -255,4 +362,61 @@ export class CreateStudentAccountComponent implements OnInit {
     this.confirmPasswordVisible = !this.confirmPasswordVisible;
   }
 
+  // ✅ TAMBAH: Toast methods
+  private showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 3000);
+    }, 100);
+  }
+
+  private showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 4000);
+    }, 100);
+  }
+
+  private showInfoToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-info';
+      this.toastIcon = 'fas fa-info-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 3000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+    
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 }

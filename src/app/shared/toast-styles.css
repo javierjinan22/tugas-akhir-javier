@@ -1,0 +1,132 @@
+/* ✅ Shared Toast Styles */
+.toast-container {
+  z-index: 1061 !important; /* Higher than modal z-index */
+}
+
+.toast {
+  min-width: 300px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.toast.show {
+  animation: slideInRight 0.3s ease;
+}
+
+.toast.hide {
+  animation: slideOutRight 0.3s ease;
+}
+
+/* ✅ Toast Success */
+.toast-success {
+  background: linear-gradient(135deg, #1BB6C1, #17a2b8) !important;
+  border-left: 4px solid #0d7377;
+}
+
+/* ✅ Toast Error */
+.toast-error {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+  border-left: 4px solid #a71e2a;
+}
+
+/* ✅ Toast Info */
+.toast-info {
+  background: linear-gradient(135deg, #17a2b8, #138496) !important;
+  border-left: 4px solid #0c5460;
+}
+
+/* ✅ Toast Warning */
+.toast-warning {
+  background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+  border-left: 4px solid #b69500;
+  color: #212529 !important;
+}
+
+.toast-warning .btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(0%);
+}
+
+.toast-body {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+.toast-body i {
+  font-size: 16px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.btn-close-white {
+  filter: invert(1) grayscale(100%) brightness(200%);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.btn-close-white:hover {
+  opacity: 1;
+}
+
+/* ✅ Animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* ✅ Responsive */
+@media (max-width: 768px) {
+  .toast-container {
+    position: fixed !important;
+    top: 1rem !important;
+    left: 1rem !important;
+    right: 1rem !important;
+    width: auto !important;
+  }
+  
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .toast-body {
+    font-size: 13px;
+    padding: 0.625rem 0.75rem;
+  }
+  
+  .toast-body i {
+    font-size: 14px;
+  }
+}
+
+/* ✅ Z-index hierarchy */
+.modal {
+  z-index: 1050;
+}
+
+.toast-container {
+  z-index: 1061;
+}

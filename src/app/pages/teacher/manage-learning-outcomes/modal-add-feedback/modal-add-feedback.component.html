@@ -8,6 +8,18 @@
 
   <h5 class="modal-title text-center mt-4">Berikan umpan balik anda kepada siswa</h5>
 
+  <!-- ✅ TAMBAH: Student dan material info -->
+  <div class="text-center mb-3" *ngIf="student && materiInfo">
+    <p class="mb-1"><strong>Siswa:</strong> {{ getStudentName() }}</p>
+    <p class="mb-0 text-muted"><strong>Materi:</strong> {{ getMaterialName() }}</p>
+  </div>
+
+  <!-- ✅ TAMBAH: Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger alert-sm mb-3">
+    <i class="fas fa-exclamation-triangle me-1"></i>
+    {{ errorMsg }}
+  </div>
+
   <form>
     <div class="form-group mt-3">
       <textarea 
@@ -16,19 +28,24 @@
         class="form-control" 
         rows="5" 
         placeholder="Masukkan umpan balik anda di sini..."
-        [(ngModel)]="feedback">
+        [(ngModel)]="feedback"
+        [disabled]="loading">
     </textarea>
     </div>
-
   </form>
 
   <div class="d-flex justify-content-between mt-4 px-3">
-    <button class="btn btn-outline-primary btn-rounded" (click)="onCancelClicked()">
+    <button class="btn btn-outline-primary btn-rounded" 
+            (click)="onCancelClicked()"
+            [disabled]="loading">
       Batal
     </button>
-    <button class="btn btn-primary btn-rounded" (click)="onSubmitClicked()">
-      Kirim
+    <button class="btn btn-primary btn-rounded" 
+            (click)="onSubmitClicked()"
+            [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2" role="status"></span>
+      <i *ngIf="!loading" class="fas fa-paper-plane me-2"></i>
+      {{ loading ? 'Mengirim...' : 'Kirim' }}
     </button>
   </div>
-
 </div>

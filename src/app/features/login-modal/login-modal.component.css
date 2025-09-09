@@ -52,3 +52,353 @@
   box-shadow: none;
   border-color: #1BB6C1;
 }
+
+.modal-body {
+  position: relative; /* Ensure proper positioning for toast */
+}
+
+/* ✅ Loading button state */
+.btn-login:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-login .fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ✅ Hide error alert when toast is showing */
+.alert-danger {
+  transition: opacity 0.3s ease;
+}
+
+/* ✅ SELARASKAN: Font Poppins dan ukuran font sesuai dengan registration */
+.modal-header .modal-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+label {
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* ✅ SELARASKAN: Input form control style */
+.form-control {
+  border-radius: 8px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  padding: 0.5rem;
+}
+
+.form-control::placeholder {
+  color: #6c757d;
+  opacity: 0.8;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #1BB6C1;
+}
+
+/* ✅ SELARASKAN: Button primary custom */
+.btn-primary-custom {
+  background-color: #1BB6C1;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+}
+
+.btn-primary-custom:hover {
+  background-color: #17a2b8;
+}
+
+/* ✅ SELARASKAN: Button disabled state */
+.btn-primary-custom:disabled {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary-custom:disabled:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+/* ✅ SELARASKAN: Modal body styling */
+.modal-body form {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body .mb-3 {
+  margin-bottom: 1rem;
+}
+
+/* ✅ SELARASKAN: Link daftar */
+.link-daftar {
+  color: #1BB6C1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-daftar:hover {
+  text-decoration: underline;
+}
+
+/* ✅ TAMBAH: Password container untuk proper positioning */
+.position-relative {
+  position: relative;
+}
+
+/* ✅ TAMBAH: Password input dengan proper padding */
+.password-input {
+  border-radius: 8px;
+  padding-right: 45px !important; /* Space for eye icon */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  height: calc(1.5em + 0.75rem + 2px); /* Standard Bootstrap input height */
+  line-height: 1.5;
+}
+
+.password-input:focus {
+  border-color: #1BB6C1;
+  box-shadow: 0 0 0 0.2rem rgba(27, 182, 193, 0.25);
+}
+
+/* ✅ TAMBAH: Password toggle icon positioning yang tepat */
+.toggle-password-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 16px;
+  transition: color 0.2s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 0;
+}
+
+.toggle-password-icon:hover {
+  color: #1BB6C1;
+}
+
+/* ✅ SELARASKAN: Styling untuk error messages yang consistent */
+.text-danger {
+  color: #dc3545 !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.text-success {
+  color: #28a745 !important;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.text-muted {
+  color: #6c757d !important;
+  font-size: 0.875rem;
+}
+
+/* ✅ SELARASKAN: Custom styling untuk valid inputs TANPA checkmark */
+.form-control.is-valid {
+  border-color: #28a745;
+  /* No background-image checkmark */
+}
+
+.form-control.is-valid:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+/* ✅ SELARASKAN: Password input valid tanpa checkmark dan padding normal */
+.password-input.is-valid {
+  padding-right: 45px !important; /* Kembali ke padding normal untuk eye icon saja */
+}
+
+/* ✅ SELARASKAN: Override untuk menghilangkan semua checkmark dari Bootstrap */
+.form-control.is-valid,
+.was-validated .form-control:valid {
+  background-image: none !important;
+  background-repeat: no-repeat;
+  background-position: right calc(0.375em + 0.1875rem) center;
+  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-control.is-valid:focus,
+.was-validated .form-control:valid:focus {
+  background-image: none !important;
+}
+
+input.form-control.is-valid,
+textarea.form-control.is-valid,
+select.form-control.is-valid {
+  background-image: none !important;
+  padding-right: 0.75rem; /* Default Bootstrap padding */
+}
+
+/* ✅ TAMBAH: Khusus untuk password input, tetap gunakan padding untuk eye icon */
+input.password-input.is-valid {
+  padding-right: 45px !important; /* Space untuk eye icon */
+}
+
+/* ✅ SELARASKAN: Responsive styling */
+@media (max-width: 768px) {
+  .toggle-password-icon {
+    right: 12px;
+    font-size: 14px;
+    width: 18px;
+    height: 18px;
+  }
+  
+  .password-input {
+    padding-right: 40px !important;
+  }
+  
+  .password-input.is-valid {
+    padding-right: 40px !important;
+  }
+  
+  .text-danger,
+  .text-success,
+  .text-muted {
+    font-size: 0.8rem;
+  }
+}
+
+/* ✅ SELARASKAN: Loading state styling */
+.fa-spinner.fa-spin {
+  color: #1BB6C1;
+}
+
+/* ✅ SELARASKAN: Icon coloring yang selaras */
+.fas.fa-check-circle {
+  color: #28a745;
+}
+
+.fas.fa-exclamation-circle {
+  color: #dc3545;
+}
+
+.fas.fa-info-circle {
+  color: #17a2b8;
+}
+
+.fas.fa-exclamation-triangle {
+  color: #ffc107;
+}
+
+.fas.fa-lightbulb {
+  color: #1BB6C1;
+}
+
+/* ✅ SELARASKAN: Ensure proper spacing dalam password container */
+.mb-3 label {
+  position: relative;
+  z-index: 1;
+}
+
+.mb-3 .form-control {
+  position: relative;
+  z-index: 2;
+}
+
+.mb-3 .toggle-password-icon {
+  position: absolute;
+  z-index: 3;
+}
+
+/* ✅ SELARASKAN: Form validation styling consistency */
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
+
+/* ✅ SELARASKAN: Toast styling */
+.toast-container {
+  z-index: 1061;
+}
+
+.toast-success {
+  background-color: #28a745;
+}
+
+.toast-error {
+  background-color: #dc3545;
+}
+
+.toast-info {
+  background-color: #17a2b8;
+}
+
+.toast-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.toast.show {
+  display: block;
+  opacity: 1;
+}
+
+.toast.hide {
+  display: none;
+  opacity: 0;
+}
+
+/* ✅ SELARASKAN: Alert styling */
+.alert {
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
+.alert-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  border-color: #28a745;
+  color: #155724;
+}
+
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
+  color: #721c24;
+}
+
+/* ✅ TAMBAH: Spinner animation */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ✅ SELARASKAN: Text alignment */
+p {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+}
+
+/* ✅ Remove old classes yang tidak digunakan lagi */
+/* Hapus: .modal-title-custom, .form-label-custom, .btn-login */

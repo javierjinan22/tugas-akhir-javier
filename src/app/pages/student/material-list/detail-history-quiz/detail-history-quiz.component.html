@@ -9,7 +9,7 @@
   
   <hr class="divider">
   
-  <!-- ✅ TAMBAH: Loading state -->
+  <!-- ✅ EXISTING: Loading state -->
   <div *ngIf="loading" class="loading-container">
     <div class="text-center py-5">
       <div class="spinner-border text-primary mb-3" role="status">
@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <!-- ✅ TAMBAH: Error state -->
+  <!-- ✅ EXISTING: Error state -->
   <div *ngIf="error && !loading" class="error-container">
     <div class="text-center py-5">
       <div class="alert alert-danger" role="alert">
@@ -42,14 +42,25 @@
           <strong>Jumlah Soal :</strong> {{ quizResult.totalQuestions }}
         </div>
       </div>
+
+      <div class="predikat-card" [ngClass]="getPredikatClass()">
+        <div class="predikat-icon-container">
+          <img [src]="getPredikatIconPath()" [alt]="getPredikatTitle()" class="predikat-icon">
+        </div>
+        <div class="predikat-content">
+          <div class="predikat-label">Predikat</div>
+          <div class="predikat-title">{{ getPredikatTitle() }}</div>
+          <div class="predikat-description">{{ getPredikatDescription() }}</div>
+        </div>
+      </div>
       
-      <div class="score-card">
-        <div class="score-label">Total Nilai</div>
+      <div class="achievement-header" [ngClass]="getAchievementHeaderClass()">
+        <div class="score-label">Kamu mendapatkan nilai</div>
         <div class="score-value">{{ quizResult.score }}</div>
       </div>
 
-      <button class="btn-view" (click)="goPredicate()">
-          Lihat predikat
+      <button class="btn-view-enhanced" (click)="goPredicate()">
+          Lihat semua pencapaian
       </button>
     </div>
     
@@ -58,7 +69,21 @@
       <div *ngFor="let question of quizResult.questions; let i = index" class="question-item">
         <div class="question-header">
           <div class="question-number-circle">{{ i + 1 }}</div>
-          <span class="question-text">{{ question.question }}</span>
+          
+          <!-- ✅ PERBAIKAN: Render question dengan HTML content jika ada -->
+          <div class="question-text-container">
+            <!-- ✅ Render HTML content jika question mengandung HTML/gambar -->
+            <div *ngIf="hasHtmlContent(question.question); else plainQuestionText" 
+                 class="question-text-html" 
+                 [innerHTML]="question.questionHtml">
+            </div>
+            
+            <!-- ✅ Fallback untuk plain text -->
+            <ng-template #plainQuestionText>
+              <span class="question-text">{{ question.question }}</span>
+            </ng-template>
+          </div>
+          
           <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
             {{ getQuestionScore(question) }}
           </div>
@@ -67,32 +92,67 @@
         <!-- Multiple choice question display -->
         <div *ngIf="question.type === 'multiple-choice'" class="options-review">
           <div *ngFor="let option of question.options; let optionIndex = index" 
-               class="option-item"
-               [ngClass]="getOptionClass(question, optionIndex)">
+              class="option-item"
+              [ngClass]="getOptionClass(question, optionIndex)">
             <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
-              <!-- ✅ Show check untuk jawaban yang benar -->
               <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check"></i>
-              <!-- ✅ Show X untuk jawaban user yang salah -->
               <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times"></i>
             </span>
-            <span class="option-text">{{ getCleanOption(option) }}</span>
+            
+            <div class="option-text-container">
+              <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
+                  class="option-text-html" 
+                  [innerHTML]="question.optionsHtml[optionIndex]">
+              </div>
+              
+              <ng-template #plainOptionText>
+                <span class="option-text">{{ getCleanOption(option) }}</span>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- ✅ TAMBAH: Benar/Salah question display - mirip dengan multiple choice -->
+        <div *ngIf="question.type === 'benar-salah'" class="options-review benar-salah-review">
+          <div *ngFor="let option of question.options; let optionIndex = index" 
+              class="option-item benar-salah-option"
+              [ngClass]="getOptionClass(question, optionIndex)">
+            <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
+              <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check"></i>
+              <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times"></i>
+            </span>
+            
+            <div class="option-text-container">
+              <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
+                  class="option-text-html" 
+                  [innerHTML]="question.optionsHtml[optionIndex]">
+              </div>
+              
+              <ng-template #plainOptionText>
+                <span class="option-text benar-salah-text" 
+                      [ngClass]="getBenarSalahTextClass(option)">
+                  {{ getCleanOption(option) }}
+                </span>
+              </ng-template>
+            </div>
           </div>
         </div>
         
         <!-- Short answer question display -->
-        <div *ngIf="question.type === 'short-answer'" class="short-answer-review">
+        <!-- <div *ngIf="question.type === 'short-answer'" class="short-answer-review">
           <div class="user-answer">
             <strong>Jawaban Anda:</strong>
             <div class="answer-text">{{ question.userAnswer || 'Tidak dijawab' }}</div>
           </div>
-          <!-- ✅ TAMBAH: Note untuk isian singkat -->
           <div class="grading-note">
             <small class="text-muted">
               <i class="fas fa-info-circle"></i>
               Jawaban isian singkat akan dinilai secara manual oleh pengajar
             </small>
           </div>
-        </div>
+        </div> -->
+
+
       </div>
     </div>
   </div>

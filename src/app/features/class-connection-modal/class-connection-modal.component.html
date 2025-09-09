@@ -1,3 +1,25 @@
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0" 
+       [class.show]="showToast" 
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert" 
+       aria-live="assertive" 
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button" 
+              class="btn-close btn-close-white me-2 m-auto" 
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-body position-relative">
   <div class="icon-warning-wrapper">
     <div class="icon-warning">

@@ -3,7 +3,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { StudentProgressService } from '../../../../service/student-progress.service';
 import { Location, PlatformLocation } from '@angular/common';
-import { Subscription } from 'rxjs';
+
+interface QuizAttempt {
+  id: number;
+  date: Date;
+  score: number;
+  isPassed: boolean;
+  attemptData?: any;
+}
 
 @Component({
   selector: 'app-view-material',
@@ -11,13 +18,17 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./view-material.component.css']
 })
 export class ViewMaterialComponent implements OnInit, OnDestroy {
+
   material: any = null;
   quiz: any = null;
   currentPageIndex: number = 0;
   currentPageContent!: SafeHtml;
-  loading: boolean = false;
+  loading: boolean = true; 
+  pageLoading: boolean = false;
   error: string = '';
   materiId: string = '';
+
+  quizAttempts: QuizAttempt[] = [];
 
   private hasUpdatedLastAccess = false;
   private originalUrl: string = '';
@@ -38,6 +49,19 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
         this.originalUrl = this.router.url;
         this.loadMaterial();
         this.setupBrowserBackDetection();
+
+        // ✅ TAMBAH: Handle query param untuk halaman spesifik
+        this.route.queryParams.subscribe(queryParams => {
+          const pageIndex = queryParams['page'];
+          if (pageIndex !== undefined && !isNaN(pageIndex)) {
+            // Delay load page sampai material data ready
+            setTimeout(() => {
+              if (this.material && this.material.pages) {
+                this.loadPage(parseInt(pageIndex));
+              }
+            }, 500);
+          }
+        });
       }
     });
   }
@@ -120,6 +144,21 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
           this.material = response.data.material;
           this.quiz = response.data.quiz;
 
+          // ✅ TAMBAH: Load quiz attempts untuk cek status lulus
+          this.quizAttempts = [];
+          if (response.data.quiz && response.data.quiz.attempts && Array.isArray(response.data.quiz.attempts)) {
+            this.quizAttempts = response.data.quiz.attempts.map((attempt: any, index: number) => ({
+              id: attempt.attempt_id || (index + 1),
+              date: new Date(attempt.completed_at),
+              score: attempt.score || 0,
+              isPassed: (attempt.score || 0) >= 75,
+              attemptData: attempt
+            }));
+          }
+
+          // ✅ UPDATE: Update progress logic dengan quiz attempts
+          this.updateMaterialProgressWithAttempts();
+
           const firstUnreadPage = this.material.pages.findIndex((page: any) => !page.isRead);
           this.loadPage(firstUnreadPage >= 0 ? firstUnreadPage : 0);
         } else {
@@ -135,11 +174,11 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     });
   }
 
-  private updateMaterialProgress(): void {
+  private updateMaterialProgressWithAttempts(): void {
     const readPagesCount = this.material.pages.filter((page: any) => page.isRead).length;
     const totalPages = this.material.pages.length;
     const hasQuiz = this.material.hasQuiz || false;
-    const quizCompleted = this.material.quizCompleted || false;
+    const hasPassedAttempt = this.quizAttempts.some(attempt => attempt.isPassed);
 
     this.material.readPages = readPagesCount;
     this.material.totalPages = totalPages;
@@ -147,21 +186,29 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     const allBabsCompleted = readPagesCount === totalPages;
 
     if (hasQuiz) {
-
-      if (quizCompleted) {
+      // ✅ PERBAIKAN: Progress 100% dan quizCompleted hanya jika ada attempt yang lulus
+      if (hasPassedAttempt) {
         this.material.progress = 100;
         this.material.isRead = true;
+        this.material.quizCompleted = true;
       } else if (allBabsCompleted) {
         this.material.progress = 90;
         this.material.isRead = true;
+        this.material.quizCompleted = false; // ✅ False jika belum lulus
       } else {
         this.material.progress = Math.round((readPagesCount / totalPages) * 80);
         this.material.isRead = false;
+        this.material.quizCompleted = false;
       }
     } else {
       this.material.progress = Math.round((readPagesCount / totalPages) * 100);
       this.material.isRead = allBabsCompleted;
+      this.material.quizCompleted = false;
     }
+  }
+
+  private updateMaterialProgress(): void {
+    this.updateMaterialProgressWithAttempts();
   }
 
   loadPage(pageIndex: number): void {
@@ -169,15 +216,21 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.currentPageIndex = pageIndex;
-    const currentPage = this.material.pages[pageIndex];
-    this.currentPageContent = this.sanitizer.bypassSecurityTrustHtml(currentPage.content);
+    this.pageLoading = true;
 
-    if (!currentPage.isRead) {
-      this.markBabAsComplete(pageIndex);
-    } else {
-      this.updateMaterialProgress();
-    }
+    setTimeout(() => {
+      this.currentPageIndex = pageIndex;
+      const currentPage = this.material.pages[pageIndex];
+      this.currentPageContent = this.sanitizer.bypassSecurityTrustHtml(currentPage.content);
+
+      if (!currentPage.isRead) {
+        this.markBabAsComplete(pageIndex);
+      } else {
+        this.updateMaterialProgress();
+      }
+
+      this.pageLoading = false;
+    }, 300);
   }
 
   private markBabAsComplete(babIndex: number): void {
@@ -191,9 +244,11 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
             this.material.totalPages = response.data.total_babs;
             this.material.hasQuiz = response.data.quiz_required;
 
-            this.updateProgressLogic(response.data);
+            this.updateProgressLogicWithAttempts(response.data);
           }
         }
+
+        this.pageLoading = false;
       },
       error: (error) => {
         console.error('Error marking bab as complete:', error);
@@ -201,50 +256,57 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     });
   }
 
-  private updateProgressLogic(data: any): void {
+  private updateProgressLogicWithAttempts(data: any): void {
     const allBabsCompleted = data.completed_babs_count === data.total_babs;
     const hasQuiz = data.quiz_required;
-    const quizCompleted = this.material.quizCompleted || false;
+    const hasPassedAttempt = this.quizAttempts.some(attempt => attempt.isPassed);
 
     if (hasQuiz) {
-      // ✅ Jika ada quiz
-      if (quizCompleted) {
+      // ✅ Progress dan status berdasarkan attempt yang lulus
+      if (hasPassedAttempt) {
         this.material.progress = 100;
         this.material.isRead = true;
+        this.material.quizCompleted = true;
       } else if (allBabsCompleted) {
         this.material.progress = 90;
         this.material.isRead = true;
+        this.material.quizCompleted = false; // ✅ False jika belum lulus
       } else {
         this.material.progress = Math.round((data.completed_babs_count / data.total_babs) * 80);
         this.material.isRead = false;
+        this.material.quizCompleted = false;
       }
     } else {
       this.material.progress = Math.round((data.completed_babs_count / data.total_babs) * 100);
       this.material.isRead = allBabsCompleted;
+      this.material.quizCompleted = false;
     }
+  }
 
+  private updateProgressLogic(data: any): void {
+    this.updateProgressLogicWithAttempts(data);
+  }
+
+  isQuizCompleted(): boolean {
+    return this.quizAttempts.some(attempt => attempt.isPassed);
   }
 
   nextPage(): void {
-    if (this.currentPageIndex < this.material.pages.length - 1) {
+    if (this.currentPageIndex < this.material.pages.length - 1 && !this.pageLoading) {
       this.loadPage(this.currentPageIndex + 1);
     }
   }
 
   previousPage(): void {
-    if (this.currentPageIndex > 0) {
+    if (this.currentPageIndex > 0 && !this.pageLoading) {
       this.loadPage(this.currentPageIndex - 1);
     }
   }
 
-  // ✅ TAMBAH: Method untuk cek apakah bisa ambil quiz
-  // canTakeQuiz(): boolean {
-  //   const allBabsRead = this.material?.readPages === this.material?.totalPages;
-  //   const hasQuiz = this.material?.hasQuiz;
-  //   const quizCompleted = this.material?.quizCompleted;
-
-  //   return allBabsRead && hasQuiz && !quizCompleted;
-  // }
+  retryLoading(): void {
+    this.error = '';
+    this.loadMaterial();
+  }
 
   canTakeQuiz(): boolean {
     const allBabsRead = this.material?.readPages === this.material?.totalPages;
@@ -296,11 +358,11 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
 
     const allBabsRead = this.material.readPages === this.material.totalPages;
     const hasQuiz = this.material.hasQuiz;
-    const quizCompleted = this.material.quizCompleted;
+    const hasPassedAttempt = this.quizAttempts.some(attempt => attempt.isPassed);
 
     if (hasQuiz) {
-      if (quizCompleted) return 'Selesai (dengan quiz)';
-      if (allBabsRead) return 'Materi selesai, quiz belum';
+      if (hasPassedAttempt) return 'Selesai (dengan kuis)';
+      if (allBabsRead) return 'Materi selesai, kuis belum lulus';
       return `${this.material.readPages}/${this.material.totalPages} bab`;
     }
 
@@ -312,12 +374,13 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     if (!this.material) return 0;
 
     const hasQuiz = this.material.hasQuiz;
-    const quizCompleted = this.material.quizCompleted;
     const readPages = this.material.readPages || 0;
     const totalPages = this.material.totalPages || 1;
+    const hasPassedAttempt = this.quizAttempts.some(attempt => attempt.isPassed);
 
     if (hasQuiz) {
-      if (quizCompleted) return 100;
+      // ✅ 100% hanya jika ada attempt yang lulus
+      if (hasPassedAttempt) return 100;
 
       const allBabsRead = readPages === totalPages;
       if (allBabsRead) return 90;
@@ -329,17 +392,13 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     return Math.round((readPages / totalPages) * 100);
   }
 
-  isQuizCompleted(): boolean {
-    return this.material?.quizCompleted || false;
-  }
-
   canDownload(): boolean {
     return this.material?.flag_unduh || false;
   }
 
   goBack(): void {
-    console.log('Manual back button clicked');
     this.hasUpdatedLastAccess = true;
+    this.pageLoading = true;
     this.updateLastAccessed().finally(() => {
       this.router.navigate(['/siswa/materi']);
     });
@@ -447,7 +506,7 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
   getQuizButtonText(): string {
     const allBabsRead = this.material?.readPages === this.material?.totalPages;
     const hasQuiz = this.material?.hasQuiz;
-    const quizCompleted = this.material?.quizCompleted;
+    const hasPassedAttempt = this.quizAttempts.some(attempt => attempt.isPassed);
 
     if (!allBabsRead) {
       return 'Selesaikan Materi Dulu';
@@ -457,7 +516,7 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
       return 'Tidak Ada Kuis';
     }
 
-    if (quizCompleted) {
+    if (hasPassedAttempt) {
       return 'Lihat Riwayat Kuis';
     }
 

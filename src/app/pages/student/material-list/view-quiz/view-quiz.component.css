@@ -179,6 +179,72 @@
   transform: rotate(45deg);
 }
 
+.benar-salah-options {
+  margin-top: 24px;
+  margin-bottom: 32px;
+}
+
+.btn-benar-salah {
+  width: 100%;
+  height: 80px;
+  border: none;
+  border-radius: 16px;
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-benar-salah:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-benar-salah:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Button Salah - Red theme */
+.btn-salah {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+}
+
+.btn-salah:hover {
+  background: linear-gradient(135deg, #ff5252, #e53935);
+}
+
+.btn-salah.selected {
+  background: linear-gradient(135deg, #d32f2f, #c62828);
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.3);
+  transform: scale(1.02);
+}
+
+/* Button Benar - Green theme */
+.btn-benar {
+  background: linear-gradient(135deg, #26d0ce, #1de9b6);
+}
+
+.btn-benar:hover {
+  background: linear-gradient(135deg, #00bcd4, #00acc1);
+}
+
+.btn-benar.selected {
+  background: linear-gradient(135deg, #00838f, #006064);
+  box-shadow: 0 0 0 3px rgba(0, 131, 143, 0.3);
+  transform: scale(1.02);
+}
+
+.btn-text {
+  position: relative;
+  z-index: 2;
+}
+
 /* Short answer */
 .short-answer {
   margin-top: 16px;
@@ -252,4 +318,33 @@
 
 .finish-button:hover {
   background-color: #f7c431;
+}
+
+@media (max-width: 768px) {
+  .btn-benar-salah {
+    height: 60px;
+    font-size: 18px;
+  }
+  
+  .benar-salah-options .row {
+    margin: 0 -8px;
+  }
+  
+  .benar-salah-options .col-6 {
+    padding: 0 8px;
+  }
+}
+
+/* Animation ketika dipilih */
+.btn-benar-salah.selected::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  transform: translate(-50%, -50%);
+  animation: pulse 1.5s infinite;
 }

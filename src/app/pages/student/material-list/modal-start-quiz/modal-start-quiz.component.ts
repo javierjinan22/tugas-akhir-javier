@@ -26,28 +26,30 @@ export class ModalStartQuizComponent implements OnInit {
     // Data sudah di-inject melalui initialState
   }
 
-  onCancelClicked(){
+  onCancelClicked() {
     this.activeModal.hide();
   }
 
   onSubmitClicked() {
-  if (this.materialId) {
-    console.log('🧹 Clearing all quiz states before starting new quiz');
-    
-    // Clear quiz state
-    localStorage.removeItem(`quiz_${this.materialId}_state`);
-    
-    // Clear timer state
-    localStorage.removeItem(`quiz_${this.materialId}_timer`);
-    
-    // Clear result (jika ada)
-    localStorage.removeItem(`quiz_result_${this.materialId}`);
-  }
-  
-  // First hide the modal
-  this.activeModal.hide();
-  
-  // Then navigate to the quiz view
-  this.router.navigate([`/siswa/materi/lihat-materi/${this.materialId}/kuis/kerjakan`]);
+    if (this.materialId) {
+      // Clear quiz state
+      localStorage.removeItem(`quiz_${this.materialId}_state`);
+
+      // Clear timer state
+      localStorage.removeItem(`quiz_${this.materialId}_timer`);
+
+      // Clear result (jika ada)
+      localStorage.removeItem(`quiz_result_${this.materialId}`);
+
+      // Clear any potential temporary states
+      localStorage.removeItem(`quiz_${this.materialId}_final_answers`);
+
+    }
+
+    // First hide the modal
+    this.activeModal.hide();
+
+    // Then navigate to the quiz view
+    this.router.navigate([`/siswa/materi/lihat-materi/${this.materialId}/kuis/kerjakan`]);
   }
 }

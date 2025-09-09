@@ -113,6 +113,16 @@
   margin-bottom: 10px;
 }
 
+.progress-status {
+  text-align: center;
+}
+
+.completion-status {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
 .progress-bar-wrapper {
   width: 100%;
   height: 8px;
@@ -291,6 +301,147 @@
   font-weight: 500;
 }
 
+/* ✅ TAMBAH: Loading States CSS */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  margin: 20px;
+}
+
+.error-container .alert {
+  border: none;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  padding: 30px;
+}
+
+.error-container .alert i {
+  color: #dc3545;
+}
+
+.error-container .alert h5 {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.error-container .alert p {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.page-loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.bab-item.loading-bab {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.bab-item.loading-bab .status-circle {
+  position: relative;
+}
+
+.bab-item.loading-bab .spinner-border-sm {
+  width: 12px;
+  height: 12px;
+  border-width: 1px;
+}
+
+/* Spinner customization */
+.spinner-border {
+  color: #1BB6C1;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.1em;
+}
+
+/* Button loading state */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-icon:disabled {
+  background-color: #e9ecef;
+  color: #adb5bd;
+}
+
+.btn-quiz:disabled {
+  background-color: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+}
+
+/* Enhanced error styling */
+.alert-danger {
+  background: linear-gradient(135deg, #ffe6e6 0%, #fff0f0 100%);
+  border: 1px solid #ffcccc;
+  color: #721c24;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1BB6C1 0%, #189AA3 100%);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #189AA3 0%, #177A82 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
+}
+
+/* Loading animation for progress bar */
+.progress-bar {
+  transition: width 0.6s ease-in-out;
+}
+
+/* Enhanced visual feedback */
+.material-content-card {
+  transition: all 0.3s ease;
+}
+
+.material-content-card.loading {
+  opacity: 0.8;
+}
+
+/* Responsive loading states */
 @media (max-width: 768px) {
   .bab-item {
     padding: 6px 8px;
@@ -300,9 +451,30 @@
     font-size: 12px;
   }
   
-  .status-circle.small {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
+  .error-container .alert {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .page-loading-container {
+    min-height: 150px;
   }
 }
+
+/* Skeleton loading animation (optional enhancement) */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* ... rest of existing styles ... */

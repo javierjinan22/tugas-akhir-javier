@@ -83,6 +83,8 @@ import { ClassArchivedComponent } from './pages/teacher/manage-class/class-archi
 import { ModalRestoreClassComponent } from './pages/teacher/manage-class/modal-restore-class/modal-restore-class.component';
 import { ModalDeleteStudentComponent } from './pages/teacher/manage-class/modal-delete-student/modal-delete-student.component';
 import { DetailMaterialsComponent } from './pages/teacher/manage-materials/detail-materials/detail-materials.component';
+import { TeacherViewStudentQuizResultComponent } from './pages/teacher/manage-learning-outcomes/teacher-view-student-quiz-result/teacher-view-student-quiz-result.component';
+import { LearningHistoryComponent } from './pages/student/learning-history/learning-history.component';
 
 @NgModule({
   declarations: [
@@ -148,7 +150,9 @@ import { DetailMaterialsComponent } from './pages/teacher/manage-materials/detai
          ClassArchivedComponent,
          ModalRestoreClassComponent,
          ModalDeleteStudentComponent,
-         DetailMaterialsComponent
+         DetailMaterialsComponent,
+         TeacherViewStudentQuizResultComponent,
+         LearningHistoryComponent
   ],
   imports: [
     BrowserModule,

@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { SchoolService, School, SchoolClass } from 'src/app/service/school.service';
 import { InputNpsnModalComponent } from '../input-npsn-modal/input-npsn-modal.component';
 import { ClassConnectionModalComponent } from '../class-connection-modal/class-connection-modal.component';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // ✅ TAMBAH: Import eye icons
 
 @Component({
   selector: 'app-login-modal',
@@ -19,6 +20,23 @@ export class LoginModalComponent implements OnInit {
   loginForm!: FormGroup;
   bsModalRef: any;
   errorMsg: string = '';
+  isSubmitting = false; 
+
+  // ✅ TAMBAH: Properties untuk success message dan prefilled username
+  successMessage?: string;
+  prefilledUsername?: string;
+
+  // ✅ TAMBAH: Eye icon properties
+  faEye = faEye;
+  faEyeSlash = faEyeSlash;
+  passwordVisible = false;
+
+  // ✅ TAMBAH: Toast properties
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
 
   constructor(
     public activeModal: BsModalRef,
@@ -32,53 +50,98 @@ export class LoginModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
+      username: [this.prefilledUsername || '', Validators.required], // ✅ Use prefilled username
       password: ['', Validators.required]
     });
+
+    // ✅ Show success message if provided
+    if (this.successMessage) {
+      this.showSuccessToast(this.successMessage);
+      // ✅ TAMBAH: Clear success message after showing it
+      setTimeout(() => {
+        this.successMessage = '';
+      }, 100);
+    }
   }
 
-  onSubmitLogin() {
+  // ✅ TAMBAH: Toggle password visibility function
+  togglePasswordVisibility() {
+    this.passwordVisible = !this.passwordVisible;
+  }
+
+  onSubmit() {
     if (this.loginForm.invalid) {
+      this.showErrorToast('Mohon lengkapi username dan password');
+      this.markFormGroupTouched(this.loginForm);
       return;
     }
 
+    this.isSubmitting = true;
+    this.errorMsg = '';
+    
+    this.showInfoToast('Sedang memproses login...');
 
-    this.authService.login(this.loginForm.value).subscribe(
-      res => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('role', res.role);
-        
-        // Store additional user data if available
-        if (res.user) {
-          localStorage.setItem('userId', res.user._id || res.user.id);
-        }
+    this.authService.login(this.loginForm.value).subscribe({
+      next: (res) => {
+        if (res.token) {
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('role', res.role);
+          
+          if (res.user) {
+            localStorage.setItem('userId', res.user._id || res.user.id);
+          }
 
-        this.activeModal.hide();
+          const userName = res.user?.nama || res.user?.username || 'User';
+          this.showSuccessToast(`Selamat datang, ${userName}!`);
 
-        if (res.role === 'guru') {
-          this.handleTeacherLogin();
-        } else if (res.role === 'siswa') {
-          this.handleStudentLogin();
+          setTimeout(() => {
+            this.isSubmitting = false;
+            this.activeModal.hide();
+            
+            if (res.role === 'guru') {
+              this.handleTeacherLogin();
+            } else if (res.role === 'siswa') {
+              this.handleStudentLogin();
+            }
+          }, 2000); 
         }
       },
-      err => {
-        console.error('❌ Login error:', err);
+      error: (err) => {
+        console.error('Login failed:', err);
+        this.isSubmitting = false;
+        
+        // Specific error toast
+        if (err.status === 401) {
+          this.showErrorToast('Username atau password salah');
+        } else if (err.status === 400) {
+          this.showErrorToast('Data login tidak valid');
+        } else if (err.status === 0) {
+          this.showErrorToast('Tidak dapat terhubung ke server');
+        } else {
+          this.showErrorToast('Terjadi kesalahan. Silakan coba lagi.');
+        }
+        
+        // Tetap set errorMsg sebagai fallback
         this.errorMsg = err?.error?.message || 'Login gagal, cek username atau password.';
       }
-    );
+    });
+  }
+
+  // Method untuk mark form as touched
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+    });
   }
 
   private handleTeacherLogin() {
-    
-    // Cek apakah guru sudah punya sekolah dan kelas
     this.schoolService.getMySchool().subscribe({
       next: (school: School) => {
+        console.log('✅ Teacher school data:', school);
 
         if (school && school._id) {
-          // Store school ID for later use
           localStorage.setItem('schoolId', school._id);
-          
-          // Cek apakah sekolah sudah punya kelas aktif
           this.checkSchoolClasses(school);
         } else {
           this.showInputNpsnModal();
@@ -90,37 +153,46 @@ export class LoginModalComponent implements OnInit {
         if (err.status === 404) {
           this.showInputNpsnModal();
         } else {
-          this.errorMsg = 'Terjadi error saat mengambil data sekolah';
+          // ✅ Error toast untuk guru
+          this.showErrorToast('Gagal mengambil data sekolah');
         }
       }
     });
   }
 
   private handleStudentLogin() {
-  // Ambil profil siswa (sekolah & kelas) dari endpoint /users/me
-  this.authService.getProfile().subscribe({
-    next: (profileRes) => {
-      if (profileRes.success && profileRes.data) {
-        // Simpan info sekolah dan kelas di localStorage
-        if (profileRes.data.sekolah) {
-          localStorage.setItem('schoolId', profileRes.data.sekolah.id);
-          localStorage.setItem('schoolName', profileRes.data.sekolah.nama);
+    this.authService.getProfile().subscribe({
+      next: (profileRes) => {
+        console.log('✅ Student profile:', profileRes);
+        
+        if (profileRes.success && profileRes.data) {
+          // Simpan info sekolah dan kelas di localStorage
+          if (profileRes.data.sekolah) {
+            localStorage.setItem('schoolId', profileRes.data.sekolah.id);
+            localStorage.setItem('schoolName', profileRes.data.sekolah.nama);
+          }
+          if (profileRes.data.kelas) {
+            localStorage.setItem('classId', profileRes.data.kelas.id);
+            localStorage.setItem('className', profileRes.data.kelas.nama_kelas);
+          }
         }
-        if (profileRes.data.kelas) {
-          localStorage.setItem('classId', profileRes.data.kelas.id);
-          localStorage.setItem('className', profileRes.data.kelas.nama_kelas);
-        }
+        
+        // ✅ Redirect ke dashboard siswa
+        this.router.navigate(['/siswa/dashboard']);
+      },
+      error: (err) => {
+        console.error('❌ Error getProfile:', err);
+        
+        // ✅ Warning toast untuk siswa
+        this.showErrorToast('Gagal memuat profil. Melanjutkan ke dashboard...');
+        
+        // Tetap redirect, bisa tampilkan pesan error jika perlu
+        setTimeout(() => {
+          this.router.navigate(['/siswa/dashboard']);
+        }, 2000);
       }
-      // Redirect ke dashboard siswa
-      this.router.navigate(['/siswa/dashboard']);
-    },
-    error: (err) => {
-      console.error('❌ Error getProfile:', err);
-      // Tetap redirect, bisa tampilkan pesan error jika perlu
-      this.router.navigate(['/siswa/dashboard']);
-    }
-  });
-}
+    });
+  }
 
   private checkSchoolClasses(school: School) {
     // Cek kelas dari response getMySchool (tidak perlu API call terpisah)
@@ -140,7 +212,9 @@ export class LoginModalComponent implements OnInit {
 
   private showInputNpsnModal() {
     this.bsModalRef = this.modalService.show(InputNpsnModalComponent, {
-      class: 'modal-dialog-centered modal-md'
+      class: 'modal-dialog-centered modal-md',
+      backdrop: 'static', 
+      keyboard: false 
     });
 
     // Listen ketika NPSN modal ditutup
@@ -154,8 +228,7 @@ export class LoginModalComponent implements OnInit {
             this.checkSchoolClasses(school);
           },
           error: (err) => {
-            // Jika masih belum ada sekolah, redirect ke dashboard
-            this.router.navigate(['/guru/dashboard']);
+              console.error('Still no school after NPSN modal');
           }
         });
       }, 500);
@@ -165,19 +238,18 @@ export class LoginModalComponent implements OnInit {
   private showClassConnectionModal(school: School) {
     
     const initialState = {
-      school: school, // Pass data sekolah ke modal
-      isMandatory: true, // Indicate that class creation is mandatory
-      isFromLogin: true // Indicate this modal is opened from login flow
+      school: school,
+      isMandatory: true, 
+      isFromLogin: true 
     };
 
     this.bsModalRef = this.modalService.show(ClassConnectionModalComponent, {
       class: 'modal-dialog-centered modal-lg',
       initialState,
-      backdrop: 'static', // Prevent closing by clicking backdrop
-      keyboard: false // Prevent closing with ESC key
+      backdrop: 'static', 
+      keyboard: false 
     });
 
-    // Listen ketika class creation modal ditutup
     this.bsModalRef.onHide?.subscribe(() => {
       
       setTimeout(() => {
@@ -203,10 +275,67 @@ export class LoginModalComponent implements OnInit {
     });
   }
 
+  // ✅ PERTAHANKAN: Function untuk ke select-role-modal (TIDAK DIHILANGKAN)
   onButtonRegistrationClicked(){
     this.activeModal.hide();
     this.bsModalRef = this.modalService.show(SelectRoleModalComponent, {
       class: 'modal-dialog-centered modal-md'
     });
+  }
+
+  // ✅ Toast methods (sama seperti sebelumnya)
+  private showSuccessToast(message: string): void {
+    this.hideToast(); // Clear any existing toast
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 3000);
+    }, 100);
+  }
+
+  private showErrorToast(message: string): void {
+    this.hideToast(); // Clear any existing toast
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 4000);
+    }, 100);
+  }
+
+  private showInfoToast(message: string): void {
+    this.hideToast(); 
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-info';
+      this.toastIcon = 'fas fa-info-circle';
+      this.showToast = true;
+
+      this.toastTimeout = window.setTimeout(() => {
+        this.hideToast();
+      }, 3000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) {
+      clearTimeout(this.toastTimeout);
+    }
   }
 }

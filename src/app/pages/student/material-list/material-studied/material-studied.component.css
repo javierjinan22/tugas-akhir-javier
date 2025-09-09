@@ -36,24 +36,106 @@
   background-color: #f0c926;
 }
 
-/* .btn-download {
-  background-color: #F9D349;
-  color: #6C613B;
-  border: none;
+/* ... existing CSS ... */
+
+/* ✅ TAMBAH: Category view styles */
+.category-view {
+  margin-top: 1rem;
+}
+
+.category-section {
+  margin-bottom: 2rem;
+}
+
+.category-header {
+  background: #f8f9fa;
   border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 1rem;
+  border-left: 4px solid #007bff;
+}
+
+.category-icon {
   width: 40px;
   height: 40px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  font-size: 14px;
+  color: white;
+  font-size: 16px;
 }
 
-.btn-download:hover {
-  background-color: #f0c926;
-} */
+.category-title {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.materials-in-category {
+  padding-left: 1rem;
+  border-left: 2px solid #e9ecef;
+  margin-left: 20px;
+}
+
+.category-divider {
+  margin: 2rem 0;
+  border-color: #dee2e6;
+  opacity: 0.5;
+}
+
+/* Status badges with quiz info */
+.status-badge.needs-quiz {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.badge.bg-warning.text-dark {
+  font-size: 0.75rem;
+}
+
+/* Enhanced material item for category view */
+.category-view .material-item {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.category-view .material-item:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .materials-in-category {
+    padding-left: 0.5rem;
+    margin-left: 10px;
+  }
+  
+  .category-header {
+    padding: 12px;
+  }
+  
+  .category-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+}
+.status-badge.needs-quiz {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.badge.bg-warning.text-dark {
+  font-size: 0.75rem;
+}
 
 .btn-download {
   background: #f8f9fa;

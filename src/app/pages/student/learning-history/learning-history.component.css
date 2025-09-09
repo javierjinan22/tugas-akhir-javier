@@ -1,0 +1,706 @@
+.learning-history-container {
+  padding: 24px;
+  min-height: 100vh;
+}
+
+/* Enhanced Header Section */
+.history-header {
+  background: linear-gradient(90deg, #1267b2 0%, #41c8b1 100%);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+  color: white;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.history-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  color: white;
+}
+
+.history-subtitle {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-right {
+  flex-shrink: 0;
+}
+
+.achievement-summary {
+  display: flex;
+  gap: 24px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 100px;
+}
+
+.summary-count {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #fdd835;
+  line-height: 1;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.history-content {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+/* Left Section: Medals */
+.medals-section {
+  flex: 2;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #212121;
+  margin: 0;
+}
+
+.feedback-icon-img {
+  width: 32px;
+  height: 32px;
+  margin-right: 12px;
+}
+
+.medals-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.medal-card {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.medal-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.medal-card.cakap-digital {
+  border-color: #e57373;
+  background: linear-gradient(135deg, #ffebee 0%, #ffffff 100%);
+}
+
+.medal-card.aman-digital {
+  border-color: #ffd700;
+  background: linear-gradient(135deg, #fffde7 0%, #ffffff 100%);
+}
+
+.medal-card.budaya-digital {
+  border-color: #81c784;
+  background: linear-gradient(135deg, #e8f5e8 0%, #ffffff 100%);
+}
+
+.medal-card.etika-digital {
+  border-color: #90a4ae;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+}
+
+.medal-icon-container {
+  position: relative;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.medal-icon {
+  width: 60px;
+  height: 60px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  animation: medalFloat 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.medal-icon:hover {
+  transform: scale(1.1) rotate(5deg);
+  animation-play-state: paused;
+}
+
+@keyframes medalFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(-2deg);
+  }
+}
+
+.medal-content {
+  flex: 1;
+}
+
+.medal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.medal-description {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.medal-stats {
+  font-size: 12px;
+  color: #999;
+}
+
+.completion-rate {
+  background: #e3f2fd;
+  color: #1976d2;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Feedback Section */
+.feedback-section {
+  margin-top: 32px;
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feedback-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.feedback-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.feedback-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  flex: 1;
+}
+
+.feedback-category {
+  background: #1BB6C1;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.feedback-description {
+  font-size: 14px;
+  color: #555;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.feedback-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.feedback-teacher {
+  font-weight: 500;
+}
+
+.feedback-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-go-to-material {
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-go-to-material:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.btn-go-to-material i {
+  font-size: 10px;
+}
+
+.no-feedback {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+/* Right Section: Rankings */
+.rankings-section {
+  flex: 1;
+  position: sticky;
+  top: 24px;
+  height: fit-content;
+}
+
+.section-title-outside {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #212121;
+  margin: 0 0 16px 0;
+}
+
+.rankings-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.rankings-header {
+  margin-bottom: 20px;
+}
+
+.category-filter {
+  width: 100%;
+}
+
+/* Ganti CSS ngx-select untuk meniru styling select HTML */
+.custom-select-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Override default ngx-select styling */
+.custom-select-container ::ng-deep ngx-select {
+  width: 100%;
+  position: relative;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select {
+  width: 100%;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle {
+  width: 100%;
+  background: linear-gradient(135deg, #1BB6C1 0%, #189AA3 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 40px 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(27, 182, 193, 0.2);
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle:hover {
+  background: linear-gradient(135deg, #189AA3 0%, #177A82 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle:focus,
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle.ngx-select__toggle--focused {
+  box-shadow: 0 0 0 3px rgba(27, 182, 193, 0.3);
+  outline: none;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__selection {
+  color: white;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__placeholder {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+/* Custom arrow */
+.custom-select-container ::ng-deep ngx-select .ngx-select__arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid white;
+  transition: transform 0.3s ease;
+}
+
+.custom-select-container ::ng-deep ngx-select.ngx-select--open .ngx-select__arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Dropdown styling */
+.custom-select-container ::ng-deep ngx-select .ngx-select__dropdown {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option {
+  color: #333;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-weight: 500;
+  border: none;
+  background: white;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option:hover,
+.custom-select-container ::ng-deep ngx-select .ngx-select__option.ngx-select__option--highlighted {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option.ngx-select__option--selected {
+  background: #1BB6C1;
+  color: white;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option.ngx-select__option--selected:hover {
+  background: #189AA3;
+  color: white;
+}
+
+/* Hide default elements yang tidak diperlukan */
+.custom-select-container ::ng-deep ngx-select .ngx-select__clear {
+  display: none;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__loader {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .custom-select-container ::ng-deep ngx-select .ngx-select__toggle {
+    padding: 8px 32px 8px 12px;
+    font-size: 13px;
+    min-height: 38px;
+  }
+  
+  .custom-select-container ::ng-deep ngx-select .ngx-select__option {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .custom-select-container ::ng-deep ngx-select .ngx-select__arrow {
+    right: 10px;
+    border-top-width: 5px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+  }
+}
+
+.rankings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ranking-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.ranking-item:hover {
+  background: #e3f2fd;
+  transform: translateX(4px);
+}
+
+.ranking-item.top-rank.rank-1 {
+  background: linear-gradient(135deg, #fff9c4 0%, #ffeaa7 50%, #fdcb6e 100%);
+  border: 2px solid #fdcb6e;
+  box-shadow: 0 6px 20px rgba(253, 203, 110, 0.3);
+}
+
+.ranking-item.top-rank.rank-2 {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+  border: 2px solid #adb5bd;
+  box-shadow: 0 6px 20px rgba(173, 181, 189, 0.3);
+}
+
+.ranking-item.top-rank.rank-3 {
+  background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 50%, #e17055 100%);
+  border: 2px solid #e17055;
+  box-shadow: 0 6px 20px rgba(225, 112, 85, 0.3);
+}
+
+.rank-badge-container {
+  margin-right: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+}
+
+.rank-badge {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.rank-number {
+  font-size: 18px;
+  font-weight: 700;
+  color: #FF9A00;
+  background: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1BB6C1;
+}
+
+.student-info {
+  flex: 1;
+}
+
+.student-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.you-label {
+  color: #715A5A;
+  font-weight: 500;
+}
+
+.score-display {
+  font-size: 20px;
+  font-weight: 700;
+  color: #715A5A;
+  margin-left: 16px;
+}
+
+/* Loading & Error States */
+.loading-container, .error-container {
+  padding: 40px;
+  text-align: center;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.alert {
+  border: none;
+  border-radius: 12px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #1BB6C1;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #189AA3;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .learning-history-container {
+    padding: 16px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .achievement-summary {
+    gap: 16px;
+  }
+  
+  .summary-item {
+    padding: 12px 16px;
+    min-width: 80px;
+  }
+  
+  .summary-count {
+    font-size: 1.5rem;
+  }
+  
+  .history-content {
+    flex-direction: column;
+    gap: 24px;
+  }
+  
+  .rankings-section {
+    position: static;
+  }
+  
+  .medal-card {
+    padding: 16px;
+  }
+  
+  .medal-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .feedback-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 576px) {
+  .history-title {
+    font-size: 1.8rem;
+  }
+  
+  .medal-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .medal-icon-container {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+  
+  .ranking-item {
+    padding: 12px;
+  }
+  
+  .achievement-summary {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .summary-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+  }
+}

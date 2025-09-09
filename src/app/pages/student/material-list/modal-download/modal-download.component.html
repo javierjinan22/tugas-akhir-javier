@@ -1,23 +1,105 @@
-<div class="modal-body">
-  <!-- Icon Warning Overlapping -->
-  <div class="icon-warning-wrapper">
-    <fa-icon [icon]="faExclamation"></fa-icon>
-  </div>
+<div class="modal-content-wrapper">
+  <div class="modal-body">
 
-  <h5 class="modal-title text-center mt-4">Silakan pilih yang ingin anda unduh</h5>
-  <p class="modal-subtitle text-center">{{ materialTitle }}</p>
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11;">
+      <div class="toast align-items-center text-white border-0" 
+           [class.show]="showToast" 
+           [class.hide]="!showToast"
+           [ngClass]="toastClass"
+           role="alert" 
+           aria-live="assertive" 
+           aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            <i [class]="toastIcon" class="me-2"></i>
+            {{ toastMessage }}
+          </div>
+          <button type="button" 
+                  class="btn-close btn-close-white me-2 m-auto" 
+                  (click)="hideToast()"
+                  aria-label="Close">
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Icon Warning Overlapping -->
+    <div class="icon-warning-wrapper">
+      <fa-icon [icon]="faExclamation"></fa-icon>
+    </div>
 
-  <div class="button-group-download mt-4 px-3">
-    <button class="btn btn-outline-primary" (click)="onCancelClicked()">
-      Batal
-    </button>
-    <button class="btn btn-primary btn-download" (click)="downloadMaterial()">
-      <i class="fas fa-download"></i>
-      <span>Download Materi</span>
-    </button>
-    <button class="btn btn-primary btn-download" (click)="downloadQuiz()">
-      <i class="fas fa-download"></i>
-      <span>Download Kuis</span>
-    </button>
+    <!-- Header Section -->
+    <div class="modal-header-section">
+      <h5 class="modal-title">Silakan pilih yang ingin anda unduh</h5>
+      <p class="modal-subtitle">{{ materialTitle }}</p>
+    </div>
+
+    <!-- Download Options Section -->
+    <div class="download-options-section">
+      <!-- Download Materi -->
+      <div class="download-option-card" 
+           [class.loading]="isDownloadingMaterial"
+           (click)="downloadMaterial()">
+        <div class="option-icon">
+          <i class="fas fa-file-pdf"></i>
+        </div>
+        <div class="option-content">
+          <h6 class="option-title">Download Materi</h6>
+          <p class="option-description">
+            {{ isDownloadingMaterial ? 'Sedang mengunduh materi...' : 'Unduh file materi pembelajaran dalam format PDF' }}
+          </p>
+        </div>
+        <div class="option-arrow">
+          <i class="fas" [class.fa-download]="!isDownloadingMaterial" [class.fa-spinner]="isDownloadingMaterial"></i>
+        </div>
+      </div>
+
+      <!-- Download Kuis -->
+      <div class="download-option-card" 
+           [class.loading]="isDownloadingQuiz"
+           (click)="downloadQuiz()">
+        <div class="option-icon">
+          <i class="fas fa-file-circle-question"></i>
+        </div>
+        <div class="option-content">
+          <h6 class="option-title">Download Kuis</h6>
+          <p class="option-description">
+            {{ isDownloadingQuiz ? 'Sedang mengunduh kuis...' : 'Unduh soal-soal kuis dalam format PDF' }}
+          </p>
+        </div>
+        <div class="option-arrow">
+          <i class="fas" [class.fa-download]="!isDownloadingQuiz" [class.fa-spinner]="isDownloadingQuiz"></i>
+        </div>
+      </div>
+
+      <!-- ✅ Download Hasil Kuis (conditional) -->
+      <div *ngIf="hasAttemptId()" 
+           class="download-option-card" 
+           [class.loading]="isDownloadingQuizAttempt"
+           (click)="downloadQuizAttempt()">
+        <div class="option-icon">
+          <i class="fas fa-file-alt"></i>
+        </div>
+        <div class="option-content">
+          <h6 class="option-title">Download Hasil Kuis</h6>
+          <p class="option-description">
+            {{ isDownloadingQuizAttempt ? 'Sedang mengunduh hasil...' : 'Unduh hasil pengerjaan kuis dalam format PDF' }}
+          </p>
+        </div>
+        <div class="option-arrow">
+          <i class="fas" [class.fa-download]="!isDownloadingQuizAttempt" [class.fa-spinner]="isDownloadingQuizAttempt"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button class="btn btn-cancel" 
+              [disabled]="isLoading()"
+              (click)="onCancelClicked()">
+        <i class="fas fa-times"></i>
+        Batal
+      </button>
+    </div>
   </div>
 </div>

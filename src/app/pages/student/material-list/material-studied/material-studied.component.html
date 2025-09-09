@@ -7,6 +7,13 @@
     <p class="mt-2">Memuat materi...</p>
   </div>
 
+  <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="!loading && !error && (materialCategories.length > 0 || studiedMaterials.length > 0)">
+    <button class="btn btn-sm btn-outline-secondary" (click)="toggleViewMode()">
+      <i class="fas" [ngClass]="viewMode === 'category' ? 'fa-list' : 'fa-layer-group'"></i>
+      {{ viewMode === 'category' ? 'Tampilkan Semua List' : 'Tampilkan Berdasarkan Kategori' }}
+    </button>
+  </div>
+
   <!-- Error state -->
   <div *ngIf="error && !loading" class="alert alert-danger">
     {{ error }}
@@ -15,8 +22,97 @@
     </button>
   </div>
 
+   <!-- ✅ CATEGORY VIEW -->
+  <div *ngIf="!loading && !error && viewMode === 'category'" class="category-view">
+    <div *ngFor="let category of materialCategories; let lastCategory = last" class="category-section">
+      <!-- Category Header -->
+      <div class="category-header">
+        <div class="d-flex align-items-center">
+          <div class="category-icon" [style.background-color]="getCategoryColor(category.name)">
+            <i class="fas" [ngClass]="getCategoryIcon(category.name)"></i>
+          </div>
+          <div class="ms-3">
+            <h6 class="category-title mb-1">Kategori {{ category.name }}</h6>
+            <small class="text-muted">
+              {{ category.materials.length }} materi • 
+              {{ category.summary.in_progress }} sedang dipelajari
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Materials in this category -->
+      <div class="materials-in-category">
+        <div *ngFor="let material of category.materials; let last = last">
+          <div class="material-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="material-info">
+                <h5 class="material-title">{{ material.judul_materi }}</h5>
+                
+                <div class="material-meta">
+                  <small class="text-muted d-block">
+                    {{ getBabProgress(material) }}
+                    <span *ngIf="hasQuiz(material)" class="ms-2">
+                      • {{ material.total_soal }} soal kuis
+                    </span>
+                  </small>
+                  
+                  <div class="d-flex align-items-center mt-1">
+                    <span class="status-badge" 
+                          [ngClass]="{
+                            'studying': material.status === 'in_progress', 
+                            'not-started': material.status === 'not_started',
+                            'needs-quiz': material.has_quiz && material.completed_babs_count === material.total_bab && (!material.quiz_best_score || material.quiz_best_score < 75)
+                          }">
+                      {{ getStatusText(material) }}
+                    </span>
+                    
+                    <span *ngIf="material.has_quiz && material.completed_babs_count === material.total_bab && (!material.quiz_best_score || material.quiz_best_score < 75)" 
+                          class="badge bg-warning text-dark ms-2">
+                      <i class="fas fa-exclamation-triangle"></i> Perlu lulus kuis
+                    </span>
+                    
+                    <small class="text-muted ms-2" *ngIf="material.status === 'in_progress'">
+                      {{ getLastAccessedText(material) }}
+                    </small>
+                  </div>
+                </div>
+                
+                <div class="progress mt-2" style="height: 6px;" *ngIf="material.status === 'in_progress'">
+                  <div class="progress-bar" 
+                       [style.width.%]="getProgressPercentage(material)"
+                       role="progressbar">
+                  </div>
+                  <small class="text-muted mt-1 d-block">
+                    {{ getProgressPercentage(material) }}% selesai
+                  </small>
+                </div>
+              </div>
+              
+              <div class="button-group">
+                <button 
+                  *ngIf="canDownload(material)"
+                  class="btn-download" 
+                  (click)="downloadMaterial(material)"
+                  title="Download Materi">
+                  <i class="fas fa-download"></i>
+                </button>
+                
+                <button class="btn-view" (click)="viewMaterial(material)">
+                  {{ material.status === 'in_progress' ? 'Lanjut belajar' : 'Mulai belajar' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <hr *ngIf="!lastCategory" class="category-divider">
+    </div>
+  </div>
+
   <!-- Materials list -->
-  <div *ngIf="!loading && !error">
+  <div *ngIf="!loading && !error && viewMode === 'list'">
     <div *ngFor="let material of studiedMaterials; let last = last">
       <div class="material-item">
         <div class="d-flex justify-content-between align-items-start">
