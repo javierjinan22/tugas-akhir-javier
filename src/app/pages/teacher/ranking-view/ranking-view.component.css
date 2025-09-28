@@ -1,0 +1,433 @@
+.page-header {
+  background: linear-gradient(90deg, #1267b2 0%, #41c8b1 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* ✅ Tabs */
+.nav-pills .nav-link {
+  background: none;
+  border: 2px solid #dee2e6;
+  color: #495057;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  padding: 10px 20px;
+  font-size: 1rem;
+}
+
+.nav-pills .nav-link:hover {
+  background-color: #f8f9fa;
+  border-color: #1BB6C1;
+  color: #1BB6C1;
+  transform: translateY(-1px);
+}
+
+.nav-pills .nav-link.active {
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+  color: white;
+}
+
+/* ✅ Filter Section */
+.filter-section {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filter-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #495057;
+  margin-bottom: 0;
+  min-width: 80px;
+}
+
+.custom-select-container {
+  min-width: 200px;
+}
+
+.custom-ranking-container {
+  font-family: 'Poppins', sans-serif;
+}
+
+.stats-summary {
+  background: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  font-size: 0.875rem;
+}
+
+/* ✅ Class Info Card */
+.class-info-card .card {
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+}
+
+.class-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #1BB6C1, #0891b2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+/* ✅ Current School Card */
+.current-school-card .rank-display {
+  text-align: center;
+}
+
+.rank-number {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 40px;
+  text-align: center;
+  color: #495057;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.rank-details div {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+/* ✅ School Stats Summary */
+.school-stats-summary {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+}
+
+.stat-card {
+  text-align: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1267b2;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* ✅ Rankings Table */
+.rankings-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  border-color: #dee2e6;
+}
+
+.table thead th {
+  font-weight: 700;
+  font-size: 1.08rem;
+  background: #fafbfc;
+  color: #212121;
+  vertical-align: middle;
+}
+
+.table td, .table th {
+  vertical-align: middle !important;
+}
+
+.table td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+}
+
+.ranking-row {
+  transition: all 0.2s ease;
+}
+
+.ranking-row:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  transform: none; /* Hilangkan transform untuk konsistensi dengan manage components */
+}
+
+/* ✅ Rank Badges */
+.rank-badge {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 40px;
+  text-align: center;
+}
+
+.badge-rank-1 {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(255, 215, 0, 0.3);
+}
+
+.badge-rank-2 {
+  background: linear-gradient(135deg, #C0C0C0, #A9A9A9);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(192, 192, 192, 0.3);
+}
+
+.badge-rank-3 {
+  background: linear-gradient(135deg, #CD7F32, #A0522D);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(205, 127, 50, 0.3);
+}
+
+.badge-rank-other {
+  background: #6c757d;
+  color: #fff;
+}
+
+/* ✅ Progress Bars */
+.progress-container {
+  min-width: 120px;
+}
+
+.progress {
+  background-color: #e9ecef;
+  border-radius: 4px;
+  height: 8px;
+}
+
+.completion-text,
+.score-text,
+.total-score {
+  font-weight: 600;
+  color: #495057;
+}
+
+/* ✅ Custom ngx-select styling untuk ranking page */
+.custom-select-container ::ng-deep ngx-select {
+  width: 100% !important;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select {
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  background-color: #fff !important;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle {
+  padding: 8px 12px !important;
+  color: #495057 !important;
+  min-height: 38px !important;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__dropdown {
+  background-color: #fff !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option {
+  background-color: #fff !important;
+  color: #495057 !important;
+  padding: 10px 12px !important;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option:hover {
+  background-color: #f8f9fa !important;
+  color: #1BB6C1 !important;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option.ngx-select__option--selected {
+  background-color: #1BB6C1 !important;
+  color: #fff !important;
+}
+
+/* ✅ Pagination */
+.pagination {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.page-link {
+  color: #1267b2;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 0.75rem;
+  margin: 0 2px;
+  border-radius: 6px !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  color: #0f5499;
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.page-item.active .page-link {
+  background-color: #1267b2;
+  border-color: #1267b2;
+  color: #fff;
+  font-weight: 600;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #fff;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+
+/* ✅ Responsive Design */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1.5rem 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .custom-select-container {
+    min-width: 100%;
+  }
+  
+  .stats-summary {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .school-stats-summary .row {
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    margin-bottom: 1rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+  
+  .nav-pills .nav-link {
+    margin-bottom: 0.5rem;
+    margin-right: 0;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .d-flex.justify-content-end {
+    justify-content: center !important;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .filter-section {
+    padding: 1rem;
+  }
+}
+
+/* ✅ Empty state styling selaras dengan manage components */
+.empty-state-icon {
+  font-size: 3rem;
+  color: #dee2e6 !important;
+  margin-bottom: 1rem;
+}
+
+.empty-state-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.empty-state-actions .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ Medal icon styling yang ringan */
+.fas.fa-medal {
+  transition: transform 0.2s ease;
+  font-size: 1.2rem;
+}
+
+.fas.fa-medal:hover {
+  transform: scale(1.1);
+}
+
+/* ✅ Loading spinner selaras dengan komponen lain */
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ✅ Tooltip styling selaras dengan komponen lain */
+.tooltip-inner {
+  background-color: #333;
+  color: white;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+.results-info {
+  padding: 1rem;
+  background: rgba(21, 178, 196, 0.05);
+  border-radius: 12px;
+  border-left: 3px solid #1BB6C1;
+  margin-top: 2rem;
+}

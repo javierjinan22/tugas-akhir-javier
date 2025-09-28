@@ -1482,3 +1482,45 @@
 .material-page::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* ✅ TAMBAH: Button styling untuk konsistensi */
+.btn-rounded {
+  border-radius: 25px;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-success {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.btn-outline-success:hover {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+/* ✅ TAMBAH: Button group spacing */
+.ms-auto .btn + .btn {
+  margin-left: 0.5rem;
+}
+
+.d-flex.gap-3 {
+  gap: 1rem !important;
+}

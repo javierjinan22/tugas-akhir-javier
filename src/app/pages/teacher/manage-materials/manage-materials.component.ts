@@ -28,14 +28,19 @@ export class ManageMaterialsComponent implements OnInit {
   materials: Material[] = [];
   processedMaterials: ProcessedMaterial[] = [];
   filteredMateri: ProcessedMaterial[] = [];
-  
-  // State management
+
   keyword: string = '';
   loading: boolean = false;
   errorMsg: string = '';
   token: string = '';
   deletingMaterial: { [key: string]: boolean } = {};
   togglingMaterial: { [key: string]: boolean } = {};
+
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
 
   bsModalRef?: BsModalRef;
 
@@ -66,7 +71,6 @@ export class ManageMaterialsComponent implements OnInit {
           this.materials = response.data;
           this.processMaterialsWithClassNames();
         } else {
-          console.warn('⚠️ Unexpected response structure:', response);
           this.materials = [];
           this.processedMaterials = [];
           this.filteredMateri = [];
@@ -102,7 +106,7 @@ export class ManageMaterialsComponent implements OnInit {
     });
 
     const uniqueClassIds = Array.from(allClassIds);
-    
+
     if (uniqueClassIds.length === 0) {
       // Jika tidak ada kelas yang ditautkan
       this.processedMaterials = this.materials.map(material => this.mapMaterialToProcessed(material, {}));
@@ -113,17 +117,17 @@ export class ManageMaterialsComponent implements OnInit {
     // Ambil nama kelas dari service
     this.materialService.getClassNamesByIds(uniqueClassIds, this.token).subscribe({
       next: (classMap: { [key: string]: string }) => {
-        
-        this.processedMaterials = this.materials.map(material => 
+
+        this.processedMaterials = this.materials.map(material =>
           this.mapMaterialToProcessed(material, classMap)
         );
         this.filteredMateri = [...this.processedMaterials];
       },
       error: (error) => {
         console.error('❌ Error getting class names:', error);
-        
+
         // Fallback: gunakan ID kelas jika gagal ambil nama
-        this.processedMaterials = this.materials.map(material => 
+        this.processedMaterials = this.materials.map(material =>
           this.mapMaterialToProcessed(material, {})
         );
         this.filteredMateri = [...this.processedMaterials];
@@ -133,7 +137,7 @@ export class ManageMaterialsComponent implements OnInit {
 
   // Helper method untuk mapping material ke format yang dibutuhkan component
   private mapMaterialToProcessed(material: Material, classMap: { [key: string]: string }): ProcessedMaterial {
-    const kelasNames = material.kelas_ditautkan?.map(classId => 
+    const kelasNames = material.kelas_ditautkan?.map(classId =>
       classMap[classId] || `Kelas ID: ${classId}`
     ) || [];
 
@@ -150,20 +154,19 @@ export class ManageMaterialsComponent implements OnInit {
   }
 
   onSearch() {
-    
+
     if (!this.keyword.trim()) {
       // ✅ MENAMPILKAN SEMUA MATERI TERLEPAS DARI STATUS
       this.filteredMateri = [...this.processedMaterials];
       return;
     }
-    
+
     const searchTerm = this.keyword.toLowerCase();
-    
+
     // ✅ FILTER HANYA BERDASARKAN JUDUL DAN KELAS, BUKAN STATUS
-    this.filteredMateri = this.processedMaterials.filter(materi => 
+    this.filteredMateri = this.processedMaterials.filter(materi =>
       materi.judul.toLowerCase().includes(searchTerm) ||
       materi.kelas.some(k => k.toLowerCase().includes(searchTerm))
-      // ❌ TIDAK ADA FILTER: && materi.is_active === true
     );
   }
 
@@ -179,46 +182,8 @@ export class ManageMaterialsComponent implements OnInit {
     this.router.navigate(['/guru/kelola-materi/edit-materi', materi._id]);
   }
 
-  // hapusMateri(materi: ProcessedMaterial) {
-  //   if (!confirm(`Yakin hapus materi: ${materi.judul}?`)) {
-  //     return;
-  //   }
-
-  //   console.log('🗑️ Deleting material:', materi.judul);
-    
-  //   this.deletingMaterial[materi._id] = true;
-    
-  //   this.materialService.deleteMaterial(materi._id, this.token).subscribe({
-  //     next: (response) => {
-  //       console.log('✅ Material deleted successfully:', response);
-        
-  //       // Remove dari arrays
-  //       this.processedMaterials = this.processedMaterials.filter(m => m._id !== materi._id);
-  //       this.filteredMateri = this.filteredMateri.filter(m => m._id !== materi._id);
-  //       this.materials = this.materials.filter(m => m._id !== materi._id);
-        
-  //       this.deletingMaterial[materi._id] = false;
-  //     },
-  //     error: (error) => {
-  //       console.error('❌ Error deleting material:', error);
-        
-  //       let errorMessage = `Gagal menghapus materi "${materi.judul}". Silakan coba lagi.`;
-        
-  //       if (error.status === 403) {
-  //         errorMessage = 'Anda tidak memiliki akses untuk menghapus materi ini.';
-  //       } else if (error.status === 404) {
-  //         errorMessage = 'Materi tidak ditemukan.';
-  //       }
-        
-  //       alert(errorMessage);
-  //       this.deletingMaterial[materi._id] = false;
-  //     }
-  //   });
-  // }
-
   hapusMateri(materi: ProcessedMaterial) {
-    
-    // ✅ Open modal instead of confirm dialog
+
     const initialState = {
       materialData: {
         judul: materi.judul,
@@ -233,96 +198,86 @@ export class ManageMaterialsComponent implements OnInit {
       keyboard: false
     });
 
-    // ✅ Subscribe to modal result
     this.bsModalRef.content.onClose.subscribe((result: { action: string }) => {
-      
+
       if (result.action === 'delete') {
         this.performMaterialDeletion(materi);
-      } 
+      }
     });
   }
-  // ✅ NEW: Separate method for actual deletion
+
   private performMaterialDeletion(materi: ProcessedMaterial) {
-    
     this.deletingMaterial[materi._id] = true;
-    
     this.materialService.deleteMaterialPermanent(materi._id, this.token).subscribe({
       next: (response) => {
-        
         // Remove dari arrays
         this.processedMaterials = this.processedMaterials.filter(m => m._id !== materi._id);
         this.filteredMateri = this.filteredMateri.filter(m => m._id !== materi._id);
         this.materials = this.materials.filter(m => m._id !== materi._id);
-        
         this.deletingMaterial[materi._id] = false;
-        
+
+        // ✅ Toast sukses
+        this.showSuccessToast(`Materi "${materi.judul}" berhasil dihapus.`);
       },
       error: (error) => {
         console.error('❌ Error deleting material:', error);
-        
         let errorMessage = `Gagal menghapus materi "${materi.judul}". Silakan coba lagi.`;
-        
         if (error.status === 403) {
           errorMessage = 'Anda tidak memiliki akses untuk menghapus materi ini.';
         } else if (error.status === 404) {
           errorMessage = 'Materi tidak ditemukan.';
         }
-        
+        this.showErrorToast(errorMessage);
         this.deletingMaterial[materi._id] = false;
       }
     });
   }
 
-  // Toggle material status (active/inactive)
   toggleMaterialStatus(materi: ProcessedMaterial, event: Event) {
     event.stopPropagation();
-    
+
     const newStatus = !materi.is_active;
     const statusText = newStatus ? 'mengaktifkan' : 'menonaktifkan';
-    
+
     this.togglingMaterial[materi._id] = true;
-    
+
     this.materialService.toggleMaterialStatus(materi._id, newStatus, this.token).subscribe({
       next: (response) => {
-        
-        // ✅ HANYA UPDATE STATUS, TIDAK MENGHAPUS DARI ARRAY
-        // Update status di processedMaterials
+        // Update status di arrays
         const materialIndex = this.processedMaterials.findIndex(m => m._id === materi._id);
         if (materialIndex !== -1) {
           this.processedMaterials[materialIndex].is_active = newStatus;
         }
-        
-        // Update status di filteredMateri
         const filteredIndex = this.filteredMateri.findIndex(m => m._id === materi._id);
         if (filteredIndex !== -1) {
           this.filteredMateri[filteredIndex].is_active = newStatus;
         }
-        
-        // Update status di materials (raw data)
         const originalIndex = this.materials.findIndex(m => m._id === materi._id);
         if (originalIndex !== -1) {
           this.materials[originalIndex].is_active = newStatus;
         }
-        
         this.togglingMaterial[materi._id] = false;
-        
+
+        // ✅ Toast sukses
+        if (newStatus) {
+          this.showSuccessToast(`Materi "${materi.judul}" berhasil diaktifkan.`);
+        } else {
+          this.showSuccessToast(`Materi "${materi.judul}" berhasil dinonaktifkan.`);
+        }
       },
       error: (error) => {
         console.error('❌ Error toggling material status:', error);
-        
         let errorMessage = `Gagal ${statusText} materi "${materi.judul}". Silakan coba lagi.`;
-        
         if (error.status === 403) {
           errorMessage = 'Anda tidak memiliki akses untuk mengubah status materi ini.';
         } else if (error.status === 404) {
           errorMessage = 'Materi tidak ditemukan.';
         }
-        
+        this.showErrorToast(errorMessage);
         this.togglingMaterial[materi._id] = false;
       }
     });
   }
-
   // Helper methods
   isDeleting(materialId: string): boolean {
     return this.deletingMaterial[materialId] || false;
@@ -357,4 +312,38 @@ export class ManageMaterialsComponent implements OnInit {
     this.searchInputRef.nativeElement.focus();
   }
 
+  onBankMaterialsClicked() {
+    this.router.navigate(['/guru/bank-materi']);
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
 }

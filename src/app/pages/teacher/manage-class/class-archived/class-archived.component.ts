@@ -19,6 +19,12 @@ export class ClassArchivedComponent implements OnInit {
   loading: boolean = false;
   errorMsg: string = '';
   restoringClass: { [key: string]: boolean } = {};
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
+
 
   constructor(
     private router: Router,
@@ -37,9 +43,8 @@ export class ClassArchivedComponent implements OnInit {
     }
   }
 
-  // ✅ UPDATE: Gunakan modal untuk restore
   restoreClass(kelas: any) {
-    
+
     const initialState = {
       classData: kelas,
       onRestoreSuccess: () => {
@@ -50,7 +55,7 @@ export class ClassArchivedComponent implements OnInit {
         this.handleRestoreError(kelas, error);
       }
     };
-    
+
     const modalRef = this.modalService.show(ModalRestoreClassComponent, {
       class: 'modal-dialog-centered',
       initialState,
@@ -67,7 +72,10 @@ export class ClassArchivedComponent implements OnInit {
     // Remove dari archived arrays karena sudah tidak diarsipkan lagi
     this.archivedClasses = this.archivedClasses.filter(k => k._id !== kelas._id);
     this.filteredArchivedClasses = this.filteredArchivedClasses.filter(k => k._id !== kelas._id);
-    
+
+    // ✅ Tampilkan toast sukses
+    this.showSuccessToast(`Kelas "${kelas.nama_kelas}" berhasil dipulihkan!`);
+
     // Refresh data untuk memastikan konsistensi
     setTimeout(() => {
       this.getArchivedClasses();
@@ -76,7 +84,11 @@ export class ClassArchivedComponent implements OnInit {
 
   private handleRestoreError(kelas: any, error: any): void {
     console.error('Error in restore callback:', error);
-    // Could add additional error handling here if needed
+    let msg = `Gagal memulihkan kelas "${kelas.nama_kelas}". Silakan coba lagi.`;
+    if (error?.error?.message) {
+      msg = error.error.message;
+    }
+    this.showErrorToast(msg);
   }
 
   isRestoring(classId: string): boolean {
@@ -107,11 +119,11 @@ export class ClassArchivedComponent implements OnInit {
 
   getArchivedDate(archivedAt: string): string {
     if (!archivedAt) return '';
-    
+
     const date = new Date(archivedAt);
     return date.toLocaleDateString('id-ID', {
       day: '2-digit',
-      month: '2-digit', 
+      month: '2-digit',
       year: 'numeric'
     });
   }
@@ -119,14 +131,14 @@ export class ClassArchivedComponent implements OnInit {
   getArchivedClasses() {
     this.loading = true;
     this.errorMsg = '';
-    
+
     this.classService.getClassesBySchool(this.schoolId, this.token).subscribe({
       next: (response: ClassesBySchoolResponse) => {
 
         if (response.success && response.data && Array.isArray(response.data)) {
           this.archivedClasses = response.data.filter(cls => cls.archived_at);
           this.filteredArchivedClasses = [...this.archivedClasses];
-          
+
         } else {
           this.archivedClasses = [];
           this.filteredArchivedClasses = [];
@@ -145,14 +157,45 @@ export class ClassArchivedComponent implements OnInit {
   }
 
   onSearch() {
-    
+
     if (!this.keyword.trim()) {
       this.filteredArchivedClasses = [...this.archivedClasses];
       return;
     }
-    
-    this.filteredArchivedClasses = this.archivedClasses.filter(kelas => 
+
+    this.filteredArchivedClasses = this.archivedClasses.filter(kelas =>
       kelas.nama_kelas && kelas.nama_kelas.toLowerCase().includes(this.keyword.toLowerCase())
     );
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 }

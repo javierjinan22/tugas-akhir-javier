@@ -99,44 +99,52 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   }
 
   loadQuizData(): void {
-    this.loading = true;
-    this.error = '';
+  this.loading = true;
+  this.error = '';
 
-    this.studentProgressService.getMateriDetailForViewing(this.materialId).subscribe({
-      next: (response) => {
-        if (response.success) {
-          const materialData = response.data.material;
-          const quizData = response.data.quiz;
+  this.studentProgressService.getMateriDetailForViewing(this.materialId).subscribe({
+    next: (response) => {
+      if (response.success) {
+        const materialData = response.data.material;
+        const quizData = response.data.quiz;
 
-          // ✅ Transform API data ke format komponen
-          this.quiz = {
-            id: materialData.id,
-            title: materialData.title,
-            timeLimit: (materialData.waktu_pengerjaan || 10) * 60, // konversi menit ke detik
-            questions: quizData.questions.map((q: any, index: number) => ({
-              id: index,
-              type: q.type, // ✅ Langsung gunakan type dari API (pilihan_ganda, benar_salah, isian_singkat)
-              question: q.question,
-              options: q.options || [],
-              correctAnswer: q.correct_answer,
-              userAnswer: undefined
-            }))
-          };
+        // ✅ Transform API data ke format komponen
+        this.quiz = {
+          id: materialData.id,
+          title: materialData.title,
+          timeLimit: (materialData.waktu_pengerjaan || 10) * 60, // konversi menit ke detik
+          questions: quizData.questions.map((q: any, index: number) => ({
+            id: index,
+            type: q.type, // ✅ Langsung gunakan type dari API (pilihan_ganda, benar_salah, isian_singkat)
+            question: q.question,
+            options: q.options || [],
+            correctAnswer: q.correct_answer,
+            userAnswer: undefined
+          }))
+        };
 
-          this.loadQuizState();
-          this.startTimer();
-        } else {
-          this.error = 'Gagal memuat data kuis';
+        // ✅ TAMBAH: Set quiz start time jika belum ada
+        const startTimeKey = `quiz_${this.materialId}_start_time`;
+        if (!localStorage.getItem(startTimeKey)) {
+          const startTime = new Date().toISOString();
+          localStorage.setItem(startTimeKey, startTime);
+          console.log('🕐 Quiz start time set:', startTime);
         }
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading quiz data:', error);
+
+        this.loadQuizState();
+        this.startTimer();
+      } else {
         this.error = 'Gagal memuat data kuis';
-        this.loading = false;
       }
-    });
-  }
+      this.loading = false;
+    },
+    error: (error) => {
+      console.error('Error loading quiz data:', error);
+      this.error = 'Gagal memuat data kuis';
+      this.loading = false;
+    }
+  });
+}
 
   loadQuizState(): void {
     if (!this.quiz) return;
@@ -314,19 +322,22 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
 
 
   saveAnswer(): void {
-    // Untuk pilihan ganda, tetap gunakan transform
-    if (this.currentQuestion?.type === 'pilihan_ganda' && this.currentQuestion.userAnswer !== undefined) {
-      const selectedIndex = this.currentQuestion.userAnswer as number;
-      const selectedOption = this.currentQuestion.options?.[selectedIndex];
+    if (!this.currentQuestion) return;
 
-      if (selectedOption) {
-        // Keep as index for pilihan_ganda - akan ditransform di generateFinalAnswers
-        console.log(`✅ Pilihan Ganda answer: index ${selectedIndex}`);
+    console.log(`💾 Saving answer for question ${this.currentQuestionIndex}:`, {
+      type: this.currentQuestion.type,
+      userAnswer: this.currentQuestion.userAnswer,
+      typeof: typeof this.currentQuestion.userAnswer
+    });
+
+    // Untuk pilihan ganda, pastikan userAnswer adalah number (index)
+    if (this.currentQuestion.type === 'pilihan_ganda') {
+      const selectedIndex = this.currentQuestion.userAnswer as number;
+      if (selectedIndex !== undefined && selectedIndex >= 0) {
+        const selectedOption = this.currentQuestion.options?.[selectedIndex];
+        console.log(`✅ Pilihan ganda selected: index ${selectedIndex} = "${selectedOption}"`);
       }
     }
-
-    // Untuk benar_salah, sudah disimpan langsung sebagai "Benar"/"Salah" di selectBenarSalah()
-    // Untuk isian_singkat, langsung simpan text
 
     this.saveQuizState();
   }
@@ -370,21 +381,75 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   }
 
   finishQuiz(): void {
-    if (!this.quiz) return;
+  if (!this.quiz) return;
 
-    // ✅ Generate final answers dalam format yang benar
-    const finalAnswers = this.generateFinalAnswers();
+  console.log('🏁 Finishing quiz with current answers:', 
+    this.quiz.questions.map(q => ({ type: q.type, userAnswer: q.userAnswer }))
+  );
 
-    console.log('📝 Final quiz answers:', finalAnswers);
+  // ✅ PAKSA SIMPAN semua jawaban sebelum submit
+  this.forceSaveAllAnswers();
 
-    // Save final answers to localStorage untuk modal
-    localStorage.setItem(`quiz_${this.materialId}_final_answers`, JSON.stringify({
-      answers: finalAnswers
-    }));
+  // ✅ PAKSA: Cek dan set jawaban dari DOM untuk semua soal
+  this.quiz.questions.forEach((question, questionIndex) => {
+    if (question.type === 'pilihan_ganda' && (question.userAnswer === undefined || question.userAnswer === null)) {
+      // Coba ambil dari DOM
+      const checkedRadio: any = document.querySelector(`input[name="question${questionIndex}"]:checked`);
+      if (checkedRadio) {
+        const selectedIndex = parseInt(checkedRadio.value, 10);
+        question.userAnswer = selectedIndex;
+        console.log(`🔧 Force set answer from DOM for question ${questionIndex}: index ${selectedIndex}`);
+      } else {
+        console.log(`❌ No DOM answer found for question ${questionIndex}`);
+      }
+    }
+  });
 
-    this.saveQuizState();
-    this.showEndModal();
-  }
+  // ✅ SAVE LAGI setelah force set
+  this.saveAnswer();
+
+  // Generate final answers
+  const finalAnswers = this.generateFinalAnswers();
+  console.log('📝 Final quiz answers before modal:', finalAnswers);
+
+  // Save final answers to localStorage untuk modal
+  localStorage.setItem(`quiz_${this.materialId}_final_answers`, JSON.stringify({
+    answers: finalAnswers
+  }));
+
+  this.saveQuizState();
+  this.showEndModal();
+}
+
+// ✅ TAMBAH: Method untuk paksa simpan semua jawaban
+private forceSaveAllAnswers(): void {
+  if (!this.quiz) return;
+
+  console.log('🔧 Force saving all answers...');
+  
+  this.quiz.questions.forEach((question, index) => {
+    if (question.type === 'pilihan_ganda') {
+      const radioInput: any = document.querySelector(`input[name="question${index}"]:checked`);
+      if (radioInput) {
+        const value = parseInt(radioInput.value, 10);
+        question.userAnswer = value;
+        console.log(`✅ Force saved question ${index}: ${value}`);
+      }
+    } else if (question.type === 'benar_salah') {
+      // Benar/salah sudah tersimpan via selectBenarSalah
+      console.log(`✅ Benar/Salah question ${index}: ${question.userAnswer}`);
+    } else if (question.type === 'isian_singkat') {
+      const textArea: any = document.querySelector(`textarea[name="question${index}"]`);
+      if (textArea) {
+        question.userAnswer = textArea.value;
+        console.log(`✅ Force saved isian singkat ${index}: ${textArea.value}`);
+      }
+    }
+  });
+
+  // Simpan ke localStorage
+  this.saveQuizState();
+}
 
   private showEndModal(): void {
     const initialState = {

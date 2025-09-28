@@ -1,0 +1,712 @@
+
+.btn-back-icon {
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 1.5rem;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-back-icon:hover {
+  color: #1BB6C1;
+  background-color: rgba(27, 182, 193, 0.1);
+  transform: translateX(-2px);
+}
+
+.btn-back-icon:active {
+  transform: translateX(-1px);
+}
+
+.btn-back-icon:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(27, 182, 193, 0.25);
+}
+
+.form-container {
+  background: #f7f7f7;
+  border-radius: 22px;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(36, 44, 54, 0.04);
+  overflow-x: auto;
+  overflow-y: visible;
+  word-wrap: break-word;
+}
+
+/* ✅ WIZARD CONTAINER STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.wizard-container {
+  margin: 0 auto;
+}
+
+.wizard {
+  padding: 20px 20px;
+}
+
+/* ✅ WIZARD STYLES - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.wizard .nav-tabs {
+  border: none;
+  margin-bottom: 0;
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  height: 50px;
+}
+
+/* Full width line behind circles - Gray background */
+.wizard .nav-tabs:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #e0e0e0;
+  transform: translateY(-50%);
+  z-index: 1;
+  border-radius: 2px;
+}
+
+/* Active line overlay - Orange progress */
+.wizard .nav-tabs:after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 50%;
+  height: 4px;
+  background: #ff9800;
+  transform: translateY(-50%);
+  z-index: 2;
+  transition: all 0.5s ease;
+  border-radius: 2px;
+}
+
+/* Step 2 active - full width orange line */
+.wizard.step-2 .nav-tabs:after {
+  width: 100%;
+}
+
+.wizard .nav-tabs .nav-item {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.wizard .nav-tabs .nav-item .nav-link {
+  width: 50px;
+  height: 50px;
+  margin: 0;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 50%;
+  color: #888;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  line-height: 1;
+  padding: 0;
+}
+
+.wizard .nav-tabs .nav-item .nav-link:hover {
+  text-decoration: none;
+  transform: scale(1.05);
+}
+
+.wizard .nav-tabs .nav-item .nav-link.active {
+  background: #ff9800;
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
+.wizard .nav-tabs .nav-item .nav-link.disabled {
+  background: #e0e0e0;
+  color: #888;
+  opacity: 1;
+  pointer-events: none;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Step labels below circles */
+.step-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #888;
+  text-align: center;
+  margin-top: 15px;
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+}
+
+/* Active step label styling */
+.wizard .nav-item:first-child .step-label {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.wizard.step-2 .nav-item:first-child .step-label {
+  color: #888;
+  font-weight: 500;
+}
+
+.wizard.step-2 .nav-item:last-child .step-label {
+  color: #ff9800;
+  font-weight: 600;
+}
+
+.step-number {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* ✅ MATERIAL INFO CARD - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.material-info-card {
+  background: #f7f7f7;
+  border-radius: 22px;
+  padding: 25px 30px;
+  color: #495057;
+  box-shadow: 0 4px 12px rgba(36, 44, 54, 0.04);
+  margin: 0 auto;
+  border: 1px solid #e9ecef;
+}
+
+.material-header-content .material-main-info {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.material-title {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.material-description {
+  font-size: 1rem;
+  margin: 0;
+  color: #6c757d;
+  line-height: 1.4;
+}
+
+.material-meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #495057;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.meta-item:hover {
+  background: #f8f9fa;
+  border-color: #1BB6C1;
+}
+
+.meta-item i {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-right: 6px;
+}
+
+/* ✅ BADGE STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.badge.bg-info {
+  background-color: #17a2b8 !important;
+  color: white !important;
+  border: none;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ✅ TAB CONTENT STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.step-content {
+  animation: fadeIn 0.3s ease-in-out;
+  overflow-x: auto;
+  overflow-y: visible;
+  word-wrap: break-word;
+}
+
+.tab-header {
+  border-bottom: 2px solid #e9ecef;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.tab-header h4 {
+  color: #2c3e50;
+  margin: 0;
+}
+
+/* ✅ MATERIAL CONTENT STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.material-content-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  overflow-x: auto;
+  overflow-y: visible;
+  box-sizing: border-box;
+}
+
+.material-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 10px;
+}
+
+.page-indicator-badge {
+  background: #239BA7;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.material-content-area {
+  padding: 20px 0;
+  min-height: 300px;
+  overflow-x: auto;
+  overflow-y: visible;
+  word-wrap: break-word;
+}
+
+.material-page {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.material-page * {
+  max-width: 100% !important;
+  box-sizing: border-box;
+}
+
+.material-page figure,
+.material-page .ck-widget,
+.question-content figure,
+.question-content .ck-widget {
+  max-width: 100% !important;
+  width: auto !important;
+  margin: 16px auto !important;
+  text-align: center;
+  overflow: visible !important;
+  display: table !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.material-page p {
+  margin-bottom: 16px;
+  text-align: justify;
+}
+
+.material-page img {
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 8px;
+  margin: 16px auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: block !important;
+  object-fit: none !important;
+}
+
+/* ✅ QUIZ CONTENT STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.quiz-content-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  overflow-x: auto;
+  overflow-y: visible;
+  box-sizing: border-box;
+}
+
+.quiz-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 10px;
+}
+
+.question-item {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px;
+  background: #ffffff;
+  margin-bottom: 20px;
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.question-number {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #F9A826 !important;
+  border-radius: 6px !important;
+  width: 32px !important;
+  height: 32px !important;
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  margin-right: 12px !important;
+  flex-shrink: 0 !important;
+}
+
+.badge.badge-jenis-soal {
+  background-color: #03A791;
+  color: white;
+}
+
+.question-content {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  line-height: 1.6;
+  color: #495057;
+  overflow-x: auto;
+  overflow-y: visible;
+  word-wrap: break-word;
+}
+
+/* ✅ ANSWER OPTIONS STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.jawaban-kunci-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.jawaban-header {
+  font-weight: 600;
+  font-size: 16px;
+  color: #333;
+}
+
+.answer-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.answer-text {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #495057;
+  transition: all 0.3s;
+}
+
+.answer-text.correct-answer {
+  border-color: #28a745;
+  background-color: #d4edda;
+  color: #155724;
+  font-weight: 500;
+}
+
+.correct-answer-display {
+  background: #d4edda;
+  border: 2px solid #28a745;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #155724;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+/* ✅ NAVIGATION STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.material-navigation,
+.quiz-navigation {
+  border-top: 1px solid #e9ecef;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.btn-nav-custom {
+  background: #FF9B00;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.btn-nav-custom:hover:not(:disabled) {
+  background: #FFC900;
+  transform: translateY(-1px);
+  color: white;
+}
+
+.btn-nav-custom:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.page-indicator-text {
+  font-weight: 600;
+  color: #495057;
+  min-width: 80px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* ✅ NO CONTENT MESSAGE - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.no-content-message {
+  background: white;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  border: 2px dashed #e9ecef;
+}
+
+.no-content-message h5 {
+  color: #6c757d;
+  margin-bottom: 10px;
+}
+
+.no-content-message p {
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+/* ✅ BUTTON STYLING - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.btn-rounded {
+  border-radius: 25px;
+  padding: 12px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary.btn-rounded {
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+}
+
+.btn-primary.btn-rounded:hover {
+  background-color: #0891b2;
+  border-color: #0891b2;
+  transform: translateY(-1px);
+}
+
+.btn-outline-primary.btn-rounded {
+  color: #1BB6C1;
+  border-color: #1BB6C1;
+}
+
+.btn-outline-primary.btn-rounded:hover {
+  background-color: #1BB6C1;
+  border-color: #1BB6C1;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-outline-secondary.btn-rounded {
+  color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-outline-secondary.btn-rounded:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-success.btn-rounded {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+}
+
+.btn-success.btn-rounded:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* ✅ ANIMATIONS - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ STATUS BADGES - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+.status-active {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-inactive {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* ✅ Responsive Design - EXACT SAMA SEPERTI DETAIL-MATERIALS */
+@media (max-width: 768px) {
+  .material-info-card {
+    padding: 20px 25px;
+  }
+  
+  .material-title {
+    font-size: 1.5rem;
+  }
+  
+  .wizard .nav-link {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .step-label {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  
+  .wizard {
+    padding: 15px 15px;
+  }
+  
+  .material-content-wrapper,
+  .quiz-content-wrapper {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 576px) {
+  .form-container {
+    padding: 1.5rem !important;
+  }
+  
+  .wizard-container {
+    padding: 1.5rem;
+  }
+  
+  .wizard {
+    padding: 15px 10px;
+  }
+  
+  .wizard .nav-link {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+  
+  .step-label {
+    font-size: 11px;
+    margin-top: 10px;
+  }
+  
+  .d-flex.gap-3.justify-content-center {
+    flex-direction: column;
+    gap: 12px !important;
+  }
+  
+  .btn-rounded {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .material-content-wrapper,
+  .quiz-content-wrapper {
+    padding: 12px;
+  }
+}
+
+/* ✅ Enhanced scrollbar styling */
+.material-content-wrapper::-webkit-scrollbar,
+.quiz-content-wrapper::-webkit-scrollbar,
+.question-content::-webkit-scrollbar,
+.material-page::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.material-content-wrapper::-webkit-scrollbar-track,
+.quiz-content-wrapper::-webkit-scrollbar-track,
+.question-content::-webkit-scrollbar-track,
+.material-page::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.material-content-wrapper::-webkit-scrollbar-thumb,
+.quiz-content-wrapper::-webkit-scrollbar-thumb,
+.question-content::-webkit-scrollbar-thumb,
+.material-page::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.material-content-wrapper::-webkit-scrollbar-thumb:hover,
+.quiz-content-wrapper::-webkit-scrollbar-thumb:hover,
+.question-content::-webkit-scrollbar-thumb:hover,
+.material-page::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

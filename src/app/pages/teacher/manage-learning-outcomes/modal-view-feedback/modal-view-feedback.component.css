@@ -1,0 +1,98 @@
+.border-left-primary {
+  border-left: 4px solid #1BB6C1 !important;
+}
+
+.feedback-content {
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 3px solid #e9ecef;
+}
+
+.feedback-list {
+  scrollbar-width: thin;
+  scrollbar-color: #1BB6C1 #f1f1f1;
+}
+
+.feedback-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.feedback-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.feedback-list::-webkit-scrollbar-thumb {
+  background: #1BB6C1;
+  border-radius: 3px;
+}
+
+.feedback-list::-webkit-scrollbar-thumb:hover {
+  background: #159ba6;
+}
+
+.card {
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-outline-primary {
+  color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  background-color: transparent;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}
+
+/* Font family dan modal body */
+.modal-body {
+  font-family: 'Poppins', sans-serif;
+  padding: 2rem;
+  border-radius: 20px;
+  position: relative;
+}
+
+/* Judul modal */
+.modal-title {
+  font-weight: 600;
+  font-size: 16px;
+  margin-top: 1rem;
+}
+
+/* Button style sama seperti modal-add-feedback */
+.btn-rounded {
+  background-color: #1BB6C1;
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+}
+
+.btn-rounded:hover {
+  background-color: #17a2b8;
+}
+
+.btn-primary {
+  background-color: #1BB6C1;
+  border: 2px solid #1BB6C1;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}

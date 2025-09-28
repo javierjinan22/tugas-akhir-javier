@@ -1,0 +1,323 @@
+/* ✅ MODAL CONTENT - TETAP SAMA */
+.custom-modal-content {
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: visible !important;
+}
+
+.modal-body {
+  font-family: 'Poppins', sans-serif;
+  padding: 2rem;
+  border-radius: 20px;
+  position: relative;
+}
+
+/* ✅ ICON SUCCESS OVERLAPPING - TETAP SAMA */
+.icon-success-wrapper {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #1BB6C1;
+  /* background-color: #ffd600; */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
+  z-index: 1000;
+}
+
+.icon-success-wrapper fa-icon {
+  color: #fff;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+/* ✅ MODAL TITLE - TETAP SAMA */
+.modal-title {
+  font-weight: 600;
+  font-size: 18px;
+  margin-top: 1rem;
+  color: #333;
+}
+
+/* ✅ PROFILE NAME - TETAP SAMA */
+.profile-name {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.profile-name strong {
+  color: #125B9A;;
+  font-weight: 600;
+}
+
+/* ✅ SUBTITLE - TETAP SAMA */
+.subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 0;
+}
+
+/* ✅ PROFILE INFO SECTION - TETAP SAMA */
+.profile-info-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e9ecef;
+  margin-top: 1.5rem;
+}
+
+.form-label {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+/* ✅ PERBAIKI: Layout vertikal dengan spacing yang lebih baik */
+.profile-info-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-height: 450px; /* ✅ TAMBAH tinggi untuk tampilkan lebih banyak konten */
+  overflow-y: auto;
+  padding: 15px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+}
+
+/* ✅ PERBAIKI: Info card styling dengan padding yang lebih baik */
+.info-card {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  min-height: auto; /* ✅ HAPUS fixed height */
+}
+
+.info-card:hover {
+  border-color: #1BB6C1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(27, 182, 193, 0.2);
+}
+
+.info-card-header {
+  background: rgba(27, 182, 193, 0.1);
+  padding: 12px 15px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #125B9A;;
+  font-size: 14px;
+}
+
+.info-card-body {
+  padding: 18px; /* ✅ TAMBAH padding */
+}
+
+/* ✅ PERBAIKI: Info row dengan spacing yang lebih baik */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 10px 0; /* ✅ TAMBAH padding vertikal */
+  border-bottom: 1px solid #f8f9fa;
+  min-height: 35px; /* ✅ TAMBAH minimum height */
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ✅ PERBAIKI: Label dengan lebar yang fleksibel */
+.info-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex: 0 0 45%; /* ✅ PERBESAR dari 40% ke 45% */
+  margin-right: 10px; /* ✅ TAMBAH margin */
+}
+
+/* ✅ PERBAIKI: Value dengan word wrapping yang lebih baik */
+.info-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #495057;
+  text-align: right;
+  flex: 1;
+  word-break: break-word;
+  line-height: 1.4; /* ✅ TAMBAH line height */
+  overflow-wrap: break-word; /* ✅ TAMBAH untuk handle text panjang */
+}
+
+/* ✅ LOADING STATE - TETAP SAMA */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.3em;
+}
+
+.text-muted {
+  color: #6c757d !important;
+  font-size: 14px;
+}
+
+/* ✅ ALERT STYLING - TETAP SAMA */
+.alert-danger {
+  border-radius: 12px;
+  border: 1px solid #f5c6cb;
+  background-color: #f8d7da;
+  color: #721c24;
+  font-size: 14px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+/* ✅ BUTTON STYLING - TETAP SAMA */
+.btn-cancel {
+  background-color: transparent;
+  border: 2px solid #ddd;
+  color: #666;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  padding: 12px 40px;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.btn-cancel:hover {
+  background-color: #f8f9fa;
+  border-color: #1BB6C1;
+  color: #1BB6C1;
+}
+
+/* ✅ SCROLLBAR STYLING - TETAP SAMA */
+.profile-info-vertical::-webkit-scrollbar {
+  width: 8px;
+}
+
+.profile-info-vertical::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.profile-info-vertical::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 6px;
+}
+
+.profile-info-vertical::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ✅ PERBAIKI RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .modal-body {
+    padding: 1.5rem;
+  }
+  
+  .profile-info-vertical {
+    max-height: 350px;
+    padding: 12px;
+  }
+  
+  .info-card-body {
+    padding: 15px;
+  }
+  
+  /* ✅ PERBAIKI: Layout mobile dengan stack vertikal */
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 12px 0;
+    min-height: auto;
+  }
+  
+  .info-label {
+    font-size: 12px;
+    flex: none;
+    margin-bottom: 4px;
+  }
+  
+  .info-value {
+    font-size: 14px;
+    text-align: left;
+    flex: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .icon-success-wrapper {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+  }
+  
+  .icon-success-wrapper fa-icon {
+    font-size: 1.5rem;
+  }
+  
+  .modal-body {
+    padding: 1.25rem;
+  }
+  
+  .profile-info-vertical {
+    max-height: 300px;
+    padding: 10px;
+  }
+  
+  .info-card-header {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .info-card-body {
+    padding: 12px;
+  }
+  
+  .info-row {
+    padding: 10px 0;
+  }
+  
+  .profile-info-section {
+    padding: 15px;
+  }
+  
+  .btn-cancel {
+    padding: 10px 30px;
+    font-size: 14px;
+  }
+}
+
+/* ✅ TAMBAH: Untuk modal yang lebih besar */
+@media (min-width: 992px) {
+  .custom-modal-content {
+    min-width: 600px;
+  }
+  
+  .profile-info-vertical {
+    max-height: 500px;
+  }
+  
+  .info-row {
+    padding: 12px 0;
+  }
+  
+  .info-card-body {
+    padding: 20px;
+  }
+}

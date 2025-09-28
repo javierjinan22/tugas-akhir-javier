@@ -1,0 +1,125 @@
+<div class="modal-content custom-modal-content">
+  <div class="modal-body position-relative">
+    
+    <!-- ✅ Icon Success Overlapping - SAMA SEPERTI MODAL LAIN -->
+    <div class="icon-success-wrapper">
+      <fa-icon [icon]="getProfileIcon()"></fa-icon>
+    </div>
+
+    <!-- ✅ TITLE - SAMA SEPERTI MODAL LAIN -->
+    <h5 class="modal-title text-center mt-4">Profil Pengguna</h5>
+    
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-4">
+      <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mb-0">Memuat profil...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && !loading" class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ error }}
+      <button class="btn btn-sm btn-outline-danger ms-2" (click)="retryLoad()">
+        Coba Lagi
+      </button>
+    </div>
+
+    <!-- Profile Content -->
+    <div *ngIf="!loading && !error && userProfile" class="profile-content">
+      
+      <!-- ✅ DESCRIPTION - SAMA SEPERTI MODAL LAIN -->
+      <div class="text-center mt-3 mb-4">
+        <p class="profile-name">Halo, <strong>{{ userProfile.nama_lengkap }}</strong></p>
+        <p class="subtitle">{{ getRoleDisplayName() }} di {{ userProfile.sekolah?.nama || 'Sekolah' }}</p>
+      </div>
+
+      <!-- ✅ PROFILE INFO SECTION - LAYOUT 3 CARDS VERTICAL -->
+      <div class="profile-info-section">
+        <label class="form-label fw-semibold">Informasi Profil</label>
+        
+        <!-- ✅ UBAH: Layout menjadi 3 card vertikal -->
+        <div class="profile-info-vertical">
+          
+          <!-- Card 1: Basic Info -->
+          <div class="info-card">
+            <div class="info-card-header">
+              <fa-icon [icon]="faUser" class="me-2" style="color: #125B9A;"></fa-icon>
+              <span>Informasi Dasar</span>
+            </div>
+            <div class="info-card-body">
+              <div class="info-row">
+                <span class="info-label">Username</span>
+                <span class="info-value">{{ userProfile.username }}</span>
+              </div>
+              <div class="info-row" *ngIf="userProfile.email">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ userProfile.email }}</span>
+              </div>
+              <div class="info-row" *ngIf="userProfile.nuptk">
+                <span class="info-label">NUPTK</span>
+                <span class="info-value">{{ userProfile.nuptk }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: School Info -->
+          <div class="info-card" *ngIf="userProfile.sekolah">
+            <div class="info-card-header">
+              <fa-icon [icon]="faSchool" class="me-2" style="color: #125B9A;"></fa-icon>
+              <span>Sekolah</span>
+            </div>
+            <div class="info-card-body">
+              <div class="info-row">
+                <span class="info-label">Nama Sekolah</span>
+                <span class="info-value">{{ userProfile.sekolah.nama }}</span>
+              </div>
+              <div class="info-row" *ngIf="userProfile.sekolah.npsn">
+                <span class="info-label">NPSN</span>
+                <span class="info-value">{{ userProfile.sekolah.npsn }}</span>
+              </div>
+              <div class="info-row" *ngIf="userProfile.kelas">
+                <span class="info-label">Kelas</span>
+                <span class="info-value">{{ userProfile.kelas.nama_kelas }}</span>
+              </div>
+              <div class="info-row" *ngIf="userProfile.kelas">
+                <span class="info-label">Tahun Ajaran</span>
+                <span class="info-value">{{ userProfile.kelas.tahun_ajaran }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Class Info -->
+          <!-- <div class="info-card" *ngIf="userProfile.kelas">
+            <div class="info-card-header">
+              <fa-icon [icon]="faUsers" class="text-primary me-2"></fa-icon>
+              <span>Kelas</span>
+            </div>
+            <div class="info-card-body">
+              <div class="info-row">
+                <span class="info-label">Kelas</span>
+                <span class="info-value">{{ userProfile.kelas.nama_kelas }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Tahun Ajaran</span>
+                <span class="info-value">{{ userProfile.kelas.tahun_ajaran }}</span>
+              </div>
+            </div>
+          </div> -->
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ ACTION BUTTONS - SAMA SEPERTI MODAL LAIN -->
+    <div class="d-flex justify-content-center gap-3 mt-4">
+      <button 
+        type="button" 
+        class="btn btn-cancel" 
+        (click)="closeModal()">
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>

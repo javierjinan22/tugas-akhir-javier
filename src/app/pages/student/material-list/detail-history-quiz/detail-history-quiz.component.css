@@ -138,10 +138,10 @@
 
 .question-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; 
   align-items: flex-start;
   margin-bottom: 16px;
-  gap: 12px; /* Add spacing between elements */
+  gap: 12px;
 }
 
 .question-number-circle {
@@ -161,9 +161,23 @@
 .question-text {
   font-size: 16px;
   font-weight: 500;
+  text-align: left !important;
+  line-height: 1.4;
+}
+
+.question-text-html {
+  text-align: left !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100%;
+  display: block;
+}
+
+.question-text-container {
+  text-align: left !important;
   flex-grow: 1;
   margin-right: 16px;
-  line-height: 1.4; /* Better text alignment with circle */
+  line-height: 1.4;
 }
 
 .score-badge {
@@ -176,7 +190,11 @@
   font-weight: bold;
   color: rgb(255, 255, 255);
   font-size: 16px;
-  flex-shrink: 0; /* Prevent shrinking */
+  flex-shrink: 0; 
+}
+
+.score-badge i {
+  font-size: 14px; 
 }
 
 .score-badge.correct {
@@ -680,6 +698,13 @@
 
 .btn-text {
   font-weight: 600;
+}
+
+.question-text-container,
+.question-text-html {
+  text-align: left !important;
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
 }
 
 /* Animations */

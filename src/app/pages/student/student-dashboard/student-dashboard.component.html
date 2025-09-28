@@ -1,140 +1,232 @@
-
-
 <div class="container mt-1">
 
-<div class="page-section">
-  <!-- Banner -->
-  <div class="dashboard-banner text-white">
-    <h3>Selamat datang di <span>Literadoo</span></h3>
-    <p class="mb-1" style="font-size:1.18rem;font-weight:500;">
-      Semangat belajar literasi digital!
-    </p>
-    <button class="btn btn-tambah mt-2" (click)="onMulaiBelajar()">
-      Mulai belajar
-      <i class="fa-solid fa-angle-right"></i>
-    </button>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-muted">Memuat dashboard...</p>
   </div>
-</div>
 
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="alert alert-danger mb-4">
+    <div class="d-flex align-items-center">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      <div class="flex-grow-1">{{ error }}</div>
+      <button class="btn btn-sm btn-outline-danger" (click)="retryLoadData()">
+        <i class="fas fa-redo me-1"></i>
+        Coba Lagi
+      </button>
+    </div>
+  </div>
 
+  <!-- Main Content -->
+  <div *ngIf="!loading && !error">
 
-<div class="page-section">
-    <h3 class="sub-title">Ringkasan</h3>
-  <!-- Ringkasan Card -->
-  <div class="row g-4">
-    <div class="col-md-6 col-12">
-      <div class="summary-card-custom summary-on-progress">
-        <div class="d-flex align-items-center mb-2">
-          <div class="icon-bg me-3">
-            <i class="fa-solid fa-book-open"></i>
-          </div>
-          <div>
-            <div class="summary-value-custom">Materi belum selesai</div>
-            <div class="summary-label-custom">8 Materi</div>
-          </div>
-        </div>
-        <hr class="divider-line">
-        <div class="d-flex justify-content-between align-items-center summary-footer-custom">
-          <span class="summary-detail-btn">Lihat detail</span>
+    <!-- Banner Section -->
+    <div class="page-section">
+      <div class="dashboard-banner text-white">
+        <h3>
+          Selamat datang 
+          <span *ngIf="studentName !== 'Siswa'; else defaultName">{{ studentName }}</span>
+          <ng-template #defaultName>
+            <span class="name-loading">{{ studentName }}</span>
+          </ng-template>
+        </h3>
+        <p class="mb-1" style="font-size:1.18rem;font-weight:500;">
+          Semangat belajar literasi digital!
+        </p>
+        <button class="btn btn-tambah mt-2" (click)="onMulaiBelajar()">
+          Mulai belajar
           <i class="fa-solid fa-angle-right"></i>
-        </div>
+        </button>
       </div>
     </div>
 
-    <div class="col-md-6 col-12">
-      <div class="summary-card-custom summary-selesai">
-        <div class="d-flex align-items-center mb-2">
-          <div class="icon-bg me-3">
-            <i class="fa-solid fa-archive"></i>
+    <!-- Summary Section -->
+    <div class="page-section">
+      <h3 class="sub-title">Ringkasan</h3>
+      
+      <div class="row g-4">
+        <div class="col-md-6 col-12">
+          <div class="summary-card-custom summary-on-progress" 
+               (click)="onViewUncompletedMaterials()"
+               style="cursor: pointer;">
+            <div class="d-flex align-items-center mb-2">
+              <div class="icon-bg me-3">
+                <i class="fa-solid fa-book-open"></i>
+              </div>
+              <div>
+                <div class="summary-value-custom">Materi belum selesai</div>
+                <div class="summary-label-custom">{{ uncompletedCount }} Materi</div>
+              </div>
+            </div>
+            <hr class="divider-line">
+            <div class="d-flex justify-content-between align-items-center summary-footer-custom">
+              <span class="summary-detail-btn">Lihat detail</span>
+              <i class="fa-solid fa-angle-right"></i>
+            </div>
           </div>
-          <div>
-            <div class="summary-value-custom">Materi sudah selesai</div>
-            <div class="summary-label-custom">3 Materi</div>
+        </div>
+
+        <div class="col-md-6 col-12">
+          <div class="summary-card-custom summary-selesai"
+               (click)="onViewCompletedMaterials()"
+               style="cursor: pointer;">
+            <div class="d-flex align-items-center mb-2">
+              <div class="icon-bg me-3">
+                <i class="fa-solid fa-archive"></i>
+              </div>
+              <div>
+                <div class="summary-value-custom">Materi sudah selesai</div>
+                <div class="summary-label-custom">{{ completedCount }} Materi</div>
+              </div>
+            </div>
+            <hr class="divider-line">
+            <div class="d-flex justify-content-between align-items-center summary-footer-custom">
+              <span class="summary-detail-btn">Lihat detail</span>
+              <i class="fa-solid fa-angle-right"></i>
+            </div>
           </div>
         </div>
-        <hr class="divider-line">
-        <div class="d-flex justify-content-between align-items-center summary-footer-custom">
-          <span class="summary-detail-btn">Lihat detail</span>
-          <i class="fa-solid fa-angle-right"></i>
-        </div>
       </div>
     </div>
-    
-  </div>
-</div>
 
-<!-- Recommended Materials Section -->
-<div class="page-section">
-  <h3 class="sub-title">Rekomendasi Materi</h3>
-  
-  <div class="materials-scroll-container">
-    <div class="materials-scroll-wrapper">
-      <!-- Material Card 1 -->
-      <div class="material-card">
-        <div class="material-image-placeholder">
-          <img src="assets/img/placeholder.png" alt="Material thumbnail">
+    <!-- Content Section dengan Top 3 dan Feedback - 50/50 Layout -->
+    <div class="page-section">
+      <div class="row g-3">
+        
+        <!-- ✅ Left Section: Top 3 Siswa di Kelasmu - col-6 -->
+        <div class="col-md-6 col-12">
+          <!-- ✅ Title dan Button di luar card -->
+          <!-- <div class="d-flex justify-content-between align-items-center mb-3"> -->
+          <div class="section-header d-flex justify-content-between align-items-center">
+            <h3 class="sub-title">Top 3 Siswa di Kelasmu</h3>
+            <!-- ✅ PERBAIKI: Button hanya muncul jika ada data ranking yang valid -->
+            <button *ngIf="hasValidRankingsData()" 
+                    class="btn btn-outline-primary btn-sm mb-3" 
+                    (click)="onViewAllRankings()">
+              <i class="fas fa-trophy me-1"></i>
+              Lihat Semua Peringkat
+            </button>
+          </div>
+
+          <!-- Rankings Loading State -->
+          <div *ngIf="rankingsLoading" class="text-center py-4">
+            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="small text-muted mb-0">Memuat peringkat...</p>
+          </div>
+
+          <!-- ✅ PERBAIKI: Empty State untuk Rankings -->
+          <div *ngIf="!rankingsLoading && !hasValidRankingsData()" class="empty-rankings-state">
+            <div class="text-center py-4">
+              <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
+              <!-- ✅ PERBAIKI: Pesan yang lebih akurat -->
+              <h6 class="text-muted">
+                <span *ngIf="totalStudentsInClass > 1; else soloStudent">
+                  Belum ada siswa yang menyelesaikan kuis
+                </span>
+                <ng-template #soloStudent>
+                  Belum ada kuis yang dikerjakan
+                </ng-template>
+              </h6>
+              <p class="small text-muted mb-3">
+                <span *ngIf="totalStudentsInClass > 1; else soloStudentDesc">
+                  Peringkat akan muncul setelah ada siswa di kelas yang menyelesaikan kuis
+                </span>
+                <ng-template #soloStudentDesc>
+                  Selesaikan materi dan kerjakan kuis untuk melihat peringkatmu
+                </ng-template>
+              </p>
+            </div>
+          </div>
+          
+          <!-- ✅ Rankings List - hanya tampil jika ada data valid -->
+          <div *ngIf="!rankingsLoading && hasValidRankingsData()" class="rankings-container">
+            <div *ngFor="let ranking of topRankings; trackBy: trackByStudentId; let i = index" 
+                class="ranking-card-new"
+                [ngClass]="{
+                  'rank-1-card': ranking.rank === 1,
+                  'rank-2-card': ranking.rank === 2,
+                  'rank-3-card': ranking.rank === 3
+                }">
+              
+              <!-- Badge selalu muncul -->
+              <div class="rank-badge-new">
+                <img [src]="getRankBadge(ranking.rank)" 
+                    [alt]="'Badge rank ' + ranking.rank" 
+                    class="badge-image">
+              </div>
+              
+              <!-- Student name -->
+              <div class="student-name-new">
+                {{ ranking.nama_siswa }}
+              </div>
+              
+              <!-- Score -->
+              <div class="score-new">
+                {{ ranking.score }}
+              </div>
+            </div>
+          </div>
         </div>
-        <h5 class="material-title">Etika Penggunaan Internet</h5>
-        <p class="material-description">Deskripsi singkat</p>
-        <a class="material-link">
-          Lihat materi
-          <i class="fas fa-arrow-right ms-1"></i>
-        </a>
-      </div>
-      
-      <!-- Material Card 2 -->
-      <div class="material-card">
-        <div class="material-image-placeholder">
-          <img src="assets/img/placeholder.png" alt="Material thumbnail">
+
+        <!-- ✅ Right Section: Feedback dari guru - col-6 -->
+        <div class="col-md-6 col-12">
+          <div class="section-header">
+          <h3 class="sub-title">Feedback dari guru</h3>
+          <img src="assets/img/feedback.png" alt="Feedback" class="feedback-icon-img ms-2">
+          
         </div>
-        <h5 class="material-title">Literasi Digital Dasar</h5>
-        <p class="material-description">Deskripsi singkat</p>
-        <a class="material-link">
-          Lihat materi
-          <i class="fas fa-arrow-right ms-1"></i>
-        </a>
-      </div>
-      
-      <!-- Material Card 3 -->
-      <div class="material-card">
-        <div class="material-image-placeholder">
-          <img src="assets/img/placeholder.png" alt="Material thumbnail">
+
+          <!-- <div class="feedback-section-dashboard"> -->
+            <!-- Feedback Loading State -->
+            <div *ngIf="feedbacksLoading" class="text-center py-4">
+              <div class="spinner-border spinner-border-sm text-primary mb-2" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="small text-muted mb-0">Memuat feedback...</p>
+            </div>
+
+            <!-- ✅ Feedback List -->
+            <div class="feedback-list-dashboard" *ngIf="!feedbacksLoading && feedbacks.length > 0">
+              <div *ngFor="let feedback of feedbacks; trackBy: trackByFeedbackId" class="feedback-card-dashboard">
+                <div class="feedback-header">
+                  <h4 class="feedback-title">{{ feedback.judul_materi }}</h4>
+                  <span class="feedback-category" 
+                        [style.background-color]="getCategoryColor(feedback.kategori_materi)">
+                    {{ feedback.kategori_materi }}
+                  </span>
+                </div>
+                <p class="feedback-description">{{ feedback.feedback_text }}</p>
+                <div class="feedback-meta">
+                  <span class="feedback-teacher">{{ feedback.guru_name }}</span>
+                  <span class="feedback-date">{{ formatDate(feedback.created_at) }}</span>
+                </div>
+                <div class="feedback-actions">
+                  <button class="btn-go-to-material" (click)="viewMaterial(feedback)">
+                    Lihat Materi
+                    <i class="fas fa-arrow-right"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State untuk Feedback -->
+            <div *ngIf="!feedbacksLoading && feedbacks.length === 0" class="no-feedback-dashboard">
+              <div class="text-center py-4">
+                <i class="fas fa-comment-slash fa-3x mb-3 text-muted"></i>
+                <h6 class="text-muted mb-2">Belum ada feedback</h6>
+                <p class="small text-muted mb-3">Feedback dari guru akan muncul di sini setelah kamu menyelesaikan materi</p>
+              </div>
+            </div>
+          <!-- </div> -->
         </div>
-        <h5 class="material-title">Etika Penggunaan Internet</h5>
-        <p class="material-description">Deskripsi singkat</p>
-        <a class="material-link">
-          Lihat materi
-          <i class="fas fa-arrow-right ms-1"></i>
-        </a>
-      </div>
-      
-      <!-- Material Card 4 -->
-      <div class="material-card">
-        <div class="material-image-placeholder">
-          <img src="assets/img/placeholder.png" alt="Material thumbnail">
-        </div>
-        <h5 class="material-title">Keamanan Digital</h5>
-        <p class="material-description">Deskripsi singkat</p>
-        <a class="material-link">
-          Lihat materi
-          <i class="fas fa-arrow-right ms-1"></i>
-        </a>
-      </div>
-      
-      <!-- Material Card 5 (for scrolling effect) -->
-      <div class="material-card">
-        <div class="material-image-placeholder">
-          <img src="assets/img/placeholder.png" alt="Material thumbnail">
-        </div>
-        <h5 class="material-title">Media Sosial</h5>
-        <p class="material-description">Deskripsi singkat</p>
-        <a class="material-link">
-          Lihat materi
-          <i class="fas fa-arrow-right ms-1"></i>
-        </a>
+
       </div>
     </div>
-  </div>
-</div>
 
+  </div>
 </div>

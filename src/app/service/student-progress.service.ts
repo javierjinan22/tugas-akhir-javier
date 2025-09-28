@@ -9,6 +9,7 @@ export interface MaterialSummary {
   judul_materi: string;
   deskripsi_singkat?: string;
   kategori_materi: string;
+  header_gambar?: string;
   total_bab: number;
   total_soal: number;
   has_quiz: boolean;
@@ -176,9 +177,25 @@ export class StudentProgressService {
     );
   }
 
-  submitQuizAttempt(materiId: string, answers: any[], token?: string): Observable<any> {
+  // submitQuizAttempt(materiId: string, answers: any[], token?: string): Observable<any> {
+  //   const headers = this.getHeaders(token);
+  //   const body = { answers };
+
+  //   return this.http.post(`${this.apiUrl}/materi/${materiId}/quiz/submit`, body, { headers }).pipe(
+  //     catchError(error => {
+  //       console.error('Error in submitQuizAttempt:', error);
+  //       return throwError(() => error);
+  //     })
+  //   );
+  // }
+
+  submitQuizAttempt(materiId: string, answers: any[], quizStartTime: Date, token?: string): Observable<any> {
     const headers = this.getHeaders(token);
-    const body = { answers };
+    
+    const body = { 
+      answers: answers,
+      started_at: quizStartTime.toISOString()  // ✅ TAMBAH INI
+    };
 
     return this.http.post(`${this.apiUrl}/materi/${materiId}/quiz/submit`, body, { headers }).pipe(
       catchError(error => {
@@ -186,7 +203,7 @@ export class StudentProgressService {
         return throwError(() => error);
       })
     );
-  }
+}
 
   updateLastAccessed(materiId: string, token?: string): Observable<any> {
     const headers = this.getHeaders(token);

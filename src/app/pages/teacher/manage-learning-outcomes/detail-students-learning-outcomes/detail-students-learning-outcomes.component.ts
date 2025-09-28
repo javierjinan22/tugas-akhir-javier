@@ -5,6 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { TeacherProgressService, StudentProgress, MaterialStudentsProgressResponse } from 'src/app/service/teacher-progress.service';
 import { ModalAddFeedbackComponent } from '../modal-add-feedback/modal-add-feedback.component';
+import { ModalViewFeedbackComponent } from '../modal-view-feedback/modal-view-feedback.component';
 
 @Component({
   selector: 'app-detail-students-learning-outcomes',
@@ -13,7 +14,6 @@ import { ModalAddFeedbackComponent } from '../modal-add-feedback/modal-add-feedb
 })
 export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestroy {
 
-  // ✅ UPDATED: Properties untuk data dinamis dengan classId dan materiId
   classId: string = '';
   materiId: string = '';
   materiInfo: any = null;
@@ -37,6 +37,13 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
   sortBy: 'name' | 'status' | 'progress' | 'score' = 'name';
   sortDirection: 'asc' | 'desc' = 'asc';
 
+  feedbackStatus: { [key: string]: boolean } = {};
+  loadingFeedbackStatus: boolean = false;
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -51,9 +58,9 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.classId = params['classId'];
       this.materiId = params['materiId'];
-      
+
       console.log('Route params:', { classId: this.classId, materiId: this.materiId });
-      
+
       if (this.classId && this.materiId) {
         this.loadMaterialStudentsProgress();
       } else {
@@ -67,7 +74,36 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     this.destroy$.complete();
   }
 
-  // ✅ UPDATED: Load data siswa dari backend dengan classId dan materiId
+  loadFeedbackStatusForAllStudents(): void {
+    if (this.students.length === 0) return;
+
+    this.loadingFeedbackStatus = true;
+    let completedRequests = 0;
+
+    this.students.forEach(student => {
+      this.teacherProgressService.getStudentFeedback(student._id, this.materiId).subscribe({
+        next: (response) => {
+          // ✅ PERBAIKI: Response.data adalah array
+          this.feedbackStatus[student._id] = response.success && response.data && response.data.length > 0;
+          completedRequests++;
+
+          if (completedRequests === this.students.length) {
+            this.loadingFeedbackStatus = false;
+          }
+        },
+        error: () => {
+          this.feedbackStatus[student._id] = false;
+          completedRequests++;
+
+          if (completedRequests === this.students.length) {
+            this.loadingFeedbackStatus = false;
+          }
+        }
+      });
+    });
+  }
+
+  // Load data siswa dari backend dengan classId dan materiId
   loadMaterialStudentsProgress(): void {
     this.loading = true;
     this.errorMsg = '';
@@ -79,14 +115,15 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
       .subscribe({
         next: (response: MaterialStudentsProgressResponse) => {
           console.log('✅ Material students progress response:', response);
-          
+
           if (response.success) {
             this.materiInfo = response.data.materi_info;
             this.students = response.data.students || [];
             this.statistics = response.data.statistics;
             this.filteredStudents = [...this.students];
-            
-            // Show message if no students found
+
+            this.loadFeedbackStatusForAllStudents();
+
             if (this.students.length === 0) {
               this.errorMsg = 'Belum ada siswa yang terdaftar untuk materi ini di kelas yang dipilih.';
             }
@@ -95,14 +132,14 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
             this.students = [];
             this.filteredStudents = [];
           }
-          
+
           this.loading = false;
         },
         error: (error) => {
           console.error('❌ Error loading material students:', error);
-          
+
           let errorMessage = 'Gagal memuat data siswa. ';
-          
+
           if (error.status === 401) {
             errorMessage += 'Sesi login telah berakhir. Silakan login ulang.';
           } else if (error.status === 403) {
@@ -114,7 +151,7 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
           } else {
             errorMessage += 'Silakan coba lagi.';
           }
-          
+
           this.errorMsg = errorMessage;
           this.students = [];
           this.filteredStudents = [];
@@ -123,23 +160,29 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
       });
   }
 
-  // ✅ UPDATED: Send feedback dengan data real menggunakan materiId yang benar
   sendFeedback(student: StudentProgress): void {
-    const initialState = { 
-      student,
-      materiInfo: this.materiInfo,
-      materiId: this.materiId, // ✅ TAMBAH: Pass materiId
-      classId: this.classId,   // ✅ TAMBAH: Pass classId
-      onFeedbackSent: () => {
-        // Optional: refresh data atau show success message
-        console.log('Feedback sent successfully');
-        this.refreshData();
+  const initialState = {
+    student,
+    materiInfo: this.materiInfo,
+    materiId: this.materiId,
+    classId: this.classId,
+    onFeedbackSent: (success: boolean, message: string) => {
+      if (success) {
+        this.showSuccessToast(message || 'Feedback berhasil dikirim!');
+      } else {
+        this.showErrorToast(message || 'Gagal mengirim feedback.');
       }
-    };
-    this.modalService.show(ModalAddFeedbackComponent, { 
-      class: 'modal-dialog-centered', 
-      initialState 
-    });
+      this.loadFeedbackStatusForAllStudents();
+    }
+  };
+  this.modalService.show(ModalAddFeedbackComponent, {
+    class: 'modal-dialog-centered',
+    initialState
+  });
+}
+
+  hasFeedback(student: StudentProgress): boolean {
+    return this.feedbackStatus[student._id] || false;
   }
 
   lihatDetailQuiz(student: StudentProgress): void {
@@ -154,12 +197,30 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     ]);
   }
 
-  // ✅ UPDATED: Back to detail learning outcomes dengan classId
-  backToDetailLearningOutcomes(): void {
-    this.router.navigate(['/guru/hasil-belajar/detail-materi-belajar', this.classId]);
+  viewFeedback(student: StudentProgress): void {
+    const initialState = {
+      student,
+      materiInfo: this.materiInfo,
+      materiId: this.materiId,
+      classId: this.classId,
+      onFeedbackUpdated: () => {
+        console.log('Feedback updated, refreshing status');
+        this.loadFeedbackStatusForAllStudents();
+      }
+    };
+
+    this.modalService.show(ModalViewFeedbackComponent, {
+      class: 'modal-lg modal-dialog-centered',
+      initialState
+    });
   }
 
-  // ✅ UPDATED: Navigate to answer review dengan parameter yang benar
+  // Back to detail learning outcomes dengan classId
+  backToDetailLearningOutcomes(): void {
+    this.router.navigate(['/guru/hasil-belajar']);
+  }
+
+  //  Navigate to answer review dengan parameter yang benar
   koreksiJawaban(student: StudentProgress): void {
     this.router.navigate([
       '/guru/hasil-belajar/detail-materi-belajar',
@@ -172,12 +233,12 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     ]);
   }
 
-  // ✅ UPDATED: Search function
+  // Search function
   onSearch(): void {
     this.applyFilters();
   }
 
-  // ✅ TAMBAH: Apply filters dan search
+  //  Apply filters dan search
   applyFilters(): void {
     let filtered = [...this.students];
 
@@ -194,19 +255,19 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     this.filteredStudents = filtered;
   }
 
-  // ✅ TAMBAH: Status change
+  // Status change
   onStatusChange(): void {
     this.applyFilters();
   }
 
-  // ✅ TAMBAH: Reset filters
+  // Reset filters
   resetFilters(): void {
     this.keyword = '';
     this.selectedStatus = 'all';
     this.onSearch();
   }
 
-  // ✅ TAMBAH: Sort functionality
+  // Sort functionality
   sortStudents(criteria: 'name' | 'status' | 'progress' | 'score'): void {
     if (this.sortBy === criteria) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -216,24 +277,24 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     }
 
     this.filteredStudents = this.teacherProgressService.sortStudents(this.filteredStudents, criteria);
-    
+
     if (this.sortDirection === 'desc') {
       this.filteredStudents.reverse();
     }
   }
 
-  // ✅ TAMBAH: Get sort icon
+  // Get sort icon
   getSortIcon(criteria: 'name' | 'status' | 'progress' | 'score'): string {
     if (this.sortBy !== criteria) return 'fas fa-sort';
     return this.sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
   }
 
-  // ✅ TAMBAH: Refresh data
+  // Refresh data
   refreshData(): void {
     this.loadMaterialStudentsProgress();
   }
 
-  // ✅ TAMBAH: Helper methods
+  // Helper methods
   getTotalStudentsCount(): number {
     return this.students.length;
   }
@@ -246,32 +307,32 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     return this.keyword.trim() !== '' || this.selectedStatus !== 'all';
   }
 
-  // ✅ TAMBAH: Get student status badge
+  // Get student status badge
   getStudentStatusBadge(status: string): { class: string; text: string } {
     return this.teacherProgressService.getStudentStatusBadge(status);
   }
 
-  // ✅ TAMBAH: Get progress percentage
+  // Get progress percentage
   getProgressPercentage(student: StudentProgress): number {
     return this.teacherProgressService.getBabCompletionPercentage(student.completed_babs, student.total_babs);
   }
 
-  // ✅ TAMBAH: Get progress color
+  // Get progress color
   getProgressColor(percentage: number): string {
     return this.teacherProgressService.getProgressColor(percentage);
   }
 
-  // ✅ TAMBAH: Format nilai
+  // Format nilai
   formatNilai(nilai: number | null): string {
     return this.teacherProgressService.formatNilai(nilai);
   }
 
-  // ✅ TAMBAH: Format date
+  // Format date
   formatDate(date: Date | string | null): string {
     return this.teacherProgressService.formatDate(date);
   }
 
-  // ✅ TAMBAH: Get completion status text
+  // Get completion status text
   getCompletionText(student: StudentProgress): string {
     if (student.status === 'completed') {
       return `Selesai (${student.completed_babs}/${student.total_babs} bab)`;
@@ -282,27 +343,54 @@ export class DetailStudentsLearningOutcomesComponent implements OnInit, OnDestro
     }
   }
 
-  // ✅ TAMBAH: Check if student has quiz score
+  // Check if student has quiz score
   hasQuizScore(student: StudentProgress): boolean {
     return student.nilai !== null && student.nilai !== undefined;
   }
 
-  // ✅ TAMBAH: Get quiz info text
+  // Get quiz info text
   getQuizInfoText(student: StudentProgress): string {
     if (!this.materiInfo?.has_quiz) {
       return 'Tidak ada kuis';
     }
-    
+
     if (student.quiz_attempts === 0) {
       return 'Belum mengerjakan';
     }
-    
+
     return `${student.quiz_attempts} percobaan`;
   }
 
-  // ✅ TAMBAH: Get statistics percentage
+  // Get statistics percentage
   getStatPercentage(count: number): number {
     if (!this.statistics?.total_siswa || this.statistics.total_siswa === 0) return 0;
     return Math.round((count / this.statistics.total_siswa) * 100);
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 }

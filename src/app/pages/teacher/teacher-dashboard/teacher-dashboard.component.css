@@ -25,6 +25,14 @@
   font-size: 1.1rem;
   box-shadow: none;
   margin-top: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-tambah:hover {
+  background: #ffea00;
+  color: #212121;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .page-section {
@@ -103,6 +111,12 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .summary-materi {
@@ -165,6 +179,10 @@
   color: #fff;
 }
 
+.summary-detail-btn:hover {
+  text-decoration: underline;
+}
+
 .summary-footer-custom i {
   font-size: 1.13rem;
 }
@@ -208,4 +226,219 @@
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
+}
+
+.summary-card-custom {
+  border-radius: 24px;
+  padding: 22px 18px 0 18px;
+  min-height: 165px;
+  position: relative;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card-custom:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* ✅ Hover effect untuk monitoring table rows */
+.monitoring-row:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-1px);
+  transition: all 0.2s ease;
+}
+
+/* ✅ Loading states */
+.summary-value-custom .fa-spinner {
+  font-size: 1.2rem;
+}
+
+/* ✅ Responsive adjustments */
+@media (max-width: 768px) {
+  .summary-card-custom {
+    margin-bottom: 1rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.9rem;
+  }
+}
+
+/* ✅ Filter Styling */
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #495057;
+  margin-bottom: 0;
+  min-width: 50px;
+}
+
+.custom-select-container {
+  min-width: 180px;
+}
+
+/* Custom ngx-select styling */
+.custom-select-container ::ng-deep ngx-select {
+  width: 100%;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle {
+  padding: 8px 12px;
+  border: none;
+  background-color: transparent;
+  font-size: 0.9rem;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle:hover {
+  border-color: #adb5bd;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle:focus,
+.custom-select-container ::ng-deep ngx-select .ngx-select__toggle.ngx-select__toggle--focused {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__selection {
+  color: #495057;
+  font-weight: 500;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__placeholder {
+  color: #6c757d;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__arrow {
+  border-top-color: #6c757d;
+}
+
+.custom-select-container ::ng-deep ngx-select.ngx-select--open .ngx-select__arrow {
+  border-bottom-color: #6c757d;
+  border-top-color: transparent;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__dropdown {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option:hover,
+.custom-select-container ::ng-deep ngx-select .ngx-select__option.ngx-select__option--highlighted {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option.ngx-select__option--selected {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.custom-select-container ::ng-deep ngx-select .ngx-select__option.ngx-select__option--selected:hover {
+  background-color: #0056b3;
+}
+
+/* ✅ Data Info Styling */
+.data-info {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* ✅ Pagination Styling */
+.pagination {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+}
+
+.page-link {
+  color: #1267b2;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 0.75rem;
+  margin: 0 2px;
+  border-radius: 6px !important;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.page-link:hover {
+  color: #0056b3;
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+.page-item.active .page-link {
+  background-color: #1267b2;
+  border-color: #1267b2;
+  color: #fff;
+  font-weight: 600;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #fff;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+
+.page-item.disabled .page-link:hover {
+  transform: none;
+}
+
+/* ✅ Responsive untuk Filter */
+@media (max-width: 768px) {
+  .d-flex.gap-3 {
+    flex-direction: column;
+    gap: 1rem !important;
+    align-items: stretch !important;
+  }
+  
+  .filter-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  
+  .custom-select-container {
+    min-width: 100%;
+  }
+  
+  .data-info {
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .pagination {
+    font-size: 0.8rem;
+  }
+  
+  .page-link {
+    padding: 0.4rem 0.6rem;
+  }
 }

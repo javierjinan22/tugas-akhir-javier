@@ -159,6 +159,57 @@ export interface SendFeedbackResponse {
   };
 }
 
+export interface AllMaterialsProgressResponse {
+  success: boolean;
+  data: {
+    sekolah_info: {
+      id: string;
+      nama: string;
+      npsn: string;
+    };
+    guru_info: {
+      nama: string;
+    };
+    kelas_list: Array<{
+      _id: string;
+      nama_kelas: string;
+      tahun_ajaran: string;
+      total_siswa: number;
+    }>;
+    tahun_ajaran_list: string[];
+    kategori_list: string[];
+    materials: Array<MaterialProgress & {
+      kelas_info: {
+        _id: string;
+        nama_kelas: string;
+        tahun_ajaran: string;
+        total_siswa: number;
+      };
+    }>;
+  };
+  message?: string;
+}
+
+export interface StudentFeedback {
+  _id: string;
+  student_id: string;
+  materi_id: string;
+  guru_id: string; 
+  feedback_text: string;
+  is_read: boolean;  
+  createdAt: Date; 
+  updatedAt: Date; 
+  __v: number;      
+}
+
+export interface GetStudentFeedbackResponse {
+  success: boolean;
+  data: StudentFeedback[]; 
+  total: number;          
+  latest: StudentFeedback; 
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -184,6 +235,34 @@ export class TeacherProgressService {
     
     return this.http.get<ClassesSummaryResponse>(
       `${this.apiUrl}/classes-summary`,
+      { headers }
+    );
+  }
+
+   getAllMaterialsProgress(filters?: {
+    kelas_id?: string;
+    tahun_ajaran?: string;
+    kategori?: string;
+  }): Observable<AllMaterialsProgressResponse> {
+    const headers = this.getAuthHeaders();
+    
+    let params = '';
+    if (filters) {
+      const queryParams = new URLSearchParams();
+      if (filters.kelas_id && filters.kelas_id !== 'all') {
+        queryParams.append('kelas_id', filters.kelas_id);
+      }
+      if (filters.tahun_ajaran && filters.tahun_ajaran !== 'all') {
+        queryParams.append('tahun_ajaran', filters.tahun_ajaran);
+      }
+      if (filters.kategori && filters.kategori !== 'all') {
+        queryParams.append('kategori', filters.kategori);
+      }
+      params = queryParams.toString() ? `?${queryParams.toString()}` : '';
+    }
+    
+    return this.http.get<AllMaterialsProgressResponse>(
+      `${this.apiUrl}/all-materials-progress${params}`,
       { headers }
     );
   }
@@ -222,7 +301,19 @@ export class TeacherProgressService {
     );
   }
 
-  // ✅ UTILITY METHODS sesuai data backend
+  // Method untuk mendapatkan feedback yang sudah dikirim
+getStudentFeedback(studentId: string, materiId: string): Observable<GetStudentFeedbackResponse> {
+  const headers = this.getAuthHeaders();
+  
+  const params = new URLSearchParams();
+  params.append('student_id', studentId);
+  params.append('materi_id', materiId);
+  
+  return this.http.get<GetStudentFeedbackResponse>(
+    `${this.apiUrl}/feedback?${params.toString()}`,
+    { headers }
+  );
+}
 
   // Get progress percentage untuk materi
   getMateriProgressPercentage(siswa_selesai: number, total_siswa: number): number {

@@ -24,7 +24,7 @@ export class ModalAddFeedbackComponent implements OnInit {
   materiInfo: any;
   materiId: string = '';
   classId: string = '';
-  onFeedbackSent: () => void = () => {};
+  onFeedbackSent: (success: boolean, message: string) => void = () => { };
 
   constructor(
     public activeModal: BsModalRef,
@@ -83,25 +83,26 @@ export class ModalAddFeedbackComponent implements OnInit {
     this.teacherProgressService.sendStudentFeedback(feedbackData).subscribe({
       next: (response) => {
         console.log('✅ Feedback sent successfully:', response);
-        
+
         if (response.success) {
-          // Success - close modal dan call callback
-          this.onFeedbackSent();
+          if (this.onFeedbackSent) {
+            this.onFeedbackSent(true, 'Feedback berhasil dikirim!');
+          }
           this.activeModal.hide();
-          
-          // Optional: Show success message
-          console.log('Feedback berhasil dikirim ke', response.data.student_name);
         } else {
+          if (this.onFeedbackSent) {
+            this.onFeedbackSent(false, response.message || 'Gagal mengirim feedback');
+          }
           this.errorMsg = response.message || 'Gagal mengirim feedback';
         }
-        
+
         this.loading = false;
       },
       error: (error) => {
-        console.error('❌ Error sending feedback:', error);
-        
+        console.error('Error sending feedback:', error);
+
         let errorMessage = 'Gagal mengirim feedback. ';
-        
+
         if (error.status === 401) {
           errorMessage += 'Sesi login telah berakhir.';
         } else if (error.status === 403) {
@@ -113,19 +114,19 @@ export class ModalAddFeedbackComponent implements OnInit {
         } else {
           errorMessage += 'Silakan coba lagi.';
         }
-        
+
         this.errorMsg = errorMessage;
         this.loading = false;
       }
     });
   }
 
-  // ✅ TAMBAH: Get student name untuk display
+  // Get student name untuk display
   getStudentName(): string {
     return this.student?.nama_siswa || this.siswa?.nama_siswa || 'Siswa';
   }
 
-  // ✅ TAMBAH: Get material name untuk display
+  // Get material name untuk display
   getMaterialName(): string {
     return this.materiInfo?.judul_materi || 'Materi';
   }

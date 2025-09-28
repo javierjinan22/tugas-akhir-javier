@@ -36,6 +36,22 @@ export interface SchoolApiResponse {
   success?: boolean;
 }
 
+export interface ClaimSchoolPayload {
+  npsn: string;
+  sekolah: string;
+  kode_prop?: string;
+  propinsi?: string;
+  kode_kab_kota?: string;
+  kabupaten_kota?: string;
+  kode_kec?: string;
+  kecamatan?: string;
+  alamat_jalan?: string;
+  lintang?: string;
+  bujur?: string;
+  bentuk?: string;
+  status?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class SchoolService {
   private apiUrl = environment.apiUrl + '/literadoo/schools';
@@ -48,11 +64,14 @@ export class SchoolService {
   }
 
   // Claim sekolah (butuh JWT token)
-  claimSchool(data: any, token: string): Observable<any> {
-    return this.http.put(`${this.apiUrl}/claim`, data, {
-      headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
-    });
-  }
+  claimSchool(payload: ClaimSchoolPayload, token: string): Observable<any> {
+  const headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.put(`${this.apiUrl}/claim`, payload, { headers });
+}
 
   // Return type yang tepat berdasarkan response actual
   getMySchool(token?: string): Observable<School> {

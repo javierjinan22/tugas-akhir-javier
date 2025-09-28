@@ -2,13 +2,13 @@
   <!-- Back button dan header -->
   <div class="d-flex align-items-center mb-4">
     <!-- Back button - hanya icon -->
-    <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas">
+    <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas" *ngIf="!isLoading">
       <i class="fas fa-arrow-left"></i>
     </button>
     
     <!-- Class info header -->
     <div *ngIf="classInfo">
-      <h2 class="fw-bold mb-0" style="font-size: 24px;">
+      <h2 class="fw-bold mb-0" style="font-size: 24px; font-family: Poppins;">
         Daftar siswa - {{ classInfo.nama_kelas }}
       </h2>
       <p class="text-muted mb-0" style="font-size: 14px;">
@@ -18,7 +18,7 @@
     </div>
     
     <!-- Default header jika classInfo belum tersedia -->
-    <h2 *ngIf="!classInfo && !isLoading" class="fw-bold mb-0" style="font-size: 24px;">
+    <h2 *ngIf="!classInfo && !isLoading" class="fw-bold mb-0" style="font-size: 24px; font-family: Poppins;">
       Daftar siswa
     </h2>
   </div>

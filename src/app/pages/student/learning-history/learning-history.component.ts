@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LearningHistoryService, AchievementsResponse, RankingsResponse, FeedbackResponse, MedalData, StudentRanking, FeedbackItem, StudentInfo } from '../../../service/learning-history.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { LearningHistoryService, AchievementsResponse, RankingsResponse, Feedbac
   templateUrl: './learning-history.component.html',
   styleUrls: ['./learning-history.component.css']
 })
-export class LearningHistoryComponent implements OnInit {
+export class LearningHistoryComponent implements OnInit, OnDestroy {
   loading = true;
   error = '';
 
@@ -31,13 +31,85 @@ export class LearningHistoryComponent implements OnInit {
   // Available categories for medals
   medalCategories = ['Cakap Digital', 'Aman Digital', 'Budaya Digital', 'Etika Digital'];
 
+  fromQuizResult = false;
+  contextMaterialId = '';
+  contextScore = 0;
+  
+  // ✅ TAMBAH: Properties untuk congratulation card
+  showCongratulationCard = true;
+  private congratulationTimer?: any;
+
   constructor(
     private learningHistoryService: LearningHistoryService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute 
   ) { }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['from'] === 'quiz-result') {
+        this.fromQuizResult = true;
+        this.contextMaterialId = params['materialId'] || '';
+        this.contextScore = parseInt(params['score']) || 0;
+        
+        console.log('📍 Navigated from quiz result:', {
+          materialId: this.contextMaterialId,
+          score: this.contextScore
+        });
+
+        // ✅ PERBAIKI: Pindahkan logika timer ke sini
+        if (this.fromQuizResult && this.contextScore > 0) {
+          this.showCongratulationCard = true;
+          this.congratulationTimer = setTimeout(() => {
+            this.showCongratulationCard = false;
+          }, 8000);
+        }
+        
+        this.showQuizCompletionMessage();
+      }
+    });
+
     this.loadAllData();
+  }
+
+  // ✅ TAMBAH: OnDestroy lifecycle hook
+  ngOnDestroy(): void {
+    // Clear timer when component is destroyed
+    if (this.congratulationTimer) {
+      clearTimeout(this.congratulationTimer);
+    }
+  }
+
+  // ✅ TAMBAH: Method untuk dismiss congratulation card
+  dismissCongratulationCard(): void {
+    this.showCongratulationCard = false;
+    if (this.congratulationTimer) {
+      clearTimeout(this.congratulationTimer);
+      this.congratulationTimer = undefined;
+    }
+  }
+
+  showQuizCompletionMessage(): void {
+    if (this.contextScore > 0) {
+      // Bisa menampilkan toast/alert congratulation
+      console.log(`🎉 Congratulations! You completed the quiz with score: ${this.contextScore}`);
+      
+      // Scroll ke section achievements setelah data loaded
+      setTimeout(() => {
+        this.scrollToAchievements();
+      }, 1000);
+    }
+  }
+
+  // ✅ TAMBAH: Method untuk scroll ke section achievements
+  scrollToAchievements(): void {
+    const achievementElement = document.getElementById('achievements-section');
+    if (achievementElement) {
+      achievementElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
   }
 
   loadAllData(): void {

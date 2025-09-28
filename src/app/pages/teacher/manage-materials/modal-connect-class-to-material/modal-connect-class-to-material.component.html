@@ -1,0 +1,95 @@
+<div class="modal-content custom-modal-content">
+  <div class="modal-body position-relative">
+    <!-- ✅ Icon Success Overlapping - SAMA SEPERTI MODAL DELETE -->
+    <div class="icon-success-wrapper">
+      <i class="fas fa-copy"></i>
+    </div>
+
+    <!-- ✅ TITLE - SAMA SEPERTI MODAL DELETE -->
+    <h5 class="modal-title text-center mt-4">Salin Materi ke Kelas</h5>
+    
+    <!-- ✅ DESCRIPTION - SAMA SEPERTI MODAL DELETE -->
+    <div class="text-center mt-3">
+      <p class="material-name">Pilih kelas untuk menyalin materi <strong>"{{ materialData?.judul }}"</strong></p>
+      <p class="subtitle">Materi akan disalin dan dapat diedit sesuai kebutuhan kelas</p>
+    </div>
+
+    <!-- ✅ LOADING STATE -->
+    <div *ngIf="isLoadingClasses" class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted mt-3">Memuat data kelas...</p>
+    </div>
+
+    <!-- ✅ ERROR STATE -->
+    <div *ngIf="errorMsg" class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      {{ errorMsg }}
+    </div>
+
+    <!-- ✅ CLASS SELECTION -->
+    <div *ngIf="!isLoadingClasses && kelasList.length > 0" class="class-selection">
+      <label class="form-label fw-semibold">
+        Pilih kelas yang dituju <span class="text-danger">*</span>
+      </label>
+      
+      <!-- ✅ CHECKBOX GROUP -->
+      <div class="kelas-checkbox-group">
+        <label *ngFor="let kelas of kelasList" class="kelas-checkbox" [attr.for]="'kelas-' + kelas.id">
+          <input
+            type="checkbox"
+            [id]="'kelas-' + kelas.id"
+            [checked]="selectedKelas.includes(kelas.id)"
+            (change)="onKelasChange($event, kelas.id)"
+          />
+          <span class="custom-check"></span>
+          <span class="kelas-name">{{ kelas.nama }}</span>
+        </label>
+      </div>
+
+      <!-- ✅ VALIDATION ERROR -->
+      <div *ngIf="showValidationError" class="text-danger small" role="alert">
+        <i class="fas fa-exclamation-circle me-1"></i>Pilih minimal satu kelas
+      </div>
+
+      <!-- ✅ SELECTED CLASSES INFO -->
+      <div *ngIf="selectedKelas.length > 0" class="selected-info">
+        <small class="text-success">
+          <i class="fas fa-check-circle me-1"></i>
+          <strong>{{ selectedKelas.length }} kelas dipilih:</strong> {{ getSelectedKelasNames().join(', ') }}
+        </small>
+      </div>
+    </div>
+
+    <!-- ✅ NO CLASSES AVAILABLE -->
+    <div *ngIf="!isLoadingClasses && kelasList.length === 0" class="text-center mt-4">
+      <i class="fas fa-info-circle text-muted mb-3" style="font-size: 3rem;"></i>
+      <h6 class="text-muted mb-2">Tidak ada kelas aktif tersedia</h6>
+      <p class="text-muted small mb-3">Pastikan sekolah Anda memiliki kelas yang aktif</p>
+      <button type="button" class="btn btn-outline-primary" (click)="loadClasses()">
+        <i class="fas fa-refresh me-1"></i>Muat ulang
+      </button>
+    </div>
+
+    <!-- ✅ ACTION BUTTONS - SAMA SEPERTI MODAL DELETE -->
+    <div class="d-flex justify-content-center gap-3 mt-4">
+      <button 
+        type="button" 
+        class="btn btn-cancel" 
+        (click)="cancelAction()"
+        [disabled]="isCopying">
+        Batal
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-copy-primary" 
+        (click)="copyMaterial()"
+        [disabled]="selectedKelas.length === 0 || isCopying">
+        <i class="fas fa-spinner fa-spin me-1" *ngIf="isCopying"></i>
+        <i class="fas fa-copy me-1" *ngIf="!isCopying"></i>
+        {{ isCopying ? 'Menyalin...' : 'Salin Materi' }}
+      </button>
+    </div>
+  </div>
+</div>

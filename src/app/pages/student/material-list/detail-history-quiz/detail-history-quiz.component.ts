@@ -48,7 +48,7 @@ export class DetailHistoryQuizComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private studentProgressService: StudentProgressService,
-    private sanitizer: DomSanitizer // ✅ TAMBAH: DomSanitizer untuk sanitize HTML
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -58,18 +58,54 @@ export class DetailHistoryQuizComponent implements OnInit {
       this.route.queryParams.subscribe(queryParams => {
         const attemptId = queryParams['attemptId'];
 
+        console.log('🔍 DetailHistory: Received params:', {
+          materialId: this.materialId,
+          attemptId: attemptId,
+          hasAttemptId: !!attemptId
+        });
+
         if (attemptId) {
+          console.log('✅ DetailHistory: Loading specific attempt:', attemptId);
           this.loadAttemptFromAPI(attemptId);
         } else {
-          setTimeout(() => {
-            this.loadQuizResult();
-          }, 100);
+          console.log('⚠️ DetailHistory: No attemptId, trying latest attempt first...');
+          this.loadLatestAttemptFromAPI();
         }
       });
     });
   }
 
-  // Method untuk load attempt dari API
+  loadLatestAttemptFromAPI(): void {
+    console.log('🔍 DetailHistory: Loading latest attempt from API...');
+    this.loading = true;
+    this.error = '';
+
+    this.studentProgressService.getMateriDetailForViewing(this.materialId).subscribe({
+      next: (response) => {
+        console.log('📊 DetailHistory: Material detail response:', response);
+
+        if (response.success && response.data.quiz.attempts && response.data.quiz.attempts.length > 0) {
+          const latestAttempt = response.data.quiz.attempts[0];
+          const attemptId = latestAttempt._id || latestAttempt.attempt_id;
+
+          console.log('✅ DetailHistory: Found latest attempt:', attemptId);
+          // Load detail attempt tersebut
+          this.loadAttemptFromAPI(attemptId);
+        } else {
+          console.log('⚠️ DetailHistory: No attempts found, fallback to localStorage');
+          this.loadQuizResult();
+          this.loading = false;
+        }
+      },
+      error: (error) => {
+        console.error('❌ DetailHistory: Error loading material detail:', error);
+        console.log('⚠️ DetailHistory: Fallback to localStorage due to API error');
+        this.loadQuizResult();
+        this.loading = false;
+      }
+    });
+  }
+
   loadAttemptFromAPI(attemptId: string): void {
     this.loading = true;
     this.error = '';
@@ -98,84 +134,121 @@ export class DetailHistoryQuizComponent implements OnInit {
   }
 
   buildQuizResultFromAPI(attempt: any): void {
-  console.log('🔧 Building quiz result from API:', attempt);
+    console.log('🔧 DetailHistory: Building quiz result from API:', attempt);
+    console.log('🔍 DetailHistory: Detailed answers:', attempt.detailed_answers);
 
-  this.quizResult = {
-    quizId: attempt.attempt_number || 1,
-    materialId: this.materialId,
-    completedAt: attempt.completed_at,
-    totalQuestions: attempt.total_questions,
-    score: attempt.score,
-    questions: attempt.detailed_answers.map((answer: any) => {
-      const originalQuestion = answer.question_data.question;
-      const originalOptions = answer.question_data.options || [];
+    // ✅ VALIDASI: Pastikan ada detailed_answers dan tidak kosong
+    if (!attempt.detailed_answers || !Array.isArray(attempt.detailed_answers) || attempt.detailed_answers.length === 0) {
+      console.log('❌ DetailHistory: No detailed_answers found, fallback to localStorage');
+      this.loadQuizResult();
+      return;
+    }
 
-      console.log('🔍 Processing question:', {
-        index: answer.question_index,
-        type: answer.question_data.type,
-        originalQuestion: originalQuestion.substring(0, 50) + '...',
-        correctAnswer: answer.question_data.correct_answer,
-        studentAnswer: answer.student_answer,
-        isCorrect: answer.is_correct
-      });
+    // ✅ VALIDASI: Cek jika jumlah detailed_answers sesuai dengan total_questions
+    const expectedQuestions = attempt.total_questions || 2;
+    const actualAnswers = attempt.detailed_answers.length;
 
-      // ✅ PERBAIKAN: Handle berbagai tipe soal dengan logging yang lebih detail
-      let questionType: 'multiple-choice' | 'short-answer' | 'benar-salah';
-      let correctAnswer: string | number;
-      let userAnswer: string | number;
+    if (actualAnswers < expectedQuestions) {
+      console.log(`⚠️ DetailHistory: Incomplete data (${actualAnswers}/${expectedQuestions}), checking localStorage...`);
 
-      if (answer.question_data.type === 'pilihan_ganda') {
-        questionType = 'multiple-choice';
-        correctAnswer = answer.question_data.correct_answer.charCodeAt(0) - 65;
-        userAnswer = answer.student_answer ? answer.student_answer.charCodeAt(0) - 65 : -1;
-      } else if (answer.question_data.type === 'benar_salah') {
-        questionType = 'benar-salah';
-        correctAnswer = answer.question_data.correct_answer;
-        userAnswer = answer.student_answer || '';
-        
-        console.log('🔍 Benar/Salah question details:', {
-          correctAnswer,
-          userAnswer,
-          isCorrect: answer.is_correct,
-          options: originalOptions
-        });
-      } else {
-        questionType = 'short-answer';
-        correctAnswer = answer.question_data.correct_answer;
-        userAnswer = answer.student_answer;
+      // Cek apakah localStorage punya data yang lebih lengkap
+      const savedResult = localStorage.getItem(`quiz_result_${this.materialId}`);
+      if (savedResult) {
+        try {
+          const localData = JSON.parse(savedResult);
+          if (localData.questions && localData.questions.length === expectedQuestions) {
+            console.log('✅ DetailHistory: Found complete data in localStorage, using it');
+            this.loadQuizResult();
+            return;
+          }
+        } catch (e) {
+          console.error('Error parsing localStorage:', e);
+        }
       }
 
-      const question: QuizResultQuestion = {
-        id: answer.question_index + 1,
-        question: originalQuestion,
-        questionHtml: this.sanitizeHtml(originalQuestion),
-        type: questionType,
-        options: originalOptions,
-        optionsHtml: originalOptions.map((opt: string) => this.sanitizeHtml(opt)),
-        correctAnswer: correctAnswer,
-        userAnswer: userAnswer,
-        isCorrect: answer.is_correct
-      };
+      console.log('⚠️ DetailHistory: Proceeding with incomplete API data...');
+    }
 
-      console.log('✅ Built question result:', {
-        id: question.id,
-        type: question.type,
-        correctAnswer: question.correctAnswer,
-        userAnswer: question.userAnswer,
-        isCorrect: question.isCorrect,
-        hasOptions: question.options.length > 0
-      });
+    this.quizResult = {
+      quizId: attempt.attempt_number || 1,
+      materialId: this.materialId,
+      completedAt: attempt.completed_at,
+      totalQuestions: expectedQuestions, // Gunakan expected, bukan actual
+      score: attempt.score,
+      questions: attempt.detailed_answers.map((answer: any, index: number) => {
+        const originalQuestion = answer.question_data?.question || `Soal ${index + 1}`;
+        const originalOptions = answer.question_data?.options || [];
 
-      return question;
-    })
-  };
+        console.log(`🔍 DetailHistory: Processing question ${index}:`, {
+          index: answer.question_index,
+          type: answer.question_data?.type,
+          correctAnswer: answer.question_data?.correct_answer,
+          studentAnswer: answer.student_answer,
+          isCorrect: answer.is_correct,
+          hasQuestionData: !!answer.question_data
+        });
 
-  console.log('✅ Built complete quiz result:', {
-    totalQuestions: this.quizResult.totalQuestions,
-    score: this.quizResult.score,
-    questionsWithAnswers: this.quizResult.questions.filter(q => q.userAnswer !== null && q.userAnswer !== '').length
-  });
-}
+        // Handle missing question_data
+        if (!answer.question_data) {
+          return {
+            id: answer.question_index + 1,
+            question: `Soal ${index + 1}`,
+            questionHtml: this.sanitizeHtml(`Soal ${index + 1}`),
+            type: 'multiple-choice' as const,
+            options: [],
+            optionsHtml: [],
+            correctAnswer: -1,
+            userAnswer: -1,
+            isCorrect: answer.is_correct || false
+          };
+        }
+
+        let questionType: 'multiple-choice' | 'short-answer' | 'benar-salah';
+        let correctAnswer: string | number;
+        let userAnswer: string | number;
+
+        if (answer.question_data.type === 'pilihan_ganda') {
+          questionType = 'multiple-choice';
+          correctAnswer = answer.question_data.correct_answer ?
+            answer.question_data.correct_answer.charCodeAt(0) - 65 : -1;
+
+          if (answer.student_answer && answer.student_answer.length > 0) {
+            userAnswer = answer.student_answer.charCodeAt(0) - 65;
+          } else {
+            userAnswer = -1;
+          }
+        } else if (answer.question_data.type === 'benar_salah') {
+          questionType = 'benar-salah';
+          correctAnswer = answer.question_data.correct_answer || '';
+          userAnswer = answer.student_answer || '';
+        } else {
+          questionType = 'short-answer';
+          correctAnswer = answer.question_data.correct_answer || '';
+          userAnswer = answer.student_answer || '';
+        }
+
+        const question: QuizResultQuestion = {
+          id: answer.question_index + 1,
+          question: originalQuestion,
+          questionHtml: this.sanitizeHtml(originalQuestion),
+          type: questionType,
+          options: originalOptions,
+          optionsHtml: originalOptions.map((opt: string) => this.sanitizeHtml(opt)),
+          correctAnswer: correctAnswer,
+          userAnswer: userAnswer,
+          isCorrect: answer.is_correct
+        };
+
+        return question;
+      })
+    };
+
+    console.log('✅ DetailHistory: Complete quiz result built:', {
+      totalQuestions: this.quizResult.totalQuestions,
+      actualQuestions: this.quizResult.questions.length,
+      score: this.quizResult.score
+    });
+  }
 
   loadQuizResult(): void {
     console.log('🔍 Loading quiz result from localStorage for material:', this.materialId);
@@ -297,6 +370,13 @@ export class DetailHistoryQuizComponent implements OnInit {
     return question.isCorrect ? '1' : '0';
   }
 
+  getQuestionScoreIcon(question: QuizResultQuestion): string {
+    if (question.type === 'short-answer') {
+      return 'fas fa-minus';
+    }
+    return question.isCorrect ? 'fas fa-check' : 'fas fa-times';
+  }
+
   getBenarSalahTextClass(option: string): string {
     const optionText = this.getBenarSalahOptionText(option);
 
@@ -310,12 +390,7 @@ export class DetailHistoryQuizComponent implements OnInit {
   }
 
   shouldShowCorrectAnswer(question: QuizResultQuestion, optionIndex: number): boolean {
-    if (question.type === 'benar-salah') {
-      // Untuk benar_salah, check berdasarkan text option
-      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
-      return optionText === question.correctAnswer && question.isCorrect === true;
-    }
-    return optionIndex === question.correctAnswer && question.isCorrect === true;
+    return this.isUserSelectedOption(question, optionIndex) && question.isCorrect === true;
   }
 
   getBenarSalahOptionText(option: string): string {
@@ -327,18 +402,23 @@ export class DetailHistoryQuizComponent implements OnInit {
   }
 
   shouldShowIncorrectAnswer(question: QuizResultQuestion, optionIndex: number): boolean {
-
-    if (question.type === 'benar-salah') {
-      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
-      return optionText === question.userAnswer && question.isCorrect === false;
-    }
-
-    return optionIndex === question.userAnswer && question.isCorrect === false;
+    return this.isUserSelectedOption(question, optionIndex) && question.isCorrect === false;
   }
 
   shouldShowNeutralOption(question: QuizResultQuestion, optionIndex: number): boolean {
-    return !this.shouldShowCorrectAnswer(question, optionIndex) &&
-      !this.shouldShowIncorrectAnswer(question, optionIndex);
+    return !this.isUserSelectedOption(question, optionIndex);
+  }
+
+  isUserSelectedOption(question: QuizResultQuestion, optionIndex: number): boolean {
+    if (question.type === 'multiple-choice') {
+      // Untuk multiple choice, bandingkan index dengan userAnswer
+      return optionIndex === question.userAnswer;
+    } else if (question.type === 'benar-salah') {
+      // Untuk benar_salah, bandingkan text option dengan userAnswer
+      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
+      return optionText === question.userAnswer;
+    }
+    return false;
   }
 
   getOptionClass(question: QuizResultQuestion, optionIndex: number): string {
@@ -346,28 +426,19 @@ export class DetailHistoryQuizComponent implements OnInit {
       return '';
     }
 
-    if (question.type === 'benar-salah') {
-      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
-
-      if (optionText === question.correctAnswer && question.isCorrect === true) {
+    // ✅ LOGIKA BARU: Hanya styling pada jawaban yang dipilih user
+    if (this.isUserSelectedOption(question, optionIndex)) {
+      // Jika user pilih option ini dan jawabannya benar -> hijau
+      if (question.isCorrect === true) {
         return 'correct-answer';
       }
-
-      if (optionText === question.userAnswer && question.isCorrect === false) {
+      // Jika user pilih option ini dan jawabannya salah -> merah
+      else if (question.isCorrect === false) {
         return 'user-incorrect';
       }
-
-      return '';
     }
 
-    if (this.shouldShowCorrectAnswer(question, optionIndex)) {
-      return 'correct-answer';
-    }
-
-    if (this.shouldShowIncorrectAnswer(question, optionIndex)) {
-      return 'user-incorrect';
-    }
-
+    // Sisanya tetap netral (tidak ada styling khusus)
     return '';
   }
 
@@ -376,56 +447,46 @@ export class DetailHistoryQuizComponent implements OnInit {
       return 'neutral';
     }
 
-    if (question.type === 'benar-salah') {
-      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
-
-      // Jika ini jawaban yang benar DAN user menjawab benar
-      if (optionText === question.correctAnswer && question.isCorrect === true) {
+    // ✅ LOGIKA BARU: Hanya tampilkan icon pada jawaban yang dipilih user
+    if (this.isUserSelectedOption(question, optionIndex)) {
+      // Jika user pilih option ini dan jawabannya benar -> check
+      if (question.isCorrect === true) {
         return 'correct';
       }
-
-      // Jika ini jawaban user DAN user menjawab salah
-      if (optionText === question.userAnswer && question.isCorrect === false) {
+      // Jika user pilih option ini dan jawabannya salah -> X
+      else if (question.isCorrect === false) {
         return 'incorrect';
       }
-
-      return 'neutral';
     }
 
-    // Logic original untuk multiple-choice
-    if (this.shouldShowCorrectAnswer(question, optionIndex)) {
-      return 'correct';
-    }
-
-    if (this.shouldShowIncorrectAnswer(question, optionIndex)) {
-      return 'incorrect';
-    }
-
+    // Sisanya netral (tidak ada icon)
     return 'neutral';
-  }
-
-  isCorrectOption(question: QuizResultQuestion, optionIndex: number): boolean {
-    if (question.type === 'benar-salah') {
-      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
-      return optionText === question.correctAnswer && question.isCorrect === true;
-    }
-    return this.shouldShowCorrectAnswer(question, optionIndex);
-  }
-
-  isIncorrectUserOption(question: QuizResultQuestion, optionIndex: number): boolean {
-    if (question.type === 'benar-salah') {
-      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
-      return optionText === question.userAnswer && question.isCorrect === false;
-    }
-    return this.shouldShowIncorrectAnswer(question, optionIndex);
   }
 
   goBack(): void {
     this.router.navigate(['/siswa/materi/lihat-materi', this.materialId, 'kuis']);
   }
 
-  goPredicate() {
-    // Implementation untuk lihat predikat
+  goPredicate(): void {
+    console.log('🎯 Navigating to learning history with context...');
+
+    // Navigate dengan informasi konteks quiz yang baru selesai
+    this.router.navigate(['/siswa/riwayat'], {
+      queryParams: {
+        from: 'quiz-result',
+        materialId: this.materialId,
+        score: this.quizResult.score,
+        timestamp: new Date().toISOString()
+      }
+    }).then(success => {
+      if (success) {
+        console.log('✅ Successfully navigated to learning history with context');
+      } else {
+        console.error('❌ Failed to navigate to learning history');
+      }
+    }).catch(error => {
+      console.error('❌ Error navigating to learning history:', error);
+    });
   }
 
   getPredikatTitle(): string {

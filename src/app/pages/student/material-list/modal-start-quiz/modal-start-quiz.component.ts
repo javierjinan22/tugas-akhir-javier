@@ -44,6 +44,11 @@ export class ModalStartQuizComponent implements OnInit {
       // Clear any potential temporary states
       localStorage.removeItem(`quiz_${this.materialId}_final_answers`);
 
+      // ✅ TAMBAH: Catat waktu mulai kuis
+      const quizStartTime = new Date();
+      localStorage.setItem(`quiz_${this.materialId}_start_time`, quizStartTime.toISOString());
+      
+      console.log('🕐 Quiz start time recorded:', quizStartTime.toISOString());
     }
 
     // First hide the modal

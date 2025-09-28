@@ -56,6 +56,50 @@ export interface MaterialStatsResponse {
   };
 }
 
+export interface PublicMaterial {
+  _id: string;
+  judul_materi: string;
+  deskripsi_singkat: string;
+  kategori_materi?: string;
+  header_gambar?: string;
+  flag_akses: number; 
+  total_bab: number;
+  total_soal: number;
+  has_quiz: boolean;
+  created_by: {
+    _id: string;
+    nama_lengkap: string;
+    username: string;
+  };
+  created_at: string;
+}
+
+export interface PublicMaterialsResponse {
+  success: boolean;
+  message: string;
+  data: PublicMaterial[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+export interface CopyMaterialResponse {
+  success: boolean;
+  message: string;
+  data: {
+    _id: string;
+    judul_materi: string;
+    flag_akses: number;
+    original_materi_id: string;
+    created_at: string;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class MaterialService {
   private apiUrl = environment.apiUrl + '/literadoo/materi';
@@ -77,10 +121,10 @@ export class MaterialService {
   private createFormDataForMaterial(materialData: any, headerImage: File): FormData {
   const formData = new FormData();
   
-  // ✅ KRITICAL: Append file dengan nama field yang sesuai backend expectation
+  // Append file dengan nama field yang sesuai backend expectation
   formData.append('header_gambar', headerImage);
   
-  // ✅ APPEND: Semua field material data secara individual (bukan sebagai JSON)
+  // Semua field material data secara individual (bukan sebagai JSON)
   // Backend controller expects individual fields, not nested JSON
   
   if (materialData.judul) formData.append('judul', materialData.judul);
@@ -88,7 +132,7 @@ export class MaterialService {
   if (materialData.kategori) formData.append('kategori', materialData.kategori);
   if (materialData.sekolah) formData.append('sekolah', materialData.sekolah);
   
-  // ✅ Arrays dan Objects harus di-stringify
+  // Arrays dan Objects harus di-stringify
   if (materialData.kelas && Array.isArray(materialData.kelas)) {
     formData.append('kelas', JSON.stringify(materialData.kelas));
   }
@@ -104,6 +148,10 @@ export class MaterialService {
   // ✅ Boolean dan Number values
   if (materialData.izinkanUnduh !== undefined) {
     formData.append('izinkanUnduh', materialData.izinkanUnduh.toString());
+  }
+
+  if (materialData.flag_akses !== undefined) {
+    formData.append('flagAkses', materialData.flag_akses.toString());
   }
   
   if (materialData.waktu_pengerjaan) {
@@ -326,4 +374,104 @@ export class MaterialService {
       })
     );
   }
+
+  getPublicMaterials(token?: string): Observable<PublicMaterialsResponse> {
+    const headers = this.getHeaders(token);
+
+    return this.http.get<PublicMaterialsResponse>(`${this.apiUrl}/public/list`, { headers }).pipe(
+      catchError(error => {
+        console.error('Error in getPublicMaterials:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // ✅ BARU: Copy public material to own school
+  copyPublicMaterial(materialId: string, kelasTujuan: string[], token?: string): Observable<CopyMaterialResponse> {
+  const headers = this.getHeaders(token);
+  const payload = {
+    kelas_tujuan: kelasTujuan
+  };
+
+  return this.http.post<CopyMaterialResponse>(`${this.apiUrl}/public/${materialId}/copy`, payload, { headers }).pipe(
+    catchError(error => {
+      console.error('Error in copyPublicMaterial:', error);
+      return throwError(() => error);
+    })
+  );
+}
+
+// ✅ TAMBAH: Method helper untuk format content dengan styles
+public formatContentWithResponsiveStyles(content: string): string {
+  if (!content) return '';
+  
+  const responsiveStyles = `
+    <style>
+      .ck-content img,
+      .material-content img,
+      img {
+        max-width: 100% !important;
+        height: auto !important;
+        width: auto !important;
+        display: block !important;
+        margin: 15px auto !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+      }
+      
+      .ck-content img:hover,
+      .material-content img:hover,
+      img:hover {
+        transform: scale(1.02) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+      }
+      
+      .ck-content iframe,
+      .ck-content video,
+      .material-content iframe,
+      .material-content video,
+      iframe, video {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: 16/9 !important;
+        border-radius: 12px !important;
+        margin: 15px 0 !important;
+      }
+      
+      .ck-content table,
+      .material-content table,
+      table {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        display: block !important;
+        white-space: nowrap !important;
+      }
+      
+      /* Responsive breakpoints */
+      @media (max-width: 768px) {
+        .ck-content img,
+        .material-content img,
+        img {
+          margin: 10px auto !important;
+          max-height: 250px !important;
+          object-fit: cover !important;
+        }
+        
+        .ck-content iframe,
+        .ck-content video,
+        .material-content iframe,
+        .material-content video,
+        iframe, video {
+          min-height: 200px !important;
+        }
+      }
+    </style>
+  `;
+  
+  return responsiveStyles + content;
+}
 }

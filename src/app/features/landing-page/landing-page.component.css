@@ -157,6 +157,22 @@
   margin: 20px 0;
 }
 
+.spinner-border {
+  width: 2rem;
+  height: 2rem;
+}
+
+.alert-warning {
+  border-radius: 10px;
+  border: 1px solid #ffeaa7;
+  background-color: #ffeaa7;
+  color: #2d3436;
+}
+
+.text-info {
+  color: #0984e3 !important;
+}
+
 .highlight-top-3{
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
@@ -371,6 +387,7 @@
 }
 
 .feature-title {
+  color: #205781;
   font-weight: 600;
   margin-top: 12px;
   font-size: 1.1rem;
@@ -492,10 +509,6 @@ html {
   .btn-warning {
     font-size: 12px;
     padding: 4px 8px;
-  }
-
-  .feature-title {
-    font-size: 1rem;
   }
 
   .feature-desc {

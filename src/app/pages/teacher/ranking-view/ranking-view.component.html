@@ -1,0 +1,404 @@
+<div class="container-fluid mt-4 custom-ranking-container">
+  <h2 class="fw-bold mb-4" style="font-size: 24px;">Peringkat & Pencapaian</h2>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-4" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p class="text-muted">Memuat data ranking...</p>
+    </div>
+  </div>
+
+  <!-- Global Error State -->
+  <div *ngIf="errorMsg && !loading" class="alert alert-danger mb-4">
+    <div class="d-flex align-items-center">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      <div class="flex-grow-1">
+        <div class="mt-1">{{ errorMsg }}</div>
+      </div>
+      <button class="btn btn-sm btn-outline-danger" (click)="refreshAllData()">
+        <i class="fas fa-sync-alt me-1"></i>
+        Coba Lagi
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!loading && !errorMsg">
+
+    <!-- Tabs Navigation - selaras dengan komponen lain -->
+    <div class="mb-4">
+      <ul class="nav nav-pills" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button 
+            class="nav-link"
+            [class.active]="activeTab === 'student'"
+            (click)="onTabChange('student')"
+            type="button">
+            <i class="fas fa-users me-2"></i>
+            Peringkat Siswa
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button 
+            class="nav-link"
+            [class.active]="activeTab === 'school'"
+            (click)="onTabChange('school')"
+            type="button">
+            <i class="fas fa-school me-2"></i>
+            Peringkat Sekolah
+          </button>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content">
+
+      <!-- Student Rankings Tab -->
+      <div class="tab-pane fade" [class.show]="activeTab === 'student'" [class.active]="activeTab === 'student'">
+        
+        <!-- Filter Section - hanya tampil jika ada data -->
+        <div *ngIf="classOptions.length > 1 || kategoriOptions.length > 1">
+          <div class="filter-section">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <div class="d-flex gap-3 flex-wrap">
+                  <div class="filter-group" *ngIf="classOptions.length > 1">
+                    <label class="filter-label">Kelas:</label>
+                    <div class="custom-select-container">
+                      <ngx-select 
+                        [items]="classOptions"
+                        optionValueField="value"
+                        optionTextField="label"
+                        [allowClear]="false"
+                        [multiple]="false"
+                        placeholder="Pilih Kelas"
+                        [ngModel]="selectedClassId"
+                        (ngModelChange)="onClassFilterChange($event)">
+                      </ngx-select>
+                    </div>
+                  </div>
+                  <div class="filter-group" *ngIf="kategoriOptions.length > 1">
+                    <label class="filter-label">Kategori:</label>
+                    <div class="custom-select-container">
+                      <ngx-select 
+                        [items]="kategoriOptions"
+                        optionValueField="value"
+                        optionTextField="label"
+                        [allowClear]="false"
+                        [multiple]="false"
+                        placeholder="Pilih Kategori"
+                        [ngModel]="selectedKategori"
+                        (ngModelChange)="onKategoriFilterChange($event)">
+                      </ngx-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="stats-summary" *ngIf="classRankingStats && classRankingStats.total_siswa > 0">
+                  <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Total: <strong>{{ classRankingStats.total_siswa || 0 }}</strong> siswa |
+                    Rata-rata: <strong>{{ classRankingStats.rata_rata_nilai || 0 }}</strong>
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Class Info Card - selaras dengan manage components -->
+        <div class="class-info-card mb-4" *ngIf="classRankingInfo && classRankingInfo.sekolah_info">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-items-center">
+                <div class="class-icon me-3">
+                  <i class="fas fa-graduation-cap"></i>
+                </div>
+                <div>
+                  <h6 class="mb-1 fw-semibold">{{ classRankingInfo.nama_kelas }}</h6>
+                  <small class="text-muted">
+                    <i class="fas fa-school me-1"></i>{{ classRankingInfo.sekolah_info?.nama }}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Class Rankings Error -->
+        <div *ngIf="classRankingError && !classRankingLoading" class="alert alert-warning mb-4">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div class="flex-grow-1">
+              <strong>Error Peringkat Siswa:</strong>
+              <div class="mt-1 small">{{ classRankingError }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State untuk Student Rankings -->
+        <div *ngIf="classRankingLoading" class="d-flex justify-content-center align-items-center mb-4" style="min-height: 200px;">
+          <div class="text-center">
+            <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+            <p class="text-muted">Memuat peringkat siswa...</p>
+          </div>
+        </div>
+
+        <!-- Student Rankings Table - selaras dengan manage components -->
+        <div class="table-responsive" *ngIf="!classRankingLoading && !classRankingError">
+          <table class="table align-middle table-bordered text-center">
+            <thead class="table-light">
+              <tr>
+                <th>Peringkat</th>
+                <th>Nama Siswa</th>
+                <th *ngIf="selectedClassId === 'all'">Kelas</th>
+                <th>Materi Selesai</th>
+                <th>Rata-rata Nilai</th>
+                <!-- <th>Medali</th> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let student of classRankings; trackBy: trackByStudentId" 
+                  class="ranking-row">
+                <!-- Rank -->
+                <td>
+                  <span class="rank-number">{{ student.peringkat }}</span>
+                </td>
+                
+                <!-- Student Name -->
+                <td class="text-start">
+                  <div>
+                    <div class="fw-semibold">{{ student.nama_siswa }}</div>
+                    <small class="text-muted">{{ student.username }}</small>
+                  </div>
+                </td>
+                
+                <!-- Class (if all classes selected) -->
+                <td *ngIf="selectedClassId === 'all'">
+                  <span class="badge bg-light text-dark">
+                    {{ student.kelas_info.nama_kelas }}
+                  </span>
+                </td>
+                
+                <!-- Materials Completed -->
+                <td>
+                  <span class="completion-text">
+                    {{ student.materi_selesai }}/{{ student.total_materi }}
+                  </span>
+                </td>
+                
+                <!-- Average Score -->
+                <td>
+                  <span class="score-text">{{ student.rata_rata_nilai }}</span>
+                </td>
+                
+                <!-- Medal -->
+                <!-- <td>
+                  <i [class]="getMedalIcon(student.medali)" 
+                     [style.color]="getMedalColor(student.medali)"
+                     [title]="student.medali"></i>
+                </td> -->
+              </tr>
+              
+              <!-- Empty State -->
+              <tr *ngIf="classRankings.length === 0">
+                <td [attr.colspan]="selectedClassId === 'all' ? 6 : 5" class="text-center text-secondary py-5">
+                  <div class="mb-3">
+                    <i class="fas fa-chart-line empty-state-icon"></i>
+                  </div>
+                  <h6 class="text-muted mb-2">Belum ada data peringkat siswa</h6>
+                  <p class="text-muted mb-3">
+                    <small>Pastikan ada siswa yang telah menyelesaikan materi untuk melihat peringkat.</small>
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- School Rankings Tab -->
+      <div class="tab-pane fade" [class.show]="activeTab === 'school'" [class.active]="activeTab === 'school'">
+        
+        <!-- School Filter Section - hanya tampil jika ada data -->
+        <div *ngIf="provinsiOptions.length > 1 || limitOptions.length > 1">
+          <div class="filter-section">
+            <div class="row align-items-center">
+              <div class="col-md-8">
+                <div class="d-flex gap-3 flex-wrap">
+                  <div class="filter-group" *ngIf="provinsiOptions.length > 1">
+                    <label class="filter-label">Provinsi:</label>
+                    <div class="custom-select-container">
+                      <ngx-select 
+                        [items]="provinsiOptions"
+                        optionValueField="value"
+                        optionTextField="label"
+                        [allowClear]="false"
+                        [multiple]="false"
+                        placeholder="Pilih Provinsi"
+                        [ngModel]="selectedProvinsi"
+                        (ngModelChange)="onProvinsiFilterChange($event)">
+                      </ngx-select>
+                    </div>
+                  </div>
+                  <div class="filter-group">
+                    <label class="filter-label">Tampilkan:</label>
+                    <div class="custom-select-container">
+                      <ngx-select 
+                        [items]="limitOptions"
+                        optionValueField="value"
+                        optionTextField="label"
+                        [allowClear]="false"
+                        [multiple]="false"
+                        placeholder="Jumlah Data"
+                        [ngModel]="selectedLimit"
+                        (ngModelChange)="onLimitChange($event)">
+                      </ngx-select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4 text-end">
+                <div class="stats-summary" *ngIf="schoolRankingStats && schoolRankingStats.total_schools > 0">
+                  <small class="text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Menampilkan <strong>{{ schoolRankingStats.showing || 0 }}</strong> dari 
+                    <strong>{{ schoolRankingStats.total_schools || 0 }}</strong> sekolah
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- School Rankings Error -->
+        <div *ngIf="schoolRankingError && !schoolRankingLoading" class="alert alert-warning mb-4">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <div class="flex-grow-1">
+              <strong>Error Peringkat Sekolah:</strong>
+              <div class="mt-1 small">{{ schoolRankingError }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State untuk School Rankings -->
+        <div *ngIf="schoolRankingLoading" class="d-flex justify-content-center align-items-center mb-4" style="min-height: 200px;">
+          <div class="text-center">
+            <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+            <p class="text-muted">Memuat peringkat sekolah...</p>
+          </div>
+        </div>
+
+        <!-- School Rankings Table - selaras dengan manage components -->
+        <div class="table-responsive" *ngIf="!schoolRankingLoading && !schoolRankingError">
+          <table class="table align-middle table-bordered text-center">
+            <thead class="table-light">
+              <tr>
+                <th>Peringkat</th>
+                <th>Nama Sekolah</th>
+                <th>Lokasi</th>
+                <th>Siswa/Guru</th>
+                <th>Total Materi</th>
+                <th>Rata-rata Nilai</th>
+                <th>Skor Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let school of schoolRankings; trackBy: trackBySchoolId" 
+                  class="ranking-row">
+                <!-- Rank -->
+                <td>
+                  <span class="rank-number">{{ school.peringkat }}</span>
+                </td>
+                
+                <!-- School Name -->
+                <td class="text-start">
+                  <div>
+                    <div class="fw-semibold">{{ school.nama }}</div>
+                    <small class="text-muted">NPSN: {{ school.npsn }}</small>
+                  </div>
+                </td>
+                
+                <!-- Location -->
+                <td>
+                  <small class="text-muted">
+                    {{ school.lokasi.kabupaten_kota }}<br>
+                    {{ school.lokasi.propinsi }}
+                  </small>
+                </td>
+                
+                <!-- Students/Teachers -->
+                <td>
+                  <div>
+                    <div><strong>{{ school.statistik.total_siswa }}</strong> siswa</div>
+                    <small class="text-muted">{{ school.statistik.total_guru }} guru</small>
+                  </div>
+                </td>
+                
+                <!-- Total Materials -->
+                <td>
+                  <span class="completion-text">{{ school.statistik.total_materi }}</span>
+                </td>
+                
+                <!-- Average Score -->
+                <td>
+                  <span class="score-text">{{ school.statistik.avg_nilai }}</span>
+                </td>
+                
+                <!-- Overall Score -->
+                <td>
+                  <span class="total-score fw-semibold">{{ school.statistik.score }}</span>
+                </td>
+              </tr>
+              
+              <!-- Empty State -->
+              <tr *ngIf="schoolRankings.length === 0">
+                <td colspan="7" class="text-center text-secondary py-5">
+                  <div class="mb-3">
+                    <i class="fas fa-school empty-state-icon"></i>
+                  </div>
+                  <h6 class="text-muted mb-2">Belum ada data peringkat sekolah</h6>
+                  <p class="text-muted mb-3">
+                    <small>Data peringkat sekolah akan tampil jika tersedia.</small>
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Stats info selaras dengan manage components -->
+    <div *ngIf="activeTab === 'student' && classRankings.length > 0" class="mt-3 results-info">
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Total siswa: {{ classRankings.length }}
+        <span *ngIf="classRankingStats">
+          • Rata-rata penyelesaian: {{ formatPercentage(classRankingStats.rata_rata_penyelesaian || 0) }}
+          • Rata-rata nilai: {{ classRankingStats.rata_rata_nilai || 0 }}
+        </span>
+      </small>
+    </div>
+
+    <div *ngIf="activeTab === 'school' && schoolRankings.length > 0" class="mt-3 results-info">
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Menampilkan {{ schoolRankings.length }} sekolah
+        <span *ngIf="schoolRankingStats">
+          dari total {{ schoolRankingStats.total_schools || 0 }} sekolah
+        </span>
+      </small>
+    </div>
+
+  </div>
+</div>
+
+<router-outlet></router-outlet>

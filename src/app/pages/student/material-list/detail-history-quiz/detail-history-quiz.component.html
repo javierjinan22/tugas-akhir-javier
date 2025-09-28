@@ -84,9 +84,13 @@
             </ng-template>
           </div>
           
-          <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
+          <!-- <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
             {{ getQuestionScore(question) }}
+          </div> -->
+          <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
+            <i [class]="getQuestionScoreIcon(question)"></i>
           </div>
+          
         </div>
         
         <!-- Multiple choice question display -->
@@ -95,8 +99,9 @@
               class="option-item"
               [ngClass]="getOptionClass(question, optionIndex)">
             <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
-              <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check"></i>
-              <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times"></i>
+              <!-- ✅ PERBAIKI: Hanya tampilkan icon untuk jawaban user -->
+              <i *ngIf="shouldShowCorrectAnswer(question, optionIndex)" class="fas fa-check"></i>
+              <i *ngIf="shouldShowIncorrectAnswer(question, optionIndex)" class="fas fa-times"></i>
             </span>
             
             <div class="option-text-container">
@@ -118,8 +123,9 @@
               class="option-item benar-salah-option"
               [ngClass]="getOptionClass(question, optionIndex)">
             <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
-              <i *ngIf="isCorrectOption(question, optionIndex)" class="fas fa-check"></i>
-              <i *ngIf="isIncorrectUserOption(question, optionIndex)" class="fas fa-times"></i>
+              <!-- ✅ PERBAIKI: Hanya tampilkan icon untuk jawaban user -->
+              <i *ngIf="shouldShowCorrectAnswer(question, optionIndex)" class="fas fa-check"></i>
+              <i *ngIf="shouldShowIncorrectAnswer(question, optionIndex)" class="fas fa-times"></i>
             </span>
             
             <div class="option-text-container">

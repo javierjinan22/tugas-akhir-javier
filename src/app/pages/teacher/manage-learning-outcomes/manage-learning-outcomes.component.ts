@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TeacherProgressService, ClassSummary, ClassesSummaryResponse } from 'src/app/service/teacher-progress.service';
+import { TeacherProgressService, MaterialProgress, AllMaterialsProgressResponse } from 'src/app/service/teacher-progress.service';
 
 @Component({
   selector: 'app-manage-learning-outcomes',
@@ -11,10 +11,22 @@ import { TeacherProgressService, ClassSummary, ClassesSummaryResponse } from 'sr
 })
 export class ManageLearningOutcomesComponent implements OnInit, OnDestroy {
 
-  // ✅ UPDATED: Properties untuk data dinamis
-  kelas: ClassSummary[] = [];
-  filteredKelas: ClassSummary[] = [];
+  // ✅ UPDATE: Properties untuk data gabungan
+  materials: Array<MaterialProgress & { kelas_info: any }> = [];
+  filteredMaterials: Array<MaterialProgress & { kelas_info: any }> = [];
+  
+  // Filter options
+  kelasList: Array<{ _id: string; nama_kelas: string; tahun_ajaran: string; total_siswa: number }> = [];
+  tahunAjaranList: string[] = [];
+  kategoriList: string[] = [];
+  
+  // Selected filters
+  selectedKelas: string = 'all';
+  selectedTahunAjaran: string = 'all';
+  selectedKategori: string = 'all';
   keyword: string = '';
+  
+  // UI state
   loading: boolean = false;
   errorMsg: string = '';
 
@@ -22,15 +34,32 @@ export class ManageLearningOutcomesComponent implements OnInit, OnDestroy {
   sekolahInfo: any = null;
   guruInfo: any = null;
 
+  // ✅ TAMBAH: Filter options untuk template
+  kelasOptions: { value: string; label: string }[] = [];
+  tahunAjaranOptions: { value: string; label: string }[] = [];
+  kategoriOptions: { value: string; label: string }[] = [];
+
   private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private teacherProgressService: TeacherProgressService
   ) { }
 
   ngOnInit(): void {
-    this.loadClassesSummary();
+    this.route.queryParams.subscribe(params => {
+      if (params['filter'] === 'completed') {
+        // Set filter untuk menampilkan hanya materi yang completed
+        this.selectedKelas = 'all';
+        this.selectedTahunAjaran = 'all';
+        this.selectedKategori = 'all';
+        // Load data dengan filter completed
+        this.loadCompletedMaterials();
+      } else {
+        this.loadAllMaterialsProgress();
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -38,37 +67,90 @@ export class ManageLearningOutcomesComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ✅ TAMBAH: Load data dari backend
-  loadClassesSummary(): void {
+  private loadCompletedMaterials(): void {
     this.loading = true;
-    this.errorMsg = '';
-
-    this.teacherProgressService.getClassesSummary()
+    this.teacherProgressService.getAllMaterialsProgress()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response: ClassesSummaryResponse) => {
-          console.log('✅ Classes summary response:', response);
+        next: (response) => {
+          if (response.success) {
+            // Filter hanya materi yang 100% completed
+            const completedMaterials = response.data.materials.filter(
+              material => material.persentase_selesai === 100
+            );
+            
+            this.materials = completedMaterials;
+            this.filteredMaterials = [...completedMaterials];
+            
+            // Set other data
+            this.kelasList = response.data.kelas_list || [];
+            this.tahunAjaranList = response.data.tahun_ajaran_list || [];
+            this.kategoriList = response.data.kategori_list || [];
+            this.sekolahInfo = response.data.sekolah_info;
+            this.guruInfo = response.data.guru_info;
+            
+            this.buildFilterOptions();
+          }
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading completed materials:', error);
+          this.loading = false;
+          this.errorMsg = 'Gagal memuat data materi selesai.';
+        }
+      });
+  }
+
+  // ✅ UPDATE: Load semua data materi dengan info kelas
+  loadAllMaterialsProgress(): void {
+    this.loading = true;
+    this.errorMsg = ''; // ✅ PERBAIKAN: Clear error message
+
+    // Get current filters
+    const filters = {
+      kelas_id: this.selectedKelas,
+      tahun_ajaran: this.selectedTahunAjaran,
+      kategori: this.selectedKategori
+    };
+
+    this.teacherProgressService.getAllMaterialsProgress(filters)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: AllMaterialsProgressResponse) => {
+          console.log('✅ All materials progress response:', response);
 
           if (response.success) {
-            this.kelas = response.data || [];
-            this.filteredKelas = [...this.kelas];
-            this.sekolahInfo = response.sekolah_info;
-            this.guruInfo = response.guru_info;
+            this.materials = response.data.materials || [];
+            this.filteredMaterials = [...this.materials];
+            
+            // Set filter options
+            this.kelasList = response.data.kelas_list || [];
+            this.tahunAjaranList = response.data.tahun_ajaran_list || [];
+            this.kategoriList = response.data.kategori_list || [];
+            
+            // Set school and teacher info
+            this.sekolahInfo = response.data.sekolah_info;
+            this.guruInfo = response.data.guru_info;
+            
+            // Build filter options untuk template
+            this.buildFilterOptions();
+            
+            // Apply search if keyword exists
+            this.applyFilters();
 
-            // Show message if no classes found
-            if (this.kelas.length === 0) {
-              this.errorMsg = response.message || 'Belum ada kelas dengan materi yang terkait.';
-            }
+            // ✅ PERBAIKAN: Jangan set error message jika materials kosong
+            // Biarkan template yang handle empty state
+            console.log('📊 Materials loaded:', this.materials.length);
           } else {
-            this.errorMsg = response.message || 'Gagal memuat data kelas.';
-            this.kelas = [];
-            this.filteredKelas = [];
+            this.errorMsg = response.message || 'Gagal memuat data materi.';
+            this.materials = [];
+            this.filteredMaterials = [];
           }
 
           this.loading = false;
         },
         error: (error) => {
-          console.error('❌ Error loading classes summary:', error);
+          console.error('❌ Error loading all materials:', error);
 
           let errorMessage = 'Gagal memuat data hasil belajar. ';
 
@@ -79,133 +161,153 @@ export class ManageLearningOutcomesComponent implements OnInit, OnDestroy {
           } else if (error.status === 0) {
             errorMessage += 'Tidak dapat terhubung ke server.';
           } else {
-            errorMessage += 'Silakan coba lagi.';
+            errorMessage += error.error?.message || error.message || 'Silakan coba lagi.';
           }
 
           this.errorMsg = errorMessage;
-          this.kelas = [];
-          this.filteredKelas = [];
+          this.materials = [];
+          this.filteredMaterials = [];
           this.loading = false;
         }
       });
   }
 
-  // ✅ UPDATED: Search function
-  onSearch(): void {
-    if (!this.keyword.trim()) {
-      this.filteredKelas = [...this.kelas];
-      return;
-    }
+  // ✅ TAMBAH: Build filter options untuk template
+  buildFilterOptions(): void {
+    // Kelas options
+    this.kelasOptions = [
+      { value: 'all', label: 'Semua Kelas' }
+    ];
+    this.kelasList.forEach(kelas => {
+      this.kelasOptions.push({ 
+        value: kelas._id, 
+        label: `${kelas.nama_kelas} (${kelas.tahun_ajaran})` 
+      });
+    });
 
-    const searchTerm = this.keyword.toLowerCase().trim();
-    this.filteredKelas = this.kelas.filter(kelas =>
-      kelas.nama_kelas.toLowerCase().includes(searchTerm) ||
-      kelas.tahun_ajaran.toLowerCase().includes(searchTerm) ||
-      kelas.nama_sekolah.toLowerCase().includes(searchTerm)
-    );
+    // Tahun ajaran options
+    this.tahunAjaranOptions = [
+      { value: 'all', label: 'Semua Tahun Ajaran' }
+    ];
+    this.tahunAjaranList.forEach(tahun => {
+      this.tahunAjaranOptions.push({ value: tahun, label: tahun });
+    });
+
+    // Kategori options
+    this.kategoriOptions = [
+      { value: 'all', label: 'Semua Kategori' }
+    ];
+    this.kategoriList.forEach(kategori => {
+      this.kategoriOptions.push({ value: kategori, label: kategori });
+    });
   }
 
+  // ✅ TAMBAH: Apply filters dan search
+  applyFilters(): void {
+    let filtered = [...this.materials];
 
-  lihatKelas(kelas: ClassSummary): void {
-    this.router.navigate(['/guru/hasil-belajar/detail-materi-belajar', kelas._id]);
+    // Filter by search keyword
+    if (this.keyword.trim()) {
+      const searchTerm = this.keyword.toLowerCase().trim();
+      filtered = filtered.filter(material => 
+        material.judul_materi.toLowerCase().includes(searchTerm) ||
+        material.kategori_materi.toLowerCase().includes(searchTerm) ||
+        material.kelas_info.nama_kelas.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    this.filteredMaterials = filtered;
+  }
+
+  // ✅ TAMBAH: Filter change handlers
+  onKelasChange(): void {
+    this.loadAllMaterialsProgress(); // Reload dengan filter baru
+  }
+
+  onTahunAjaranChange(): void {
+    this.loadAllMaterialsProgress(); // Reload dengan filter baru
+  }
+
+  onKategoriChange(): void {
+    this.loadAllMaterialsProgress(); // Reload dengan filter baru
+  }
+
+  onSearch(): void {
+    this.applyFilters();
+  }
+
+  // ✅ UPDATE: Navigation ke detail students
+  lihatDetailMateri(material: MaterialProgress & { kelas_info: any }): void {
+    // Navigate to students progress untuk materi ini
+    this.router.navigate([
+      '/guru/hasil-belajar/detail-materi-belajar', 
+      material.kelas_info._id, 
+      'materials', 
+      material._id, 
+      'students'
+    ]);
+  }
+
+  // ✅ TAMBAH: Reset filters
+  resetFilters(): void {
+    this.selectedKelas = 'all';
+    this.selectedTahunAjaran = 'all';
+    this.selectedKategori = 'all';
+    this.keyword = '';
+    this.loadAllMaterialsProgress();
   }
 
   // ✅ TAMBAH: Refresh data
   refreshData(): void {
-    this.loadClassesSummary();
+    this.errorMsg = ''; // ✅ Clear error message saat refresh
+    this.loadAllMaterialsProgress();
   }
 
-  // ✅ TAMBAH: Helper methods untuk stats
-  getTotalClassesCount(): number {
-    return this.kelas.length;
+  // ✅ TAMBAH: Helper methods
+  getTotalMaterialsCount(): number {
+    return this.materials ? this.materials.length : 0;
   }
 
-  getFilteredClassesCount(): number {
-    return this.filteredKelas.length;
+  getFilteredMaterialsCount(): number {
+    return this.filteredMaterials ? this.filteredMaterials.length : 0;
   }
 
   getTotalStudentsCount(): number {
-    return this.kelas.reduce((total, kelas) => total + kelas.jumlah_siswa, 0);
+    return this.materials.reduce((total, material) => total + material.kelas_info.total_siswa, 0);
   }
 
-  getTotalMaterialsCount(): number {
-    return this.kelas.reduce((total, kelas) => total + kelas.materi_tertaut, 0);
+  getAverageProgress(): number {
+    if (this.materials.length === 0) return 0;
+    const total = this.materials.reduce((sum, material) => sum + material.persentase_selesai, 0);
+    return Math.round(total / this.materials.length);
   }
 
-  // ✅ TAMBAH: Get average students per class
-  getAverageStudentsPerClass(): number {
-    if (this.kelas.length === 0) return 0;
-    return Math.round(this.getTotalStudentsCount() / this.kelas.length);
+  getTotalStudentsCompleted(): number {
+    return this.materials.reduce((total, material) => total + material.siswa_selesai, 0);
   }
 
-  // ✅ TAMBAH: Get average materials per class
-  getAverageMaterialsPerClass(): number {
-    if (this.kelas.length === 0) return 0;
-    return Math.round(this.getTotalMaterialsCount() / this.kelas.length);
+  hasFiltersApplied(): boolean {
+    const hasKeyword = this.keyword && this.keyword.trim().length > 0;
+    return Boolean(hasKeyword) || 
+           this.selectedKelas !== 'all' || 
+           this.selectedTahunAjaran !== 'all' || 
+           this.selectedKategori !== 'all';
   }
 
-  // ✅ TAMBAH: Get progress color based on material count
-  getProgressColor(materiTertaut: number): string {
-    if (materiTertaut >= 10) return '#28a745'; // Green - Banyak materi
-    if (materiTertaut >= 5) return '#17a2b8';  // Blue - Cukup materi
-    if (materiTertaut >= 3) return '#ffc107';  // Yellow - Sedang
-    if (materiTertaut >= 1) return '#fd7e14';  // Orange - Sedikit
-    return '#dc3545'; // Red - Tidak ada materi
+  // ✅ TAMBAH: Get progress color dan helper methods
+  getProgressColor(percentage: number): string {
+    return this.teacherProgressService.getProgressColor(percentage);
   }
 
-  // ✅ TAMBAH: Get progress text
-  getProgressText(materiTertaut: number): string {
-    if (materiTertaut >= 10) return 'Sangat Baik';
-    if (materiTertaut >= 5) return 'Baik';
-    if (materiTertaut >= 3) return 'Cukup';
-    if (materiTertaut >= 1) return 'Perlu Ditingkatkan';
-    return 'Belum Ada Materi';
+  getProgressText(percentage: number): string {
+    return this.teacherProgressService.getProgressText(percentage);
   }
 
-  // ✅ TAMBAH: Sort functionality
-  sortBy: 'name' | 'students' | 'materials' = 'name';
-  sortDirection: 'asc' | 'desc' = 'asc';
-
-  sortClasses(criteria: 'name' | 'students' | 'materials'): void {
-    if (this.sortBy === criteria) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortBy = criteria;
-      this.sortDirection = 'asc';
-    }
-
-    this.filteredKelas.sort((a, b) => {
-      let valueA: any;
-      let valueB: any;
-
-      switch (criteria) {
-        case 'name':
-          valueA = a.nama_kelas.toLowerCase();
-          valueB = b.nama_kelas.toLowerCase();
-          break;
-        case 'students':
-          valueA = a.jumlah_siswa;
-          valueB = b.jumlah_siswa;
-          break;
-        case 'materials':
-          valueA = a.materi_tertaut;
-          valueB = b.materi_tertaut;
-          break;
-        default:
-          return 0;
-      }
-
-      if (this.sortDirection === 'asc') {
-        return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
-      } else {
-        return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
-      }
-    });
+  getKategoriIcon(kategori: string): string {
+    return this.teacherProgressService.getKategoriMateriIcon(kategori);
   }
 
-  // ✅ TAMBAH: Get sort icon
-  getSortIcon(criteria: 'name' | 'students' | 'materials'): string {
-    if (this.sortBy !== criteria) return 'fas fa-sort';
-    return this.sortDirection === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+  formatDate(date: Date | string): string {
+    return this.teacherProgressService.formatDateShort(date);
   }
 }

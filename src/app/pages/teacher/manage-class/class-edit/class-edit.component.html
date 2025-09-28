@@ -1,3 +1,25 @@
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0"
+       [class.show]="showToast"
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert"
+       aria-live="assertive"
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="container-fluid mt-4">
     <!-- Back button dan header -->
     <div class="d-flex align-items-center mb-4">
@@ -5,7 +27,7 @@
         <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas">
             <i class="fas fa-arrow-left"></i>
         </button>
-        <h2 class="fw-bold mb-0" style="font-size: 24px;">Edit kelas</h2>
+        <h2 class="fw-bold mb-0" style="font-size: 24px; font-family: Poppins;">Edit kelas</h2>
     </div>
 
     <!-- Loading indicator -->
@@ -19,16 +41,16 @@
     <!-- Main form container -->
     <div class="form-container p-4 p-md-5" *ngIf="!isLoading">
         <!-- Error message display -->
-        <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+        <!-- <div *ngIf="errorMsg" class="alert alert-danger mb-3">
             <i class="fas fa-exclamation-triangle me-2"></i>
             {{ errorMsg }}
-        </div>
+        </div> -->
 
         <!-- Success message display -->
-        <div *ngIf="successMsg" class="alert alert-success mb-3">
+        <!-- <div *ngIf="successMsg" class="alert alert-success mb-3">
             <i class="fas fa-check-circle me-2"></i>
             {{ successMsg }}
-        </div>
+        </div> -->
 
         <!-- Loading message -->
         <div *ngIf="isSubmitting" class="alert alert-info mb-3">
@@ -113,14 +135,14 @@
         <!-- Action buttons -->
         <div class="d-flex justify-content-center mt-4 px-3 gap-3">
             <button 
-                class="btn btn-outline-secondary btn-rounded" 
+                class="btn btn-outline-primary" 
                 (click)="onCancelClicked()"
                 [disabled]="isSubmitting">
                 <i class="fas fa-times me-1"></i>
                 Batal
             </button>
             <button 
-                class="btn btn-warning btn-rounded" 
+                class="btn btn-primary" 
                 (click)="onSubmitClicked()"
                 [disabled]="isSubmitting || !school || classForm.invalid"
                 *ngIf="!successMsg">
@@ -136,11 +158,11 @@
         </div>
 
         <!-- Success action -->
-        <div class="d-flex justify-content-center mt-4" *ngIf="successMsg">
+        <!-- <div class="d-flex justify-content-center mt-4" *ngIf="successMsg">
             <button class="btn btn-success btn-rounded" (click)="onCancelClicked()">
                 <i class="fas fa-check me-1"></i>
                 Kembali ke Daftar Kelas
             </button>
-        </div>
+        </div> -->
     </div>
 </div>

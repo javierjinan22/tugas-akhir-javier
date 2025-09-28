@@ -1,17 +1,26 @@
 <div class="container-fluid mt-4 custom-class-container">
-  <h2 class="fw-bold mb-4" style="font-size: 24px;">Lihat hasil belajar</h2>
+  <h2 class="fw-bold mb-4" style="font-size: 24px;">Hasil Belajar Siswa</h2>
 
-  <!-- ✅ TAMBAH: School and teacher info -->
-  <div *ngIf="sekolahInfo && guruInfo" class="alert alert-info mb-4">
+  <!-- ✅ School and teacher info - SELALU TAMPIL jika ada data -->
+  <div *ngIf="sekolahInfo && guruInfo && !loading" class="alert alert-info mb-4">
     <i class="fas fa-school me-2"></i>
-    <strong>{{ sekolahInfo.nama }}</strong> ({{ sekolahInfo.npsn }})
+    <strong>{{ sekolahInfo.nama }}</strong> 
+    <span *ngIf="sekolahInfo.npsn">({{ sekolahInfo.npsn }})</span>
     <small class="d-block text-muted mt-1">
       <i class="fas fa-user me-1"></i>{{ guruInfo.nama }}
     </small>
   </div>
 
-  <!-- ✅ TAMBAH: Error message -->
-  <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+  <!-- ✅ Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-4" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat data hasil belajar...</p>
+    </div>
+  </div>
+
+  <!-- ✅ Error message - HANYA untuk ERROR SEBENARNYA -->
+  <div *ngIf="errorMsg && !loading" class="alert alert-danger mb-4">
     <i class="fas fa-exclamation-triangle me-2"></i>
     {{ errorMsg }}
     <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshData()">
@@ -19,120 +28,215 @@
     </button>
   </div>
 
-  <!-- ✅ TAMBAH: Loading indicator -->
-  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-3" style="min-height: 200px;">
-    <div class="text-center">
-      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
-      <p>Memuat data hasil belajar...</p>
+  <!-- ✅ KONDISI KETIKA TIDAK LOADING DAN TIDAK ERROR -->
+  <div *ngIf="!loading && !errorMsg">
+
+    <!-- ✅ PERBAIKAN: Filters hanya tampil jika ada materi -->
+    <div class="row mb-4" *ngIf="getTotalMaterialsCount() > 0">
+      <!-- Filter Kelas -->
+      <div class="col-md-3 mb-3">
+        <label class="mb-2 fw-medium">Kelas</label>
+        <ngx-select
+          [items]="kelasOptions"
+          optionValueField="value"
+          optionTextField="label"
+          [(ngModel)]="selectedKelas"
+          (ngModelChange)="onKelasChange()"
+          [allowClear]="false"
+          placeholder="Pilih kelas">
+        </ngx-select>
+      </div>
+
+      <!-- Filter Tahun Ajaran -->
+      <div class="col-md-3 mb-3">
+        <label class="mb-2 fw-medium">Tahun Ajaran</label>
+        <ngx-select
+          [items]="tahunAjaranOptions"
+          optionValueField="value"
+          optionTextField="label"
+          [(ngModel)]="selectedTahunAjaran"
+          (ngModelChange)="onTahunAjaranChange()"
+          [allowClear]="false"
+          placeholder="Pilih tahun ajaran">
+        </ngx-select>
+      </div>
+
+      <!-- Filter Kategori -->
+      <div class="col-md-3 mb-3">
+        <label class="mb-2 fw-medium">Kategori Materi</label>
+        <ngx-select
+          [items]="kategoriOptions"
+          optionValueField="value"
+          optionTextField="label"
+          [(ngModel)]="selectedKategori"
+          (ngModelChange)="onKategoriChange()"
+          [allowClear]="false"
+          placeholder="Pilih kategori">
+        </ngx-select>
+      </div>
+
+      
     </div>
-  </div>
 
-  <!-- ✅ UPDATED: Search bar dengan style sesuai manage-class -->
-  <div class="d-flex justify-content-end align-items-center mb-3" *ngIf="!loading && getTotalClassesCount() > 0">
-    <div class="search-bar d-flex align-items-center">
-      <input 
-        type="text"
-        class="form-control rounded-pill me-2"
-        placeholder="Cari nama kelas"
-        [(ngModel)]="keyword"  
-        (keydown.enter)="onSearch()"
-        (input)="onSearch()"
-        style="width: 280px;" />
 
-      <span class="search-icon" (click)="onSearch()" style="cursor: pointer;">
-        <i class="fa fa-search"></i>
-      </span>
+    <div *ngIf="!loading && !errorMsg">
+
+    <!-- ✅ PERBAIKAN: Filters hanya tampil jika ada materi -->
+    <div class="row mb-4" *ngIf="getTotalMaterialsCount() > 0">
+
+      <!-- Search bar -->
+      <div class="col-md-3 d-flex align-items-end ms-auto">
+        <div class="search-bar d-flex align-items-center w-100">
+          <input 
+            type="text"
+            class="form-control rounded-pill me-2"
+            placeholder="Cari judul materi, kelas"
+            [(ngModel)]="keyword"
+            (keydown.enter)="onSearch()"
+            (input)="onSearch()"
+            [disabled]="loading" />
+          <span class="search-icon" (click)="onSearch()" style="cursor: pointer;">
+            <i class="fa fa-search"></i>
+          </span>
+        </div>
+      </div>
+
     </div>
-  </div>
+    </div>
 
-  <!-- ✅ UPDATED: Classes table dengan style manage-class -->
-  <div class="table-responsive" *ngIf="!loading && !errorMsg">
-    <table class="table align-middle table-bordered text-center">
-      <thead class="table-light">
-        <tr>
-          <th>No.</th>
-          <th style="cursor: pointer;" (click)="sortClasses('name')">
-            Kelas
-          </th>
-          <th>Tahun Ajaran</th>
-          <th style="cursor: pointer;" (click)="sortClasses('students')">
-            Jumlah Siswa
-          </th>
-          <th style="cursor: pointer;" (click)="sortClasses('materials')">
-            Materi Tertaut
-          </th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let kelas of filteredKelas; let i = index">
-          <td>{{ i + 1 }}.</td>
-          <td>
-            <span class="fw-medium">{{ kelas.nama_kelas }}</span>
-          </td>
-          <td>
-            <small class="text-muted">{{ kelas.tahun_ajaran || '-' }}</small>
-          </td>
-          <td>
-            <span class="fw-medium">{{ kelas.jumlah_siswa }} Siswa</span>
-          </td>
-          <td>
-            <span class="fw-medium">{{ kelas.materi_tertaut }} Materi</span>
-          </td>
-          <td>
-            <div class="btn-group" role="group" aria-label="Aksi kelas">
-              <!-- Lihat Detail -->
+    
+
+    <!-- ✅ Reset filters button hanya tampil jika ada filter aktif dan ada materi -->
+    <div class="d-flex justify-content-between align-items-center mb-3" *ngIf="hasFiltersApplied() && getTotalMaterialsCount() > 0">
+      <button class="btn btn-sm btn-outline-secondary" (click)="resetFilters()">
+        <i class="fas fa-times me-1"></i>Reset Semua Filter
+      </button>
+      <small class="text-muted">
+        <i class="fas fa-filter me-1"></i>Filter aktif
+      </small>
+    </div>
+
+    <!-- ✅ PERBAIKAN: Tabel SELALU ditampilkan saat tidak loading dan tidak error -->
+    <div class="table-responsive">
+      <table class="table align-middle table-bordered text-center">
+        <thead class="table-light">
+          <tr>
+            <th>No.</th>
+            <th>Judul Materi</th>
+            <th>Kelas</th>
+            <th>Tahun Ajaran</th>
+            <th>Kategori</th>
+            <th>Siswa Selesai</th>
+            <th>Progress</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- ✅ Tampilkan data materi jika ada -->
+          <tr *ngFor="let material of filteredMaterials; let i = index">
+            <td>{{ i + 1 }}.</td>
+            <td>
+              <div class="text-start">
+                <span class="fw-medium">{{ material.judul_materi }}</span>
+                <small class="d-block text-muted">
+                  {{ material.total_bab }} bab • {{ material.total_soal }} soal
+                </small>
+              </div>
+            </td>
+            <td>
+              <span class="fw-medium">{{ material.kelas_info.nama_kelas }}</span>
+              <small class="d-block text-muted">{{ material.kelas_info.total_siswa }} siswa</small>
+            </td>
+            <td>
+              <small class="text-muted">{{ material.kelas_info.tahun_ajaran }}</small>
+            </td>
+            <td>
+                {{ material.kategori_materi }}
+            </td>
+            <td>
+              <div class="text-center">
+                <div class="fw-medium">{{ material.siswa_selesai }} / {{ material.total_siswa }}</div>
+              </div>
+            </td>
+            <td>
+              <div class="text-center">
+                <div class="progress mb-1" style="height: 8px;">
+                  <div class="progress-bar" 
+                       [style.width.%]="material.persentase_selesai"
+                       [style.background-color]="getProgressColor(material.persentase_selesai)">
+                  </div>
+                </div>
+                <small class="text-muted">{{ material.persentase_selesai }}%</small>
+              </div>
+            </td>
+            <td>
               <button 
                 class="btn btn-sm btn-outline-primary" 
-                (click)="lihatKelas(kelas)" 
-                [title]="'Lihat detail kelas ' + kelas.nama_kelas"
+                (click)="lihatDetailMateri(material)"
+                [title]="'Lihat detail siswa untuk ' + material.judul_materi"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top">
                 <i class="fas fa-eye"></i>
               </button>
-            </div>
-          </td>
-        </tr>
-        
-        <!-- ✅ TAMBAH: No data rows -->
-        <tr *ngIf="getFilteredClassesCount() === 0 && keyword.trim() && !loading">
-          <td colspan="7" class="text-center text-secondary py-4">
-            <i class="fas fa-search me-2"></i>
-            Tidak ditemukan kelas dengan kata kunci "{{ keyword }}"
-            <br>
-            <button class="btn btn-sm btn-outline-secondary mt-2" (click)="keyword = ''; onSearch()">
-              <i class="fas fa-times me-1"></i>Hapus Filter
-            </button>
-          </td>
-        </tr>
-        
-        <tr *ngIf="getTotalClassesCount() === 0 && !keyword.trim() && !loading">
-          <td colspan="7" class="text-center text-secondary py-4">
-            <i class="fas fa-clipboard-list me-2"></i>
-            Belum ada kelas dengan materi yang terkait.
-            <br>
-            <small class="text-muted mt-1">
-              Mulai dengan membuat materi pembelajaran dan tautkan ke kelas Anda.
-            </small>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+            </td>
+          </tr>
+          
+          <!-- ✅ PERBAIKAN: Kondisi belum ada materi SAMA SEKALI -->
+          <tr *ngIf="getTotalMaterialsCount() === 0">
+            <td colspan="8" class="text-center py-5">
+              <div class="mb-3">
+                <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+              </div>
+              <h5 class="text-muted mb-3">Belum Ada Hasil Belajar</h5>
+              <p class="text-muted mb-4">
+                Anda belum memiliki hasil belajar karena belum ada materi yang dibuat.
+                <br>
+                <small>Mulai dengan membuat materi pembelajaran dan tautkan ke kelas Anda untuk melihat hasil belajar siswa.</small>
+              </p>
+              <div class="d-flex justify-content-center gap-2">
+                <button class="btn btn-primary-custom btn-sm" [routerLink]="['/guru/kelola-materi']">
+                  <i class="fas fa-plus me-1"></i>Buat Materi Baru
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- ✅ Tidak ada data dengan filter aktif -->
+          <tr *ngIf="getFilteredMaterialsCount() === 0 && hasFiltersApplied() && getTotalMaterialsCount() > 0">
+            <td colspan="8" class="text-center text-secondary py-4">
+              <div class="mb-3">
+                <i class="fas fa-search fa-2x text-muted mb-2"></i>
+              </div>
+              <h6 class="text-muted mb-2">Tidak ditemukan materi</h6>
+              <p class="text-muted mb-3">
+                Tidak ditemukan materi dengan filter yang dipilih.
+                <br>
+                <small>Coba ubah filter atau reset semua filter untuk melihat semua materi.</small>
+              </p>
+              <button class="btn btn-sm btn-outline-secondary" (click)="resetFilters()">
+                <i class="fas fa-times me-1"></i>Reset Semua Filter
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-  <!-- ✅ TAMBAH: Stats info -->
-  <div *ngIf="!loading && !errorMsg && getTotalClassesCount() > 0" class="mt-3">
-    <small class="text-muted">
-      <i class="fas fa-info-circle me-1"></i>
-      Total: {{ getTotalClassesCount() }} kelas
-      <span *ngIf="getFilteredClassesCount() !== getTotalClassesCount()">
-        (menampilkan {{ getFilteredClassesCount() }} kelas)
-      </span>
-      • 
-      Siswa: {{ getTotalStudentsCount() }} 
-      • 
-      Materi tertaut: {{ getTotalMaterialsCount() }}
-    </small>
+    <!-- ✅ Stats info hanya tampil jika ada materi -->
+    <div *ngIf="getTotalMaterialsCount() > 0" class="mt-3 results-info">
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Total: {{ getTotalMaterialsCount() }} materi
+        <span *ngIf="getFilteredMaterialsCount() !== getTotalMaterialsCount()">
+          (menampilkan {{ getFilteredMaterialsCount() }} materi)
+        </span>
+        • 
+        Progress rata-rata: {{ getAverageProgress() }}%
+        • 
+        Total siswa selesai: {{ getTotalStudentsCompleted() }}
+      </small>
+    </div>
+
   </div>
 </div>
 

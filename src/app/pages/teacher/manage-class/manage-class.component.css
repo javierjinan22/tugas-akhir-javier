@@ -165,6 +165,14 @@
   animation: fa-spin 1s infinite linear;
 }
 
+.results-info {
+  padding: 1rem;
+  background: rgba(21, 178, 196, 0.05);
+  border-radius: 12px;
+  border-left: 3px solid #1BB6C1;
+  margin-top: 2rem;
+}
+
 @keyframes fa-spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }

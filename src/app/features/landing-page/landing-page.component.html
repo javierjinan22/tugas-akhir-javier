@@ -58,8 +58,8 @@
       </p>
 
 
-      <button class="btn btn-primary btn-primary-custom me-2">Mulai sekarang</button>
-      <button class="btn btn-outline-primary btn-outline-primary-custom">Pelajari lebih lanjut</button>
+      <button class="btn btn-primary btn-primary-custom me-2" (click)="onButtonLoginClicked()">Mulai sekarang</button>
+      <button class="btn btn-outline-primary btn-outline-primary-custom" (click)="scrollTo('panduan')">Pelajari lebih lanjut</button>
     </div>
     <div class="col-md-6">
       <img src="assets/img/landing-page-main-2.svg" alt="Illustration" class="img-fluid mt-5" />
@@ -67,7 +67,7 @@
   </div>
 
   <!-- Top Sekolah Teraktif -->
-  <div class="top-school-container p-4 mb-5" id="sekolah-teraktif">
+  <!-- <div class="top-school-container p-4 mb-5" id="sekolah-teraktif">
 
     <div class="section-title-top-school">
      <span class="highlight-top-3">TOP 3</span> Sekolah Teraktif
@@ -96,7 +96,7 @@
           role="progressbar"
           [style.width.%]="sekolah.progres"
         ></div>
-        <!-- Bintang di ujung progress -->
+        
          <fa-icon
             [icon]="faStar"
             class="star-icon"
@@ -112,7 +112,88 @@
     </button>
   </div>
 
+  </div> -->
+
+  <!-- Top Sekolah Teraktif -->
+<div class="top-school-container p-4 mb-5" id="sekolah-teraktif">
+
+  <div class="section-title-top-school">
+   <span class="highlight-top-3">TOP 3</span> Sekolah Teraktif
   </div>
+
+  <!-- ✅ TAMBAH: Loading state -->
+  <div *ngIf="isLoadingTopSchools" class="text-center py-4">
+    <div class="spinner-border text-warning"  role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2" style="color: aliceblue;">Memuat data sekolah teraktif...</p>
+  </div>
+
+  <!-- ✅ TAMBAH: Error state --> 
+  <div *ngIf="topSchoolsError && !isLoadingTopSchools" class="alert alert-warning" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ topSchoolsError }}
+    <button class="btn btn-sm btn-outline-primary ms-2" (click)="loadTopSchools()">
+      <i class="fas fa-refresh me-1"></i>Coba lagi
+    </button>
+  </div>
+
+  <!-- ✅ UPDATE: Card list dengan kondisi loading -->
+  <div *ngIf="!isLoadingTopSchools && !topSchoolsError">
+    <div class="card-progress" *ngFor="let sekolah of topSekolah; let i = index"
+     [ngClass]="{ 'highlight-card': i === 2 }">
+      <div class="d-flex align-items-center mb-2">
+        <div class="badge badge-custom" [ngClass]="{
+          'badge-1': i === 0,
+          'badge-2': i === 1,
+          'badge-3': i === 2
+        }">
+          {{ i + 1 }}
+        </div>
+        <div class="flex-grow-1">
+          <h6 class="school-name mb-0">{{ sekolah.nama }}</h6>
+          <small class="text-muted" *ngIf="sekolah.lokasi">{{ sekolah.lokasi }}</small>
+          <small class="d-block">{{ sekolah.progres }}% penyelesaian</small>
+          <small style="color: #7B4019;" *ngIf="sekolah.total_siswa">{{ sekolah.total_siswa }} siswa aktif</small>
+        </div>
+        <button 
+          class="btn btn-warning btn-sm" 
+          (click)="openSchoolDetail(i)" 
+          [disabled]="isLoadingTopSchools">
+          Detail Sekolah
+        </button>
+      </div>
+
+      <div class="progress progress-with-star" style="height: 8px; position: relative;">
+        <div
+          class="progress-bar progress-bar-custom"
+          role="progressbar"
+          [style.width.%]="sekolah.score"
+        ></div>
+        <!-- Bintang di ujung progress -->
+         <fa-icon
+            [icon]="faStar"
+            class="star-icon"
+            [style.left.%]="sekolah.score"
+          ></fa-icon>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ TAMBAH: Empty state jika tidak ada data -->
+  <div *ngIf="!isLoadingTopSchools && !topSchoolsError && topSekolah.length === 0" class="text-center py-4">
+    <i class="fas fa-school text-muted mb-3" style="font-size: 3rem;"></i>
+    <h6 class="text-muted">Belum ada data sekolah teraktif</h6>
+    <p class="text-muted small">Data akan tampil setelah sekolah mulai menggunakan platform</p>
+  </div>
+
+  <div class="top-school-footer">
+    <button class="btn btn-light btn-light-custom d-flex align-items-center gap-1" (click)="onButtonLoginClicked()">
+      Lihat lainnya <fa-icon [icon]="faAngleRight" class="my-fa-icon-custom"></fa-icon>
+    </button>
+  </div>
+
+</div>
 
   <!-- Panduan Section -->
 <section class="mb-5" id="panduan">

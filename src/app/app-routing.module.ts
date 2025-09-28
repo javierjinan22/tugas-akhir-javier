@@ -29,6 +29,9 @@ import { ClassArchivedComponent } from './pages/teacher/manage-class/class-archi
 import { DetailMaterialsComponent } from './pages/teacher/manage-materials/detail-materials/detail-materials.component';
 import { TeacherViewStudentQuizResultComponent } from './pages/teacher/manage-learning-outcomes/teacher-view-student-quiz-result/teacher-view-student-quiz-result.component';
 import { LearningHistoryComponent } from './pages/student/learning-history/learning-history.component';
+import { RankingViewComponent } from './pages/teacher/ranking-view/ranking-view.component';
+import { BankMaterialsComponent } from './pages/teacher/manage-materials/bank-materials/bank-materials.component';
+import { PreviewMaterialsComponent } from './pages/teacher/manage-materials/preview-materials/preview-materials.component';
 
 // const routes: Routes = [];
 // const routes: Routes = [
@@ -67,8 +70,11 @@ const routes: Routes = [
           path: 'hasil-belajar/detail-materi-belajar/:classId/materials/:materiId/students/:studentId/quiz-result', 
           component: TeacherViewStudentQuizResultComponent 
         },
-       { path: 'hasil-belajar/detail-materi-belajar/:materiId/detail-siswa/:siswaId/koreksi-jawaban', component: AnswerReviewComponent }
-
+       { path: 'hasil-belajar/detail-materi-belajar/:materiId/detail-siswa/:siswaId/koreksi-jawaban', component: AnswerReviewComponent },
+       { path: 'peringkat', component: RankingViewComponent },
+       { path: 'bank-materi', component: BankMaterialsComponent},
+       { path: 'preview-materi/:id', component: PreviewMaterialsComponent},
+       
     ]
   },
   {

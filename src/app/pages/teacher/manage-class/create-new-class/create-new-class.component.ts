@@ -21,7 +21,7 @@ export class CreateNewClassComponent implements OnInit {
   errorMsg = '';
   school: any = null;
   existingDataList: any[] = []; // Array untuk menyimpan data kelas yang sudah ada
-  
+
   academicYears: AcademicYear[] = [
     { id: 1, name: '2023/2024' },
     { id: 2, name: '2024/2025' },
@@ -32,12 +32,18 @@ export class CreateNewClassComponent implements OnInit {
 
   selectedAcademicYear: AcademicYear | null = null;
 
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private classService: ClassService,
     private schoolService: SchoolService
-  ) { 
+  ) {
     this.classForm = this.fb.group({
       className: ['', [Validators.required, Validators.minLength(2), this.classNameValidator.bind(this)]],
       academicYearId: ['', [Validators.required]]
@@ -66,9 +72,9 @@ export class CreateNewClassComponent implements OnInit {
     }
 
     const inputClassName = control.value.trim().toLowerCase();
-    
+
     // Cek apakah nama kelas sudah ada di array existingDataList
-    const isDuplicate = this.existingDataList.some(classData => 
+    const isDuplicate = this.existingDataList.some(classData =>
       classData.nama_kelas.toLowerCase().trim() === inputClassName
     );
 
@@ -76,12 +82,12 @@ export class CreateNewClassComponent implements OnInit {
   }
 
   private getTeacherSchool(): void {
-    
+
     this.schoolService.getMySchool().subscribe({
       next: (response: School) => {
         // Response langsung berupa School object
         this.school = response;
-        
+
         // Check if we have a valid school ID
         const schoolId = this.school?._id;
         if (!schoolId) {
@@ -95,7 +101,7 @@ export class CreateNewClassComponent implements OnInit {
       error: (err: any) => {
         console.error('Error getting school:', err);
         this.errorMsg = 'Tidak dapat mengambil data sekolah. Pastikan Anda sudah terdaftar di sekolah.';
-        
+
         if (err.status === 404) {
           this.errorMsg = 'Anda belum terhubung dengan sekolah manapun. Silakan hubungi admin untuk menghubungkan akun Anda dengan sekolah.';
         }
@@ -110,7 +116,7 @@ export class CreateNewClassComponent implements OnInit {
 
     this.classService.getClassesBySchool(schoolId, token).subscribe({
       next: (response: ClassesBySchoolResponse) => {
-        
+
         // ✅ PERBAIKAN: Ambil array dari response.data dan filter yang tidak diarsipkan
         if (response.success && response.data && Array.isArray(response.data)) {
           this.existingDataList = response.data.filter(cls => !cls.archived_at);
@@ -118,7 +124,7 @@ export class CreateNewClassComponent implements OnInit {
           console.warn('Unexpected response structure:', response);
           this.existingDataList = [];
         }
-        
+
         // Update validator setelah data loaded
         this.classForm.get('className')?.updateValueAndValidity();
       },
@@ -168,7 +174,7 @@ export class CreateNewClassComponent implements OnInit {
 
     if (!token) {
       this.errorMsg = 'Token tidak ditemukan. Silakan login ulang.';
-      this.isSubmitting = false;
+      this.isSubmitting = true;
       return;
     }
 
@@ -179,33 +185,29 @@ export class CreateNewClassComponent implements OnInit {
       id_sekolah: schoolId
     };
 
-
     this.classService.addClass(classData, token).subscribe({
       next: (response: any) => {
         if (response.success) {
-          this.router.navigate(['/guru/kelola-kelas']);
+          this.showSuccessToast(`Kelas "${classData.nama_kelas}" berhasil dibuat!`);
+          setTimeout(() => {
+            this.isSubmitting = false;
+            this.router.navigate(['/guru/kelola-kelas']);
+          }, 2000);
         } else {
-          this.errorMsg = response.message || 'Gagal membuat kelas. Silakan coba lagi.';
+          this.showErrorToast(response.message || 'Gagal membuat kelas. Silakan coba lagi.');
+          this.isSubmitting = false;
         }
       },
       error: (err: any) => {
-        console.error('Error creating class:', err);
-        console.error('Error details:', {
-          status: err.status,
-          message: err.error?.message,
-          error: err.error
-        });
-        
+        let msg = '';
         if (err.status === 404 && err.error?.message === 'Sekolah tidak ditemukan') {
-          this.errorMsg = `Sekolah dengan ID ${schoolId} tidak ditemukan di database. Silakan hubungi admin.`;
+          msg = `Sekolah dengan ID ${schoolId} tidak ditemukan di database. Silakan hubungi admin.`;
         } else if (err.status === 400) {
-          this.errorMsg = 'Data yang dikirim tidak valid. Periksa kembali form Anda.';
+          msg = 'Data yang dikirim tidak valid. Periksa kembali form Anda.';
         } else {
-          this.errorMsg = err?.error?.message || 'Gagal membuat kelas. Silakan coba lagi.';
+          msg = err?.error?.message || 'Gagal membuat kelas. Silakan coba lagi.';
         }
-        this.isSubmitting = false;
-      },
-      complete: () => {
+        this.showErrorToast(msg);
         this.isSubmitting = false;
       }
     });
@@ -221,7 +223,7 @@ export class CreateNewClassComponent implements OnInit {
     const field = this.classForm.get(fieldName);
     return field ? field.hasError(errorType) && (field.dirty || field.touched) : false;
   }
-  
+
   onAcademicYearChange(year: AcademicYear): void {
     this.selectedAcademicYear = year;
     this.classForm.patchValue({
@@ -240,5 +242,36 @@ export class CreateNewClassComponent implements OnInit {
     if (classNameControl) {
       classNameControl.updateValueAndValidity();
     }
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 }

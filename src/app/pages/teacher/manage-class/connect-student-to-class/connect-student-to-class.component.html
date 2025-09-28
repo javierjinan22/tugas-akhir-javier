@@ -6,7 +6,7 @@
       <i class="fas fa-arrow-left"></i>
     </button>
     <div>
-      <h2 class="fw-bold mb-0" style="font-size: 24px;">Tambah siswa</h2>
+      <h2 class="fw-bold mb-0" style="font-size: 24px; font-family: Poppins;">Tambah siswa</h2>
       <!-- Class info subtitle -->
       <p class="text-muted mb-0" style="font-size: 14px;" *ngIf="currentClassInfo">
         Ke kelas: {{ currentClassInfo.nama_kelas }} 
@@ -14,16 +14,6 @@
       </p>
     </div>
   </div>
-
-  <!-- Debug info (hapus setelah testing) -->
-  <!-- <div class="alert alert-secondary mb-2" style="font-size: 12px;">
-    <strong>Debug:</strong> 
-    Total students: {{ allStudents.length }} | 
-    Search results: {{ filteredStudents.length }} | 
-    Show results: {{ showResults }} | 
-    Keyword: "{{ keyword }}"
-    <button class="btn btn-xs btn-secondary ms-2" (click)="debugData()">Debug Log</button>
-  </div> -->
 
   <!-- Loading indicator for initial data load -->
   <div *ngIf="isLoading" class="d-flex justify-content-center align-items-center" style="min-height: 200px;">

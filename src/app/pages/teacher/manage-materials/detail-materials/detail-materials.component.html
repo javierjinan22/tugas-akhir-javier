@@ -1,12 +1,32 @@
 <div class="container-fluid mt-4">
   <!-- Back button dan header -->
-  <div class="d-flex align-items-center mb-4">
-    <!-- Back button - hanya icon -->
+
+  <!-- <div class="d-flex align-items-center mb-4">
     <button class="btn-back-icon me-3" (click)="backToManageMaterials()" title="Kembali ke daftar materi">
       <i class="fas fa-arrow-left"></i>
     </button>
     <h2 class="fw-bold mb-0" style="font-size: 24px;">Detail Materi</h2>
     <div class="ms-auto">
+      <button class="btn btn-outline-primary btn-rounded" (click)="editMaterial()">
+        <i class="fas fa-edit me-1"></i>
+        Edit Materi
+      </button>
+    </div>
+  </div> -->
+
+  <div class="d-flex align-items-center mb-4">
+    <button class="btn-back-icon me-3" (click)="backToManageMaterials()" title="Kembali ke daftar materi">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <h2 class="fw-bold mb-0" style="font-size: 24px; font-family: Poppins;">Detail Materi</h2>
+    <div class="ms-auto d-flex gap-2">
+      <button *ngIf="material?.flagUnduh" 
+              class="btn btn-outline-success btn-rounded" 
+              (click)="openDownloadModal()"
+              title="Unduh materi dalam berbagai format">
+        <i class="fas fa-download me-1"></i>
+        Unduh Materi
+      </button>
       <button class="btn btn-outline-primary btn-rounded" (click)="editMaterial()">
         <i class="fas fa-edit me-1"></i>
         Edit Materi
@@ -77,6 +97,17 @@
         <div class="meta-item">
           <i class="fas" [ngClass]="material.flagUnduh ? 'fa-download' : 'fa-download-slash'"></i>
           <span>{{ material.flagUnduh ? 'Dapat diunduh' : 'Tidak dapat diunduh' }}</span>
+        </div>
+      </div>
+
+      <div class="meta-row">
+        <div class="meta-item">
+          <i class="fas" [ngClass]="material.flagAkses ? 'fa-share-alt' : 'fa-lock'"></i>
+          <span>{{ material.flagAkses ? 'Dapat digunakan guru lain' : 'Hanya untuk guru ini' }}</span>
+        </div>
+        <div class="meta-item" *ngIf="getTotalQuestions() > 0">
+          <i class="fas fa-clock"></i>
+          <span>Waktu pengerjaan: {{ formatWaktuPengerjaan() }}</span>
         </div>
       </div>
 

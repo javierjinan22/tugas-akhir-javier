@@ -112,6 +112,12 @@ export class CreateMaterialsComponent implements OnInit {
   selectedHeaderImage: File | null = null;
   headerImagePreview: string | null = null;
 
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -124,7 +130,8 @@ export class CreateMaterialsComponent implements OnInit {
       kategori: ['', Validators.required],
       kelas: [[], Validators.required],
       babList: this.fb.array([this.createBabGroup()]),
-      izinkanUnduh: [false]
+      izinkanUnduh: [false],
+      flagAkses: [false]
     });
 
     this.quizForm = this.fb.group({
@@ -470,7 +477,6 @@ export class CreateMaterialsComponent implements OnInit {
     return question.value.kunci === null;
   }
 
-  // Check if question has validation errors and should show them
   shouldShowQuestionErrors(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const soalTouched = question.get('soal')?.touched || false;
@@ -481,7 +487,6 @@ export class CreateMaterialsComponent implements OnInit {
     return soalTouched || kunciTouched || anyJawabanTouched;
   }
 
-  // Check if isian singkat should show error
   shouldShowIsianSingkatError(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const jawabanSingkatControl = question.get('jawabanSingkat');
@@ -493,7 +498,6 @@ export class CreateMaterialsComponent implements OnInit {
     return !jawabanSingkatControl.value || jawabanSingkatControl.value.trim() === '';
   }
 
-  // Check if question soal should show error
   shouldShowSoalError(questionIndex: number): boolean {
     const question = this.questions.at(questionIndex);
     const soalControl = question.get('soal');
@@ -711,6 +715,7 @@ export class CreateMaterialsComponent implements OnInit {
         kelas: materialData.kelas,
         babList: filteredBabList,
         izinkanUnduh: materialData.izinkanUnduh,
+        flagAkses: materialData.flagAkses ? 1 : 0,
         quiz: [],
         sekolah: this.schoolId
       };
@@ -719,13 +724,15 @@ export class CreateMaterialsComponent implements OnInit {
 
       this.materialService.addMaterial(finalData, headerImage).subscribe({
         next: (response) => {
-          this.isSubmitting = false;
-          this.backToManageMaterials();
+          this.showSuccessToast('Materi berhasil disimpan tanpa kuis!');
+          setTimeout(() => {
+            this.isSubmitting = false;
+            this.backToManageMaterials();
+          }, 2000);
         },
         error: (error) => {
-          console.error('Error creating material draft:', error);
           this.isSubmitting = false;
-          this.errorMsg = 'Gagal menyimpan draft materi. Silakan coba lagi.';
+          this.showErrorToast('Gagal menyimpan draft materi. Silakan coba lagi.');
         }
       });
 
@@ -736,141 +743,119 @@ export class CreateMaterialsComponent implements OnInit {
   }
 
   onFinalSubmit() {
-  if (!this.isStep1Valid()) {
-    this.errorMsg = 'Data utama belum lengkap';
-    this.currentStep = 1;
-    return;
-  }
-
-  if (!this.isStep2Valid()) {
-    this.errorMsg = 'Kuis belum lengkap. Mohon lengkapi semua soal.';
-    return;
-  }
-
-  this.isSubmitting = true;
-  this.errorMsg = '';
-
-  const materialData = this.materialForm.value;
-  const quizData = this.quizForm.value;
-
-  // Transform quiz dengan format konsisten dan logging
-  const transformedQuiz = quizData.questions.map((question: any, index: number) => {
-    // console.log(`🔍 Processing Question ${index + 1}:`, {
-    //   tipeSoal: question.tipeSoal,
-    //   soal: question.soal?.substring(0, 50) + '...',
-    //   kunci: question.kunci,
-    //   jawaban: question.jawaban,
-    //   jawabanSingkat: question.jawabanSingkat
-    // });
-
-    if (question.tipeSoal === 'pilihan_ganda') {
-      const filteredJawaban = question.jawaban.filter((jawab: string) => jawab && jawab.trim() !== '');
-      
-      if (question.kunci === null || question.kunci === undefined) {
-        throw new Error(`Soal ${index + 1}: Kunci jawaban pilihan ganda belum dipilih`);
-      }
-
-      if (question.kunci < 0 || question.kunci >= filteredJawaban.length) {
-        throw new Error(`Soal ${index + 1}: Kunci jawaban pilihan ganda tidak valid`);
-      }
-
-      // console.log(`✅ Pilihan Ganda ${index + 1} Final:`, {
-      //   jawabanCount: filteredJawaban.length,
-      //   kunci: question.kunci,
-      //   kunciText: filteredJawaban[question.kunci]
-      // });
-
-      return {
-        jenis_soal: 'pilihan_ganda',
-        soal: question.soal,
-        jawaban: filteredJawaban,
-        kunci: question.kunci
-      };
-
-    } else if (question.tipeSoal === 'benar_salah') {
-      if (question.kunci === null || question.kunci === undefined) {
-        throw new Error(`Soal ${index + 1}: Kunci jawaban benar/salah belum dipilih`);
-      }
-
-      const kunciNumber = typeof question.kunci === 'string' ? parseInt(question.kunci) : question.kunci;
-      
-      if (kunciNumber !== 0 && kunciNumber !== 1) {
-        throw new Error(`Soal ${index + 1}: Kunci jawaban benar/salah tidak valid. Harus 0 (Benar) atau 1 (Salah)`);
-      }
-
-      return {
-        jenis_soal: 'benar_salah',
-        soal: question.soal,
-        jawaban: ['Benar', 'Salah'], 
-        kunci: kunciNumber
-      };
-
-    } else if (question.tipeSoal === 'isian_singkat') {
-      if (!question.jawabanSingkat || question.jawabanSingkat.trim() === '') {
-        throw new Error(`Soal ${index + 1}: Jawaban singkat belum diisi`);
-      }
-
-      return {
-        jenis_soal: 'isian_singkat',
-        soal: question.soal,
-        kunci_jawaban: question.jawabanSingkat.trim()
-      };
-
-    } else {
-      throw new Error(`Soal ${index + 1}: Tipe soal tidak valid: ${question.tipeSoal}`);
+    if (!this.isStep1Valid()) {
+      this.errorMsg = 'Data utama belum lengkap';
+      this.currentStep = 1;
+      return;
     }
-  });
 
-  const filteredBabList = materialData.babList.filter((bab: any) => {
-    const hasJudul = bab.judulBab && bab.judulBab.trim() !== '';
-    const hasIsi = bab.isiBab && bab.isiBab.trim() !== '';
-    return hasJudul || hasIsi;
-  });
+    if (!this.isStep2Valid()) {
+      this.errorMsg = 'Kuis belum lengkap. Mohon lengkapi semua soal.';
+      return;
+    }
 
-  const finalData = {
-    judul: materialData.judul,
-    deskripsi: materialData.deskripsi,
-    kategori: materialData.kategori,
-    kelas: materialData.kelas,
-    babList: filteredBabList,
-    izinkanUnduh: materialData.izinkanUnduh,
-    quiz: transformedQuiz,
-    waktu_pengerjaan: quizData.waktu_pengerjaan,
-    sekolah: this.schoolId
-  };
+    this.isSubmitting = true;
+    this.errorMsg = '';
 
-  const headerImage = this.selectedHeaderImage || undefined;
+    const materialData = this.materialForm.value;
+    const quizData = this.quizForm.value;
 
-  // console.log('🚀 Submitting material data:', {
-  //   judul: finalData.judul,
-  //   kategori: finalData.kategori,
-  //   kelasCount: finalData.kelas?.length || 0,
-  //   babCount: finalData.babList?.length || 0,
-  //   quizCount: finalData.quiz?.length || 0,
-  //   hasHeaderImage: !!headerImage
-  // });
+    // Transform quiz dengan format konsisten dan logging
+    const transformedQuiz = quizData.questions.map((question: any, index: number) => {
 
-  this.materialService.addMaterial(finalData, headerImage).subscribe({
-    next: (response) => {
-      console.log('✅ Material created successfully:', response);
-      this.isSubmitting = false;
-      this.backToManageMaterials();
-    },
-    error: (error) => {
-      console.error('❌ Error creating material with quiz:', error);
-      this.isSubmitting = false;
-      
-      // ✅ PERBAIKAN: Error handling yang lebih detail
-      if (error.error?.message) {
-        this.errorMsg = error.error.message;
-      } else if (error.message) {
-        this.errorMsg = error.message;
+      if (question.tipeSoal === 'pilihan_ganda') {
+        const filteredJawaban = question.jawaban.filter((jawab: string) => jawab && jawab.trim() !== '');
+
+        if (question.kunci === null || question.kunci === undefined) {
+          throw new Error(`Soal ${index + 1}: Kunci jawaban pilihan ganda belum dipilih`);
+        }
+
+        if (question.kunci < 0 || question.kunci >= filteredJawaban.length) {
+          throw new Error(`Soal ${index + 1}: Kunci jawaban pilihan ganda tidak valid`);
+        }
+
+        return {
+          jenis_soal: 'pilihan_ganda',
+          soal: question.soal,
+          jawaban: filteredJawaban,
+          kunci: question.kunci
+        };
+
+      } else if (question.tipeSoal === 'benar_salah') {
+        if (question.kunci === null || question.kunci === undefined) {
+          throw new Error(`Soal ${index + 1}: Kunci jawaban benar/salah belum dipilih`);
+        }
+
+        const kunciNumber = typeof question.kunci === 'string' ? parseInt(question.kunci) : question.kunci;
+
+        if (kunciNumber !== 0 && kunciNumber !== 1) {
+          throw new Error(`Soal ${index + 1}: Kunci jawaban benar/salah tidak valid. Harus 0 (Benar) atau 1 (Salah)`);
+        }
+
+        return {
+          jenis_soal: 'benar_salah',
+          soal: question.soal,
+          jawaban: ['Benar', 'Salah'],
+          kunci: kunciNumber
+        };
+
+      } else if (question.tipeSoal === 'isian_singkat') {
+        if (!question.jawabanSingkat || question.jawabanSingkat.trim() === '') {
+          throw new Error(`Soal ${index + 1}: Jawaban singkat belum diisi`);
+        }
+
+        return {
+          jenis_soal: 'isian_singkat',
+          soal: question.soal,
+          kunci_jawaban: question.jawabanSingkat.trim()
+        };
+
       } else {
-        this.errorMsg = 'Gagal membuat materi dengan kuis. Silakan coba lagi.';
+        throw new Error(`Soal ${index + 1}: Tipe soal tidak valid: ${question.tipeSoal}`);
       }
-    }
-  });
-}
+    });
+
+    const filteredBabList = materialData.babList.filter((bab: any) => {
+      const hasJudul = bab.judulBab && bab.judulBab.trim() !== '';
+      const hasIsi = bab.isiBab && bab.isiBab.trim() !== '';
+      return hasJudul || hasIsi;
+    });
+
+    const finalData = {
+      judul: materialData.judul,
+      deskripsi: materialData.deskripsi,
+      kategori: materialData.kategori,
+      kelas: materialData.kelas,
+      babList: filteredBabList,
+      izinkanUnduh: materialData.izinkanUnduh,
+      flagAkses: materialData.flagAkses ? 1 : 0,
+      quiz: transformedQuiz,
+      waktu_pengerjaan: quizData.waktu_pengerjaan,
+      sekolah: this.schoolId
+    };
+
+    const headerImage = this.selectedHeaderImage || undefined;
+
+    this.materialService.addMaterial(finalData, headerImage).subscribe({
+      next: (response) => {
+        this.showSuccessToast('Materi berhasil dibuat!');
+        setTimeout(() => {
+          this.isSubmitting = false;
+          this.backToManageMaterials();
+        }, 2000);
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        if (error.error?.message) {
+          this.showErrorToast(error.error.message);
+        } else if (error.message) {
+          this.showErrorToast(error.message);
+        } else {
+          this.showErrorToast('Gagal membuat materi dengan kuis. Silakan coba lagi.');
+        }
+      }
+    });
+  }
 
   onBatal() {
     if (this.currentStep > 1) {
@@ -883,5 +868,36 @@ export class CreateMaterialsComponent implements OnInit {
 
   backToManageMaterials() {
     this.router.navigate(['/guru/kelola-materi']);
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 }

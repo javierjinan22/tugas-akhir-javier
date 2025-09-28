@@ -622,6 +622,46 @@
   transform: translateY(-1px);
 }
 
+/* New Styles for Alert */
+.alert-congratulation {
+  background: linear-gradient(135deg, #fff9c4 0%, #fff3cd 100%);
+  border: 2px solid #ffc107;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+  animation: slideInDown 0.6s ease-out;
+}
+
+.alert-congratulation .alert-heading {
+  color: #856404;
+  font-weight: 600;
+}
+
+.alert-congratulation p {
+  color: #856404;
+}
+
+.alert-congratulation .text-muted {
+  color: #6c757d !important;
+}
+
+.trophy-gif {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(255, 193, 7, 0.3));
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .learning-history-container {

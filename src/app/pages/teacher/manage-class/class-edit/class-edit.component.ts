@@ -25,7 +25,7 @@ export class ClassEditComponent implements OnInit {
   classData: any = null;
   classId: string = '';
   existingDataList: any[] = [];
-  
+
   academicYears: AcademicYear[] = [
     { id: 1, name: '2023/2024' },
     { id: 2, name: '2024/2025' },
@@ -36,13 +36,19 @@ export class ClassEditComponent implements OnInit {
 
   selectedAcademicYear: AcademicYear | null = null;
 
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private classService: ClassService,
     private schoolService: SchoolService
-  ) { 
+  ) {
     this.classForm = this.fb.group({
       className: ['', [Validators.required, Validators.minLength(2), this.classNameValidator.bind(this)]],
       academicYearId: ['', [Validators.required]]
@@ -52,7 +58,7 @@ export class ClassEditComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.params.subscribe(params => {
       this.classId = params['id'];
-      
+
       if (this.classId) {
         this.loadClassData();
       } else {
@@ -64,7 +70,6 @@ export class ClassEditComponent implements OnInit {
     this.getTeacherSchool();
   }
 
-  // ✅ TAMBAH METHOD BACK TO MANAGE CLASSES
   backToManageClasses(): void {
     this.router.navigate(['/guru/kelola-kelas']);
   }
@@ -76,9 +81,9 @@ export class ClassEditComponent implements OnInit {
     }
 
     const inputClassName = control.value.trim().toLowerCase();
-    
-    const isDuplicate = this.existingDataList.some(classData => 
-      classData.nama_kelas.toLowerCase().trim() === inputClassName && 
+
+    const isDuplicate = this.existingDataList.some(classData =>
+      classData.nama_kelas.toLowerCase().trim() === inputClassName &&
       classData._id !== this.classId
     );
 
@@ -97,7 +102,7 @@ export class ClassEditComponent implements OnInit {
 
     this.classService.getClassById(this.classId, token).subscribe({
       next: (response: any) => {
-        
+
         let classData = null;
         if (response && response.data) {
           classData = response.data;
@@ -113,7 +118,7 @@ export class ClassEditComponent implements OnInit {
         } else {
           this.errorMsg = 'Data kelas tidak ditemukan.';
         }
-        
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -127,7 +132,7 @@ export class ClassEditComponent implements OnInit {
   private patchFormWithClassData(): void {
     if (!this.classData) return;
 
-    const matchingYear = this.academicYears.find(year => 
+    const matchingYear = this.academicYears.find(year =>
       year.name === this.classData.tahun_ajaran
     );
 
@@ -143,12 +148,12 @@ export class ClassEditComponent implements OnInit {
   }
 
   private getTeacherSchool(): void {
-    
+
     this.schoolService.getMySchool().subscribe({
       next: (response: School) => {
-        
+
         this.school = response;
-        
+
         const schoolId = this.school?._id;
         if (!schoolId) {
           this.errorMsg = 'Data sekolah tidak lengkap. ID sekolah tidak ditemukan.';
@@ -160,7 +165,7 @@ export class ClassEditComponent implements OnInit {
       error: (err: any) => {
         console.error('Error getting school:', err);
         this.errorMsg = 'Tidak dapat mengambil data sekolah. Pastikan Anda sudah terdaftar di sekolah.';
-        
+
         if (err.status === 404) {
           this.errorMsg = 'Anda belum terhubung dengan sekolah manapun. Silakan hubungi admin untuk menghubungkan akun Anda dengan sekolah.';
         }
@@ -175,13 +180,13 @@ export class ClassEditComponent implements OnInit {
 
     this.classService.getClassesBySchool(schoolId, token).subscribe({
       next: (response: ClassesBySchoolResponse) => {
-        
+
         if (response.success && response.data && Array.isArray(response.data)) {
           this.existingDataList = response.data.filter(cls => cls._id !== this.classId);
         } else {
           this.existingDataList = [];
         }
-        
+
         this.classForm.get('className')?.updateValueAndValidity();
       },
       error: (error) => {
@@ -239,30 +244,23 @@ export class ClassEditComponent implements OnInit {
 
     this.classService.updateClass(this.classId, updateData, token).subscribe({
       next: (response: any) => {
-        
-        this.successMsg = `Kelas "${updateData.nama_kelas}" berhasil diperbarui!`;
-        
+        this.showSuccessToast(`Kelas "${updateData.nama_kelas}" berhasil diperbarui!`);
         setTimeout(() => {
           this.router.navigate(['/guru/kelola-kelas']);
         }, 2000);
       },
       error: (err: any) => {
-        console.error('Error updating class:', err);
-        console.error('Error details:', {
-          status: err.status,
-          message: err.error?.message,
-          error: err.error
-        });
-        
+        let msg = '';
         if (err.status === 404) {
-          this.errorMsg = 'Kelas tidak ditemukan.';
+          msg = 'Kelas tidak ditemukan.';
         } else if (err.status === 400) {
-          this.errorMsg = 'Data yang dikirim tidak valid. Periksa kembali form Anda.';
+          msg = 'Data yang dikirim tidak valid. Periksa kembali form Anda.';
         } else if (err.status === 403) {
-          this.errorMsg = 'Anda tidak memiliki akses untuk mengubah kelas ini.';
+          msg = 'Anda tidak memiliki akses untuk mengubah kelas ini.';
         } else {
-          this.errorMsg = err?.error?.message || 'Gagal memperbarui kelas. Silakan coba lagi.';
+          msg = err?.error?.message || 'Gagal memperbarui kelas. Silakan coba lagi.';
         }
+        this.showErrorToast(msg);
         this.isSubmitting = false;
       },
       complete: () => {
@@ -280,7 +278,7 @@ export class ClassEditComponent implements OnInit {
     const field = this.classForm.get(fieldName);
     return field ? field.hasError(errorType) && (field.dirty || field.touched) : false;
   }
-  
+
   onAcademicYearChange(year: AcademicYear): void {
     this.selectedAcademicYear = year;
     this.classForm.patchValue({
@@ -297,5 +295,36 @@ export class ClassEditComponent implements OnInit {
     if (classNameControl) {
       classNameControl.updateValueAndValidity();
     }
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 }

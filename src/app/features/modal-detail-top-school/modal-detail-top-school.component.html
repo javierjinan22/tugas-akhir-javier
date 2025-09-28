@@ -1,0 +1,143 @@
+<div class="modal-content school-detail-modal">
+  <!-- ✅ HEADER SAMA SEPERTI LOGIN MODAL -->
+  <div class="modal-header">
+    <h5 class="modal-title">Detail Sekolah</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+  </div>
+
+  <div class="modal-body">
+    <!-- ✅ LOADING STATE -->
+    <div *ngIf="!schoolData" class="text-center py-5">
+      <div class="spinner-border text-primary mb-3" role="status"></div>
+      <p class="text-muted">Memuat detail sekolah...</p>
+    </div>
+
+    <!-- ✅ SCHOOL DETAIL CONTENT -->
+    <div *ngIf="schoolData" class="school-detail-content">
+      
+      <!-- ✅ HEADER WITH RANK BADGE -->
+      <div class="school-header text-center mb-4">
+        <div class="rank-badge-wrapper mb-3">
+          <div class="rank-badge" [ngClass]="getRankBadgeClass()">
+            <!-- ✅ ENHANCED: Asset gambar dengan efek bergerak dan ukuran lebih besar -->
+            <div class="rank-image-container">
+              <img [src]="getRankImage()" [alt]="'Peringkat ' + schoolData.peringkat" class="rank-image">
+              <div class="rank-glow"></div>
+            </div>
+          </div>
+        </div>
+        
+        <h4 class="school-name mb-2">{{ schoolData.nama }}</h4>
+        <div class="school-npsn">
+          <i class="fas fa-id-card me-2 text-primary"></i>
+          <span>NPSN: {{ schoolData.npsn || 'Tidak tersedia' }}</span>
+        </div>
+      </div>
+
+      <!-- ✅ LOCATION INFO -->
+      <div class="location-section mb-4">
+        <div class="section-title">
+          <i class="fas fa-map-marker-alt me-2"></i>
+          Lokasi Sekolah
+        </div>
+        <div class="location-content">
+          {{ getFullAddress() }}
+        </div>
+      </div>
+
+      <!-- ✅ PERFORMANCE OVERVIEW -->
+      <div class="performance-overview mb-4">
+        <div class="performance-header text-center">
+          <div class="performance-label">Status Aktivitas</div>
+          <div class="performance-level" [ngClass]="getProgressColorClass()">
+            {{ getPerformanceLevel() }}
+          </div>
+          <div class="completion-percentage">
+            {{ schoolData.statistik.avg_penyelesaian }}% Rata-rata Penyelesaian
+          </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container">
+          <div class="progress custom-progress">
+            <div 
+              class="progress-bar" 
+              [ngClass]="getProgressColorClass()"
+              role="progressbar" 
+              [style.width.%]="schoolData.statistik.avg_penyelesaian"
+              [attr.aria-valuenow]="schoolData.statistik.avg_penyelesaian"
+              aria-valuemin="0" 
+              aria-valuemax="100">
+            </div>
+          </div>
+          <div class="progress-indicators">
+            <span class="progress-start">0%</span>
+            <span class="progress-end">100%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ STATISTICS GRID -->
+      <div class="statistics-section">
+        <div class="section-title mb-3">
+          <i class="fas fa-chart-bar me-2"></i>
+          Statistik Aktivitas
+        </div>
+        
+        <div class="statistics-grid">
+          <!-- Total Siswa -->
+          <div class="stat-card stat-students">
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ schoolData.statistik.total_siswa }}</div>
+              <div class="stat-label">Siswa Aktif</div>
+            </div>
+          </div>
+
+          <!-- Total Guru -->
+          <div class="stat-card stat-teachers">
+            <div class="stat-icon">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ schoolData.statistik.total_guru }}</div>
+              <div class="stat-label">Guru Aktif</div>
+            </div>
+          </div>
+
+          <!-- Total Materi -->
+          <div class="stat-card stat-materials">
+            <div class="stat-icon">
+              <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ schoolData.statistik.total_materi }}</div>
+              <div class="stat-label">Materi Dibuat</div>
+            </div>
+          </div>
+
+          <!-- Rata-rata Nilai -->
+          <div class="stat-card stat-average">
+            <div class="stat-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="stat-content">
+              <div class="stat-number">{{ schoolData.statistik.avg_nilai }}</div>
+              <div class="stat-label">Rata-rata Nilai</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ ACTION BUTTONS -->
+      <div class="modal-actions text-center mt-4">
+        <button type="button" class="btn btn-outline-primary me-2" (click)="closeModal()">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

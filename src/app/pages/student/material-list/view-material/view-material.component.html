@@ -49,8 +49,11 @@
         </div>
 
         <div *ngIf="!pageLoading" class="material-content">
-          <!-- Render current page content -->
-          <div class="material-page" [innerHTML]="currentPageContent"></div>
+          <!-- ✅ TAMBAH: Content wrapper -->
+          <div class="material-content-wrapper">
+            <!-- Render current page content -->
+            <div class="material-page" [innerHTML]="currentPageContent"></div>
+          </div>
         </div>
 
         <div class="pagination-controls">

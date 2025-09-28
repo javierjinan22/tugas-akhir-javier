@@ -1,10 +1,32 @@
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0"
+       [class.show]="showToast"
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert"
+       aria-live="assertive"
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="container-fluid mt-4 custom-materi-container">
   <div class="d-flex align-items-center mb-4">
     <!-- Back button -->
     <button class="btn-back-icon me-3" (click)="backToManageClasses()" title="Kembali ke daftar kelas">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <h2 class="fw-bold mb-0" style="font-size: 24px;">Kelas yang diarsipkan</h2>
+    <h2 class="fw-bold mb-0" style="font-size: 24px; font-family: Poppins;">Kelas yang diarsipkan</h2>
   </div>
 
   <!-- Error message -->

@@ -1,3 +1,25 @@
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0"
+       [class.show]="showToast"
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert"
+       aria-live="assertive"
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
+</div>
+
 <div class="container-fluid mt-4">
   <!-- Back button dan header -->
   <div class="d-flex align-items-center mb-4">
@@ -5,7 +27,7 @@
     <button class="btn-back-icon me-3" (click)="backToManageMaterials()" title="Kembali ke daftar materi">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <h2 class="fw-bold mb-0" style="font-size: 24px;">Edit materi</h2>
+    <h2 class="fw-bold mb-0" style="font-size: 24px; font-family: Poppins;">Edit materi</h2>
   </div>
 
   <!-- ✅ Loading Material -->
@@ -196,6 +218,30 @@
             </small>
           </div>
         </div>
+
+        <div class="row">
+          <!-- Izinkan unduh materi -->
+          <div class="col-md-6 mb-3">
+            <div class="d-flex align-items-center">
+              <label class="toggle-switch mb-0">
+                <input type="checkbox" formControlName="izinkanUnduh">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="ms-3">Izinkan unduh materi</span>
+            </div>
+          </div>
+
+          <!-- ✅ BARU: Flag akses -->
+          <div class="col-md-6 mb-3">
+            <div class="d-flex align-items-center">
+              <label class="toggle-switch mb-0">
+                <input type="checkbox" formControlName="flagAkses">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="ms-3">Izinkan guru lain menggunakan materi ini</span>
+            </div>
+          </div>
+        </div>
       </form>
     </div>
 
@@ -288,14 +334,14 @@
               Batal
             </button>
             <!-- ✅ Skip Quiz button -->
-            <!-- <button 
+            <button 
               type="button" 
               class="btn btn-outline-secondary btn-rounded" 
               (click)="onSkipQuiz()"
               [disabled]="isSubmitting || !isStep1Valid()">
               <i class="fas fa-save me-1"></i>
-              Simpan Tanpa Kuis
-            </button> -->
+              Simpan Tanpa Edit Kuis
+            </button>
             <button 
               type="submit" 
               class="btn btn-primary btn-rounded"

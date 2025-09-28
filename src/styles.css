@@ -11,3 +11,39 @@
   color: #fff !important; /* Warna teks saat hover */
   cursor: pointer;
 }
+
+/* Global responsive content styling */
+.ck-content img,
+.material-content img,
+.material-page img {
+  max-width: 100% !important;
+  height: auto !important;
+  width: auto !important;
+  display: block !important;
+  margin: 15px auto !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.ck-content img:hover,
+.material-content img:hover,
+.material-page img:hover {
+  transform: scale(1.02) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.ck-content iframe,
+.ck-content video,
+.material-content iframe,
+.material-content video,
+.material-page iframe,
+.material-page video {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16/9 !important;
+  border-radius: 12px !important;
+  margin: 15px 0 !important;
+}

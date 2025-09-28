@@ -110,6 +110,11 @@ export class EditMaterialsComponent implements OnInit {
 
   materialForm: FormGroup;
   quizForm: FormGroup;
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
 
   constructor(
     private fb: FormBuilder,
@@ -121,10 +126,11 @@ export class EditMaterialsComponent implements OnInit {
     this.materialForm = this.fb.group({
       judul: ['', [Validators.required, Validators.minLength(2)]],
       deskripsi: ['', [Validators.required, Validators.minLength(2)]],
-      kategori: ['', Validators.required], 
+      kategori: ['', Validators.required],
       kelas: [[], Validators.required],
       babList: this.fb.array([this.createBabGroup()]),
-      izinkanUnduh: [false]
+      izinkanUnduh: [false],
+      flagAkses: [false]
     });
 
     this.quizForm = this.fb.group({
@@ -202,7 +208,7 @@ export class EditMaterialsComponent implements OnInit {
   }
 
   getAnswerLabel(index: number): string {
-    return String.fromCharCode(65 + index); 
+    return String.fromCharCode(65 + index);
   }
 
   getTrueFalseOption(index: number): string {
@@ -287,9 +293,10 @@ export class EditMaterialsComponent implements OnInit {
     this.materialForm.patchValue({
       judul: this.originalMaterial.judul_materi || '',
       deskripsi: this.originalMaterial.deskripsi_singkat || '',
-      kategori: this.originalMaterial.kategori_materi || '', 
+      kategori: this.originalMaterial.kategori_materi || '',
       kelas: this.originalMaterial.kelas_ditautkan || [],
-      izinkanUnduh: this.originalMaterial.flag_unduh || false
+      izinkanUnduh: this.originalMaterial.flag_unduh || false,
+      flagAkses: this.originalMaterial.flag_akses || false
     });
 
     if (this.originalMaterial.header_gambar) {
@@ -503,7 +510,7 @@ export class EditMaterialsComponent implements OnInit {
     return this.fb.group({
       tipeSoal: ['pilihan_ganda', Validators.required],
       soal: ['', Validators.required],
-      jawaban: this.fb.array(['', '', '', '']), 
+      jawaban: this.fb.array(['', '', '', '']),
       kunci: [null, Validators.required],
       jawabanSingkat: ['']
     });
@@ -543,18 +550,18 @@ export class EditMaterialsComponent implements OnInit {
       qGroup.setControl('jawaban', this.fb.array(['Benar', 'Salah']));
       qGroup.patchValue({
         tipeSoal: 'benar_salah',
-        kunci: null, 
+        kunci: null,
         jawabanSingkat: ''
       });
     } else if (tipe === 'pilihan_ganda') {
       qGroup.setControl('jawaban', this.fb.array(['', '', '', '']));
       qGroup.patchValue({
         tipeSoal: 'pilihan_ganda',
-        kunci: null, 
+        kunci: null,
         jawabanSingkat: ''
       });
     } else if (tipe === 'isian_singkat') {
-      qGroup.setControl('jawaban', this.fb.array([])); 
+      qGroup.setControl('jawaban', this.fb.array([]));
       qGroup.patchValue({
         tipeSoal: 'isian_singkat',
         kunci: null,
@@ -866,14 +873,14 @@ export class EditMaterialsComponent implements OnInit {
         return {
           jenis_soal: 'pilihan_ganda',
           soal: question.soal,
-          jawaban: question.jawaban.filter((jawab: string) => jawab && jawab.trim() !== ''), 
+          jawaban: question.jawaban.filter((jawab: string) => jawab && jawab.trim() !== ''),
           kunci: question.kunci
         };
       } else if (question.tipeSoal === 'benar_salah') {
         return {
           jenis_soal: 'benar_salah',
           soal: question.soal,
-          kunci: question.kunci 
+          kunci: question.kunci
         };
       } else {
         return {
@@ -897,6 +904,7 @@ export class EditMaterialsComponent implements OnInit {
       kelas: materialData.kelas,
       babList: filteredBabList,
       izinkanUnduh: materialData.izinkanUnduh,
+      flagAkses: materialData.flagAkses ? 1 : 0,
       quiz: transformedQuiz,
       waktu_pengerjaan: quizData.waktu_pengerjaan,
       sekolah: this.schoolId
@@ -906,15 +914,66 @@ export class EditMaterialsComponent implements OnInit {
 
     this.materialService.updateMaterial(this.materialId, finalData, headerImage, this.token).subscribe({
       next: (response) => {
-        this.isSubmitting = false;
-        this.backToManageMaterials();
+        this.showSuccessToast('Materi berhasil diperbarui!');
+        setTimeout(() => {
+          this.isSubmitting = false;
+          this.backToManageMaterials();
+        }, 2000);
       },
       error: (error) => {
-        console.error('Error updating material with quiz:', error);
         this.isSubmitting = false;
-        this.errorMsg = error.error?.message || 'Gagal memperbarui materi dengan kuis. Silakan coba lagi.';
+        this.showErrorToast(error.error?.message || 'Gagal memperbarui materi. Silakan coba lagi.');
       }
     });
+  }
+
+  onSkipQuiz() {
+    if (this.isStep1Valid()) {
+      this.isSubmitting = true;
+      this.errorMsg = '';
+
+      const materialData = this.materialForm.value;
+      const filteredBabList = materialData.babList.filter((bab: any) => {
+        const hasJudul = bab.judulBab && bab.judulBab.trim() !== '';
+        const hasIsi = bab.isiBab && bab.isiBab.trim() !== '';
+        return hasJudul || hasIsi;
+      });
+
+      const quiz = this.originalMaterial?.soal || [];
+      const waktu_pengerjaan = this.originalMaterial?.waktu_pengerjaan || null;
+
+      const finalData = {
+        judul: materialData.judul,
+        deskripsi: materialData.deskripsi,
+        kategori: materialData.kategori,
+        kelas: materialData.kelas,
+        babList: filteredBabList,
+        izinkanUnduh: materialData.izinkanUnduh,
+        flagAkses: materialData.flagAkses ? 1 : 0,
+        quiz: quiz,
+        waktu_pengerjaan: waktu_pengerjaan,
+        sekolah: this.schoolId
+      };
+
+      const headerImage = this.selectedHeaderImage || undefined;
+
+      this.materialService.updateMaterial(this.materialId, finalData, headerImage, this.token).subscribe({
+        next: (response) => {
+          this.showSuccessToast('Materi berhasil diperbarui tanpa kuis!');
+          setTimeout(() => {
+            this.isSubmitting = false;
+            this.backToManageMaterials();
+          }, 2000);
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          this.showErrorToast(error.error?.message || 'Gagal memperbarui materi tanpa kuis. Silakan coba lagi.');
+        }
+      });
+    } else {
+      this.materialForm.markAllAsTouched();
+      this.showErrorToast('Mohon lengkapi data utama: judul, deskripsi, kategori, dan pilih minimal satu kelas.');
+    }
   }
 
   onBatal() {
@@ -928,5 +987,36 @@ export class EditMaterialsComponent implements OnInit {
 
   backToManageMaterials() {
     this.router.navigate(['/guru/kelola-materi']);
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 }

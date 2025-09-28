@@ -35,7 +35,21 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* Search bar styling - menggunakan style yang sudah ada */
+.btn-outline-secondary {
+  border: 2px solid #6c757d;
+  color: #6c757d;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+}
+
 .search-bar {
   border: 2px solid #1cc4cc;
   border-radius: 2rem;
@@ -143,6 +157,14 @@
   border-color: #1BB6C1;
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(27, 182, 193, 0.25);
+}
+
+.results-info {
+  padding: 1rem;
+  background: rgba(21, 178, 196, 0.05);
+  border-radius: 12px;
+  border-left: 3px solid #1BB6C1;
+  margin-top: 2rem;
 }
 
 /* Responsive adjustments */

@@ -21,6 +21,23 @@
     </div>
   </div>
 
+  <!-- ✅ TAMBAH: Congratulation message jika datang dari quiz result -->
+  <!-- <div *ngIf="fromQuizResult && contextScore > 0 && showCongratulationCard" 
+     class="alert alert-congratulation alert-dismissible fade show mb-4" 
+     role="alert">
+  <div class="d-flex align-items-center">
+    <img src="assets/img/trophy.gif" 
+         alt="Trophy Animation" 
+         class="trophy-gif me-3">
+    <div>
+      <h6 class="alert-heading mb-1">Selamat!</h6>
+      <p class="mb-0">Kamu baru saja menyelesaikan kuis dengan nilai <strong>{{ contextScore }}</strong>!</p>
+      <small class="text-muted">Lihat pencapaian dan peringkatmu di bawah ini.</small>
+    </div>
+  </div>
+  <button type="button" class="btn-close" (click)="dismissCongratulationCard()" aria-label="Close"></button>
+</div> -->
+
   <!-- Loading State -->
   <div *ngIf="loading" class="loading-container">
     <div class="text-center py-5">

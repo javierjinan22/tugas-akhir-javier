@@ -41,8 +41,17 @@ export interface AchievementsResponse {
 export interface StudentRanking {
   student_id: string;
   nama_siswa: string;
+  username: string;
   score: number;
   completed_materi: number;
+  total_materi: number;
+  completion_rate: number;
+  avg_duration_seconds: number;
+  avg_attempts: number;
+  total_attempts: number;  
+  ranking_score: number;
+  ranking_attempts: number;
+  ranking_duration: number;
   medal_level: string;
   rank: number;
 }
@@ -58,8 +67,13 @@ export interface RankingsResponse {
   success: boolean;
   data: {
     kategori: string;
-    current_student: CurrentStudent;
+    kelas_info: {
+      _id: string;
+      nama_kelas: string;
+    };
+    current_student: StudentRanking;
     rankings: StudentRanking[];
+    total_students: number; 
   };
 }
 

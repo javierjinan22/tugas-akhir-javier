@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { MaterialService } from '../../../../service/material.service';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { ModalDownloadComponent } from 'src/app/pages/student/material-list/modal-download/modal-download.component';
 
 interface MaterialPage {
   content: string;
@@ -22,6 +24,7 @@ interface ProcessedMaterial {
   kelasNames: string[];
   createdAt: string;
   flagUnduh: boolean;
+  flagAkses: boolean;
   isActive: boolean;
   waktuPengerjaan?: number;
 }
@@ -47,11 +50,14 @@ export class DetailMaterialsComponent implements OnInit {
   currentTab: 'materi' | 'quiz' = 'materi';
   currentQuizIndex: number = 0;
 
+  bsModalRef: BsModalRef | undefined;
+  
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private sanitizer: DomSanitizer,
-    private materialService: MaterialService
+    private materialService: MaterialService,
+    private modalService: BsModalService
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +77,38 @@ export class DetailMaterialsComponent implements OnInit {
     }
     
     this.loadMaterialData();
+  }
+
+  openDownloadModal(): void {
+    if (!this.material) {
+      console.error('Material data not available');
+      return;
+    }
+
+    console.log('🔍 Opening download modal for material:', this.material.title);
+    
+    const initialState = {
+      materialId: this.material.id,
+      materialTitle: this.material.title,
+      slug: this.generateSlug(this.material.title),
+      attemptId: undefined // Guru tidak memiliki attempt ID
+    };
+
+    this.bsModalRef = this.modalService.show(ModalDownloadComponent, {
+      class: 'modal-lg modal-dialog-centered',
+      backdrop: 'static',
+      keyboard: false,
+      initialState
+    });
+  }
+
+  // ✅ TAMBAH: Helper method untuk generate slug
+  private generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .trim();
   }
 
   loadMaterialData(): void {
@@ -156,6 +194,7 @@ export class DetailMaterialsComponent implements OnInit {
         kelasNames: kelasNames,
         createdAt: data.created_at,
         flagUnduh: data.flag_unduh || false,
+        flagAkses: data.flag_akses || false,
         isActive: data.is_active,
         waktuPengerjaan: waktuPengerjaan
       };
@@ -182,6 +221,7 @@ export class DetailMaterialsComponent implements OnInit {
         kelasNames: data.kelas_ditautkan || [],
         createdAt: data.created_at,
         flagUnduh: data.flag_unduh || false,
+        flagAkses: data.flag_akses || false,
         isActive: data.is_active,
         waktuPengerjaan: data.waktu_pengerjaan || null // ✅ FIX: Root level waktu_pengerjaan
       };

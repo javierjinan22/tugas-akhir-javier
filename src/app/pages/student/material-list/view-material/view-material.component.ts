@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { StudentProgressService } from '../../../../service/student-progress.service';
 import { Location, PlatformLocation } from '@angular/common';
+import { MaterialService } from 'src/app/service/material.service';
 
 interface QuizAttempt {
   id: number;
@@ -39,7 +40,8 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     private location: Location,
     private platformLocation: PlatformLocation,
     private sanitizer: DomSanitizer,
-    private studentProgressService: StudentProgressService
+    private studentProgressService: StudentProgressService,
+    private materialService: MaterialService 
   ) { }
 
   ngOnInit(): void {
@@ -211,27 +213,52 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     this.updateMaterialProgressWithAttempts();
   }
 
+  // loadPage(pageIndex: number): void {
+  //   if (!this.material || pageIndex < 0 || pageIndex >= this.material.pages.length) {
+  //     return;
+  //   }
+
+  //   this.pageLoading = true;
+
+  //   setTimeout(() => {
+  //     this.currentPageIndex = pageIndex;
+  //     const currentPage = this.material.pages[pageIndex];
+  //     this.currentPageContent = this.sanitizer.bypassSecurityTrustHtml(currentPage.content);
+
+  //     if (!currentPage.isRead) {
+  //       this.markBabAsComplete(pageIndex);
+  //     } else {
+  //       this.updateMaterialProgress();
+  //     }
+
+  //     this.pageLoading = false;
+  //   }, 300);
+  // }
+
   loadPage(pageIndex: number): void {
-    if (!this.material || pageIndex < 0 || pageIndex >= this.material.pages.length) {
-      return;
+  if (!this.material || pageIndex < 0 || pageIndex >= this.material.pages.length) {
+    return;
+  }
+
+  this.pageLoading = true;
+
+  setTimeout(() => {
+    this.currentPageIndex = pageIndex;
+    const currentPage = this.material.pages[pageIndex];
+    
+    // ✅ GUNAKAN: Service method untuk format content
+    const formattedContent = this.materialService.formatContentWithResponsiveStyles(currentPage.content);
+    this.currentPageContent = this.sanitizer.bypassSecurityTrustHtml(formattedContent);
+
+    if (!currentPage.isRead) {
+      this.markBabAsComplete(pageIndex);
+    } else {
+      this.updateMaterialProgress();
     }
 
-    this.pageLoading = true;
-
-    setTimeout(() => {
-      this.currentPageIndex = pageIndex;
-      const currentPage = this.material.pages[pageIndex];
-      this.currentPageContent = this.sanitizer.bypassSecurityTrustHtml(currentPage.content);
-
-      if (!currentPage.isRead) {
-        this.markBabAsComplete(pageIndex);
-      } else {
-        this.updateMaterialProgress();
-      }
-
-      this.pageLoading = false;
-    }, 300);
-  }
+    this.pageLoading = false;
+  }, 300);
+}
 
   private markBabAsComplete(babIndex: number): void {
     this.studentProgressService.completeBab(this.materiId, babIndex).subscribe({
@@ -537,6 +564,53 @@ export class ViewMaterialComponent implements OnInit, OnDestroy {
     }
 
     return baseClass;
+  }
+
+  // ✅ TAMBAH: Method untuk setup image click handlers
+  ngAfterViewChecked(): void {
+    this.setupImageClickHandlers();
+  }
+
+  private setupImageClickHandlers(): void {
+    const images = document.querySelectorAll('.material-page img');
+    images.forEach(img => {
+      img.removeEventListener('click', this.onImageClick); // Remove existing listeners
+      img.addEventListener('click', this.onImageClick);
+    });
+  }
+
+  private onImageClick = (event: Event) => {
+    const img = event.target as HTMLImageElement;
+    this.openImageZoom(img.src, img.alt);
+  }
+
+  private openImageZoom(src: string, alt: string): void {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'image-zoom-overlay';
+    overlay.innerHTML = `<img src="${src}" alt="${alt}">`;
+    
+    // Add click to close
+    overlay.addEventListener('click', () => {
+      document.body.removeChild(overlay);
+    });
+    
+    // Add to body
+    document.body.appendChild(overlay);
+    
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+    
+    // Remove on escape key
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        document.body.removeChild(overlay);
+        document.body.style.overflow = 'auto';
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
   }
 
 }

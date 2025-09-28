@@ -21,6 +21,11 @@ export class ManageClassComponent implements OnInit {
   togglingClass: { [key: string]: boolean } = {};
   deletingClass: { [key: string]: boolean } = {};
   bsModalRef?: BsModalRef;
+  showToast = false;
+  toastMessage = '';
+  toastClass = '';
+  toastIcon = '';
+  private toastTimeout?: number;
 
   constructor(
     private router: Router,
@@ -42,7 +47,7 @@ export class ManageClassComponent implements OnInit {
   getClasses() {
     this.loading = true;
     this.errorMsg = '';
-    
+
 
     this.classService.getClassesBySchool(this.schoolId, this.token).subscribe({
       next: (response: ClassesBySchoolResponse) => {
@@ -50,7 +55,7 @@ export class ManageClassComponent implements OnInit {
         if (response.success && response.data && Array.isArray(response.data)) {
           this.kelas = response.data.filter(cls => !cls.archived_at);
           this.filteredKelas = [...this.kelas];
-          
+
         } else {
           this.kelas = [];
           this.filteredKelas = [];
@@ -69,13 +74,13 @@ export class ManageClassComponent implements OnInit {
   }
 
   onSearch() {
-    
+
     if (!this.keyword.trim()) {
       this.filteredKelas = [...this.kelas];
       return;
     }
-    
-    this.filteredKelas = this.kelas.filter(kelas => 
+
+    this.filteredKelas = this.kelas.filter(kelas =>
       kelas.nama_kelas && kelas.nama_kelas.toLowerCase().includes(this.keyword.toLowerCase())
     );
 
@@ -90,27 +95,27 @@ export class ManageClassComponent implements OnInit {
   }
 
   lihatKelas(kelas: any) {
-      this.router.navigate(['/guru/kelola-kelas/detail-kelas', kelas._id]);
+    this.router.navigate(['/guru/kelola-kelas/detail-kelas', kelas._id]);
   }
 
   editKelas(kelas: any) {
     this.router.navigate(['/guru/kelola-kelas/edit-kelas', kelas._id]);
   }
- 
+
   hapusKelas(kelas: any) {
     const initialState = {
       classData: kelas
     };
-    
+
     this.bsModalRef = this.modalService.show(
-      ModalConfirmationDeleteComponent, 
+      ModalConfirmationDeleteComponent,
       {
         initialState,
-        class: 'modal-dialog-centered', 
+        class: 'modal-dialog-centered',
         backdrop: 'static'
       }
     );
-    
+
     if (this.bsModalRef.content) {
       this.bsModalRef.content.onClose.subscribe((result: { action: string, permanent?: boolean }) => {
         if (result.action === 'delete') {
@@ -121,40 +126,35 @@ export class ManageClassComponent implements OnInit {
       });
     }
   }
-  
+
   private processDeleteClass(kelas: any, isPermanent: boolean) {
-    
     this.deletingClass[kelas._id] = true;
-    
+
     this.classService.deleteClass(kelas._id, isPermanent, this.token).subscribe({
       next: (response) => {
-        
-        // ✅ SELALU REMOVE dari array karena:
-        // - Jika permanent delete: kelas dihapus dari database
-        // - Jika archive: kelas punya archived_at, jadi tidak tampil di ManageClass
         this.kelas = this.kelas.filter(k => k._id !== kelas._id);
         this.filteredKelas = this.filteredKelas.filter(k => k._id !== kelas._id);
-        
-        // if (isPermanent) {
-        //   alert(`Kelas "${kelas.nama_kelas}" berhasil dihapus secara permanen.`);
-        // } else {
-        //   alert(`Kelas "${kelas.nama_kelas}" berhasil diarsipkan.`);
-        // }
-        
+
+        if (isPermanent) {
+          this.showSuccessToast(`Kelas "${kelas.nama_kelas}" berhasil dihapus permanen.`);
+        } else {
+          this.showSuccessToast(`Kelas "${kelas.nama_kelas}" berhasil diarsipkan.`);
+        }
+
         this.deletingClass[kelas._id] = false;
       },
       error: (error) => {
         console.error('❌ Error processing class:', error);
-        
+
         let errorMessage = `Gagal ${isPermanent ? 'menghapus' : 'mengarsipkan'} kelas "${kelas.nama_kelas}". Silakan coba lagi.`;
-        
+
         if (error.status === 403) {
           errorMessage = 'Anda tidak memiliki akses untuk menghapus kelas ini.';
         } else if (error.status === 404) {
           errorMessage = 'Kelas tidak ditemukan.';
         }
-        
-        // alert(errorMessage);
+
+        this.showErrorToast(errorMessage);
         this.deletingClass[kelas._id] = false;
       }
     });
@@ -164,44 +164,92 @@ export class ManageClassComponent implements OnInit {
     return this.deletingClass[classId] || false;
   }
 
+  // toggleClassStatus(kelas: any, event: Event) {
+  //   event.stopPropagation();
+
+  //   const currentStatus = kelas.flag_aktif;
+  //   const newStatus = currentStatus === 1 ? 0 : 1;
+  //   const statusText = newStatus === 1 ? 'mengaktifkan' : 'menonaktifkan';
+
+
+  //   this.togglingClass[kelas._id] = true;
+
+  //   this.classService.toggleClassStatus(kelas._id, newStatus, this.token).subscribe({
+  //     next: (response) => {
+
+  //       const classIndex = this.kelas.findIndex(k => k._id === kelas._id);
+  //       if (classIndex !== -1) {
+  //         this.kelas[classIndex].flag_aktif = newStatus;
+  //       }
+
+  //       const filteredIndex = this.filteredKelas.findIndex(k => k._id === kelas._id);
+  //       if (filteredIndex !== -1) {
+  //         this.filteredKelas[filteredIndex].flag_aktif = newStatus;
+  //       }
+
+
+  //       this.togglingClass[kelas._id] = false;
+  //     },
+  //     error: (error) => {
+  //       console.error('❌ Error toggling class status:', error);
+
+  //       let errorMessage = `Gagal ${statusText} kelas "${kelas.nama_kelas}". Silakan coba lagi.`;
+
+  //       if (error.status === 403) {
+  //         errorMessage = 'Anda tidak memiliki akses untuk mengubah status kelas ini.';
+  //       } else if (error.status === 404) {
+  //         errorMessage = 'Kelas tidak ditemukan.';
+  //       }
+
+  //       // alert(errorMessage);
+  //       this.togglingClass[kelas._id] = false;
+  //     }
+  //   });
+  // }
+
   toggleClassStatus(kelas: any, event: Event) {
     event.stopPropagation();
-    
+
     const currentStatus = kelas.flag_aktif;
     const newStatus = currentStatus === 1 ? 0 : 1;
     const statusText = newStatus === 1 ? 'mengaktifkan' : 'menonaktifkan';
-    
-    
+
     this.togglingClass[kelas._id] = true;
-    
+
     this.classService.toggleClassStatus(kelas._id, newStatus, this.token).subscribe({
       next: (response) => {
-        
         const classIndex = this.kelas.findIndex(k => k._id === kelas._id);
         if (classIndex !== -1) {
           this.kelas[classIndex].flag_aktif = newStatus;
         }
-        
+
         const filteredIndex = this.filteredKelas.findIndex(k => k._id === kelas._id);
         if (filteredIndex !== -1) {
           this.filteredKelas[filteredIndex].flag_aktif = newStatus;
         }
-        
-        
+
+        // ✅ Tampilkan toast sukses
+        if (newStatus === 1) {
+          this.showSuccessToast(`Kelas "${kelas.nama_kelas}" berhasil diaktifkan.`);
+        } else {
+          this.showSuccessToast(`Kelas "${kelas.nama_kelas}" berhasil dinonaktifkan.`);
+        }
+
         this.togglingClass[kelas._id] = false;
       },
       error: (error) => {
         console.error('❌ Error toggling class status:', error);
-        
+
         let errorMessage = `Gagal ${statusText} kelas "${kelas.nama_kelas}". Silakan coba lagi.`;
-        
+
         if (error.status === 403) {
           errorMessage = 'Anda tidak memiliki akses untuk mengubah status kelas ini.';
         } else if (error.status === 404) {
           errorMessage = 'Kelas tidak ditemukan.';
         }
-        
-        // alert(errorMessage);
+
+        // ✅ Tampilkan toast error
+        this.showErrorToast(errorMessage);
         this.togglingClass[kelas._id] = false;
       }
     });
@@ -242,5 +290,36 @@ export class ManageClassComponent implements OnInit {
 
   refreshClasses(): void {
     this.getClasses();
+  }
+
+  showSuccessToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-success';
+      this.toastIcon = 'fas fa-check-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 3000);
+    }, 100);
+  }
+
+  showErrorToast(message: string): void {
+    this.hideToast();
+    setTimeout(() => {
+      this.toastMessage = message;
+      this.toastClass = 'toast-error';
+      this.toastIcon = 'fas fa-exclamation-circle';
+      this.showToast = true;
+      this.toastTimeout = window.setTimeout(() => this.hideToast(), 4000);
+    }, 100);
+  }
+
+  hideToast(): void {
+    this.showToast = false;
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+  }
+
+  ngOnDestroy(): void {
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
   }
 }

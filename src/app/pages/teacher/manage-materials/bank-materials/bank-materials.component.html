@@ -1,0 +1,203 @@
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+  <div class="toast align-items-center text-white border-0"
+       [class.show]="showToast"
+       [class.hide]="!showToast"
+       [ngClass]="toastClass"
+       role="alert"
+       aria-live="assertive"
+       aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i [class]="toastIcon" class="me-2"></i>
+        {{ toastMessage }}
+      </div>
+      <button type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              (click)="hideToast()"
+              aria-label="Close">
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid mt-4 custom-materi-container">
+  <!-- Header Section -->
+  <div class="d-flex align-items-center mb-4">
+    <!-- Back button - hanya icon -->
+    <button class="btn-back-icon me-3" (click)="backToManageMaterials()" title="Kembali ke daftar materi">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div class="flex-grow-1">
+      <h2 class="fw-bold mb-1" style="font-size: 24px;">Bank Materi Publik</h2>
+      <p class="text-muted mb-0">Temukan dan salin materi dari guru lain untuk digunakan di sekolah Anda</p>
+    </div>
+  </div>
+
+  <!-- Error message -->
+  <div *ngIf="errorMsg" class="alert alert-danger mb-3">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {{ errorMsg }}
+    <button class="btn btn-sm btn-outline-danger ms-2" (click)="refreshMaterials()">
+      <i class="fas fa-sync-alt me-1"></i>Coba Lagi
+    </button>
+  </div>
+
+  <!-- Loading indicator -->
+  <div *ngIf="loading" class="d-flex justify-content-center align-items-center mb-3" style="min-height: 200px;">
+    <div class="text-center">
+      <i class="fas fa-spinner fa-spin fa-2x text-primary mb-2"></i>
+      <p>Memuat bank materi...</p>
+    </div>
+  </div>
+
+  <!-- Filters and Search Section -->
+  <div class="row mb-4" *ngIf="!loading && !errorMsg">
+    <!-- ✅ UBAH: Category Filter - gunakan ngx-select -->
+    <div class="col-md-4 mb-3 mb-md-0">
+      <label class="form-label fw-semibold small">Filter Kategori</label>
+      <ngx-select
+        [items]="categories"
+        optionValueField="value"
+        optionTextField="label"
+        placeholder="Pilih kategori"
+        [allowClear]="false"
+        [(ngModel)]="selectedCategory"
+        (ngModelChange)="onCategoryChange()"
+        class="ngx-select-dropdown">
+      </ngx-select>
+    </div>
+
+    <!-- Search Bar - sama seperti manage-materials -->
+    <div class="col-md-8">
+      <div class="d-flex justify-content-end">
+        <div class="search-bar d-flex align-items-center">
+          <input 
+            #searchInput
+            type="text"
+            class="form-control rounded-pill me-2"
+            placeholder="Cari judul, deskripsi, kategori, atau nama guru"
+            [(ngModel)]="keyword"  
+            (keydown.enter)="onSearch()"
+            (input)="onSearch()" />
+          <span class="search-icon" (click)="onSearchIconClick()" style="cursor: pointer;">
+            <i class="fa fa-search"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Materials Container - konsep seperti material-studied -->
+  <div class="materials-container" *ngIf="!loading && !errorMsg">
+    <!-- Materials list -->
+    <div *ngFor="let materi of filteredMateri; let last = last">
+      <div class="material-card">
+        <div class="material-item">
+          <div class="material-info">
+            <!-- Category Badge -->
+            <span class="category-badge" [ngClass]="getCategoryClass(materi.kategori)">
+              {{ materi.kategori }}
+            </span>
+            
+            <!-- Material Title -->
+            <h5 class="material-title">{{ materi.judul }}</h5>
+            
+            <!-- Description -->
+            <p class="material-description">{{ materi.deskripsi_singkat }}</p>
+            
+            <!-- Material Metadata -->
+            <div class="material-meta">
+              <div class="meta-item">
+                <i class="fas fa-book-open text-info"></i>
+                <span>{{ materi.total_bab }} BAB</span>
+              </div>
+              <div class="meta-item">
+                <i [class]="getQuizStatusIcon(materi.has_quiz)"></i>
+                <span>{{ getQuizStatusText(materi.has_quiz, materi.total_soal) }}</span>
+              </div>
+            </div>
+            
+            <!-- Author Info -->
+            <div class="author-info">
+              <i class="fas fa-user-circle"></i>
+              <div class="author-details">
+                <div class="author-name">{{ materi.created_by.nama_lengkap }}</div>
+                <div class="author-username">@{{ materi.created_by.username }}</div>
+              </div>
+              <span class="created-date">{{ formatDate(materi.created_at) }}</span>
+            </div>
+          </div>
+          
+          <!-- Action buttons -->
+          <div class="button-group">
+            <!-- ✅ UPDATE: Button Lihat Materi - navigasi ke detail-materials -->
+            <button 
+              class="btn btn-view"
+              (click)="previewMaterial(materi)"
+              title="Lihat preview materi">
+              <i class="fas fa-eye"></i>
+              Lihat Materi
+            </button>
+            
+            <!-- Button Salin Materi -->
+            <button 
+              class="btn btn-copy"
+              (click)="copyMaterial(materi)"
+              [disabled]="isCopying(materi._id)"
+              [title]="'Salin materi ' + materi.judul + ' ke sekolah Anda'">
+              <i *ngIf="!isCopying(materi._id)" class="fas fa-copy"></i>
+              <i *ngIf="isCopying(materi._id)" class="fas fa-spinner fa-spin"></i>
+              {{ isCopying(materi._id) ? 'Menyalin...' : 'Salin Materi' }}
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Divider -->
+      <hr *ngIf="!last" class="my-0" style="opacity: 0.1;">
+    </div>
+
+    <!-- No results -->
+    <div *ngIf="getFilteredMaterialsCount() === 0 && (keyword.trim() || selectedCategory !== 'all')" 
+         class="text-center py-5">
+      <i class="fas fa-search fa-3x text-muted mb-3"></i>
+      <h5 class="text-muted">Tidak ada materi ditemukan</h5>
+      <p class="text-muted">
+        <span *ngIf="keyword.trim()">Tidak ditemukan materi dengan kata kunci "{{ keyword }}"</span>
+        <span *ngIf="selectedCategory !== 'all'"> untuk kategori {{ selectedCategory }}</span>
+      </p>
+    </div>
+
+    <!-- No materials at all -->
+    <div *ngIf="getTotalMaterialsCount() === 0 && !keyword.trim() && selectedCategory === 'all'" 
+         class="text-center py-5">
+      <i class="fas fa-book fa-3x text-muted mb-3"></i>
+      <h5 class="text-muted">Belum ada materi publik tersedia</h5>
+      <p class="text-muted">
+        Saat ini belum ada guru yang membagikan materi secara publik.<br>
+        Materi akan muncul di sini ketika guru lain mengaktifkan "izinkan guru lain menggunakan materi ini".
+      </p>
+      <div class="mt-3">
+        <button class="btn btn-primary-custom me-2" (click)="goToMyMaterials()">
+          <i class="fas fa-plus me-1"></i>Buat Materi Sendiri
+        </button>
+        <button class="btn btn-outline-secondary" (click)="refreshMaterials()">
+          <i class="fas fa-sync-alt me-1"></i>Muat Ulang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results info -->
+  <div *ngIf="!loading && !errorMsg && getTotalMaterialsCount() > 0" class="results-info">
+    <small class="text-muted">
+      <i class="fas fa-info-circle me-1"></i>
+      <span *ngIf="getFilteredMaterialsCount() === getTotalMaterialsCount()">
+        Menampilkan {{ getTotalMaterialsCount() }} materi publik
+      </span>
+      <span *ngIf="getFilteredMaterialsCount() !== getTotalMaterialsCount()">
+        Menampilkan {{ getFilteredMaterialsCount() }} dari {{ getTotalMaterialsCount() }} materi publik
+      </span>
+    </small>
+  </div>
+</div>

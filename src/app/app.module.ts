@@ -85,6 +85,13 @@ import { ModalDeleteStudentComponent } from './pages/teacher/manage-class/modal-
 import { DetailMaterialsComponent } from './pages/teacher/manage-materials/detail-materials/detail-materials.component';
 import { TeacherViewStudentQuizResultComponent } from './pages/teacher/manage-learning-outcomes/teacher-view-student-quiz-result/teacher-view-student-quiz-result.component';
 import { LearningHistoryComponent } from './pages/student/learning-history/learning-history.component';
+import { RankingViewComponent } from './pages/teacher/ranking-view/ranking-view.component';
+import { BankMaterialsComponent } from './pages/teacher/manage-materials/bank-materials/bank-materials.component';
+import { PreviewMaterialsComponent } from './pages/teacher/manage-materials/preview-materials/preview-materials.component';
+import { ModalConnectClassToMaterialComponent } from './pages/teacher/manage-materials/modal-connect-class-to-material/modal-connect-class-to-material.component';
+import { ModalDetailTopSchoolComponent } from './features/modal-detail-top-school/modal-detail-top-school.component';
+import { ModalViewFeedbackComponent } from './pages/teacher/manage-learning-outcomes/modal-view-feedback/modal-view-feedback.component';
+import { ModalViewProfileComponent } from './features/modal-view-profile/modal-view-profile.component';
 
 @NgModule({
   declarations: [
@@ -152,7 +159,14 @@ import { LearningHistoryComponent } from './pages/student/learning-history/learn
          ModalDeleteStudentComponent,
          DetailMaterialsComponent,
          TeacherViewStudentQuizResultComponent,
-         LearningHistoryComponent
+         LearningHistoryComponent,
+         RankingViewComponent,
+         BankMaterialsComponent,
+         PreviewMaterialsComponent,
+         ModalConnectClassToMaterialComponent,
+         ModalDetailTopSchoolComponent,
+         ModalViewFeedbackComponent,
+         ModalViewProfileComponent,
   ],
   imports: [
     BrowserModule,
