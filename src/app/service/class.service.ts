@@ -46,7 +46,7 @@ export interface ClassesBySchoolResponse {
   total: number;
 }
 
-// ✨ UPDATE: Interface untuk response removeStudentFromClass
+// Interface untuk response removeStudentFromClass
 export interface RemoveStudentResponse {
   success: boolean;
   message: string;
@@ -79,7 +79,7 @@ export class ClassService {
 
   constructor(private http: HttpClient) {}
 
-  // ✨ Helper method untuk headers
+  // Helper method untuk headers
   private getHeaders(token?: string): HttpHeaders {
     const jwtToken = token || localStorage.getItem('token') || '';
     return new HttpHeaders({ 
@@ -133,15 +133,8 @@ export class ClassService {
     return this.http.get(`${this.apiUrl}/${classId}`, { headers });
   }
 
-  // ✨ UPDATE: Perbaiki dengan interface yang tepat dan error handling
   removeStudentFromClass(classId: string, studentId: string, token: string): Observable<RemoveStudentResponse> {
     const headers = this.getHeaders(token);
-    
-    // console.log('Calling removeStudentFromClass API:', {
-    //   classId,
-    //   studentId,
-    //   endpoint: `${this.apiUrl}/${classId}/students/${studentId}`
-    // });
     
     return this.http.delete<RemoveStudentResponse>(`${this.apiUrl}/${classId}/students/${studentId}`, { headers }).pipe(
       catchError(error => {

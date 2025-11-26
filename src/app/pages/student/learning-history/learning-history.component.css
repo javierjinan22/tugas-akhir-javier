@@ -1,3 +1,4 @@
+/* ✅ Container dengan padding konsisten seperti komponen lain */
 .learning-history-container {
   padding: 24px;
   min-height: 100vh;
@@ -477,27 +478,6 @@
   display: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .custom-select-container ::ng-deep ngx-select .ngx-select__toggle {
-    padding: 8px 32px 8px 12px;
-    font-size: 13px;
-    min-height: 38px;
-  }
-  
-  .custom-select-container ::ng-deep ngx-select .ngx-select__option {
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-  
-  .custom-select-container ::ng-deep ngx-select .ngx-select__arrow {
-    right: 10px;
-    border-top-width: 5px;
-    border-left-width: 4px;
-    border-right-width: 4px;
-  }
-}
-
 .rankings-list {
   display: flex;
   flex-direction: column;
@@ -662,85 +642,569 @@
   }
 }
 
-/* Responsive Design */
+/* ✅ CRITICAL: Mobile responsive design */
 @media (max-width: 768px) {
+  /* ✅ Container mobile padding - SAMA seperti komponen lain */
   .learning-history-container {
-    padding: 16px;
+    padding: 16px !important;
+    min-height: calc(100vh - 60px);
+  }
+  
+  /* ✅ Header mobile - COMPACT */
+  .history-header {
+    padding: 16px !important; /* ✅ REDUCED: dari 32px */
+    margin-bottom: 16px !important; /* ✅ REDUCED: dari 32px */
+    border-radius: 12px !important;
   }
   
   .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important; /* ✅ REDUCED: dari 16px */
+  }
+  
+  .history-title {
+    font-size: 1.4rem !important; /* ✅ REDUCED: dari 2.2rem */
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .history-subtitle {
+    font-size: 0.9rem !important; /* ✅ REDUCED: dari 1.1rem */
+    margin: 0;
+  }
+  
+  .header-right {
+    width: 100% !important;
   }
   
   .achievement-summary {
-    gap: 16px;
+    gap: 12px !important; /* ✅ REDUCED: dari 24px */
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
   }
   
   .summary-item {
-    padding: 12px 16px;
-    min-width: 80px;
+    padding: 10px 12px !important; /* ✅ REDUCED: dari 16px 20px */
+    min-width: 70px !important; /* ✅ REDUCED: dari 100px */
+    flex: 1 !important;
+    margin: 0 4px !important;
   }
   
   .summary-count {
-    font-size: 1.5rem;
+    font-size: 1.3rem !important; /* ✅ REDUCED: dari 1.8rem */
   }
   
+  .summary-label {
+    font-size: 0.75rem !important; /* ✅ REDUCED: dari 0.85rem */
+  }
+  
+  /* ✅ History content - stack vertically */
   .history-content {
-    flex-direction: column;
-    gap: 24px;
+    flex-direction: column !important;
+    gap: 16px !important; /* ✅ REDUCED: dari 32px */
+    align-items: stretch !important;
   }
   
+  /* ✅ Rankings section - no longer sticky */
   .rankings-section {
-    position: static;
+    position: static !important;
+    order: 1 !important; /* ✅ MOVED: rankings to top */
   }
   
-  .medal-card {
-    padding: 16px;
+  .medals-section {
+    order: 2 !important; /* ✅ MOVED: medals to bottom */
   }
   
-  .medal-icon {
-    width: 48px;
-    height: 48px;
+  .section-title,
+  .section-title-outside {
+    font-size: 18px !important; /* ✅ REDUCED: dari 24px */
+    margin-bottom: 12px !important; /* ✅ REDUCED: dari 16px/24px */
   }
   
-  .feedback-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-}
-
-@media (max-width: 576px) {
-  .history-title {
-    font-size: 1.8rem;
+  /* ✅ Rankings card mobile - COMPACT */
+  .rankings-card {
+    padding: 16px !important; /* ✅ REDUCED: dari 24px */
+    border-radius: 12px !important;
   }
   
-  .medal-card {
-    flex-direction: column;
-    text-align: center;
-    padding: 20px;
+  .rankings-header {
+    margin-bottom: 12px !important; /* ✅ REDUCED: dari 20px */
   }
   
-  .medal-icon-container {
-    margin-right: 0;
-    margin-bottom: 16px;
+  /* ✅ Custom select mobile - COMPACT */
+  .custom-select-container ::ng-deep ngx-select .ngx-select__toggle {
+    padding: 8px 32px 8px 12px !important; /* ✅ REDUCED: dari 10px 40px 10px 16px */
+    font-size: 13px !important; /* ✅ REDUCED: dari 14px */
+    min-height: 38px !important; /* ✅ REDUCED: dari 42px */
+  }
+  
+  .custom-select-container ::ng-deep ngx-select .ngx-select__option {
+    padding: 10px 12px !important; /* ✅ REDUCED: dari 12px 16px */
+    font-size: 13px !important; /* ✅ REDUCED: dari default */
+  }
+  
+  .custom-select-container ::ng-deep ngx-select .ngx-select__arrow {
+    right: 10px !important; /* ✅ REDUCED: dari 12px */
+    border-top-width: 5px !important;
+    border-left-width: 4px !important;
+    border-right-width: 4px !important;
+  }
+  
+  /* ✅ Rankings list mobile - COMPACT */
+  .rankings-list {
+    gap: 8px !important; /* ✅ REDUCED: dari 12px */
   }
   
   .ranking-item {
-    padding: 12px;
+    padding: 10px 12px !important; /* ✅ REDUCED: dari 16px */
+    border-radius: 8px !important;
+  }
+  
+  .rank-badge-container {
+    margin-right: 12px !important; /* ✅ REDUCED: dari 16px */
+    width: 32px !important; /* ✅ REDUCED: dari 40px */
+    height: 32px !important;
+  }
+  
+  .rank-badge {
+    width: 24px !important; /* ✅ REDUCED: dari 32px */
+    height: 24px !important;
+  }
+  
+  .rank-number {
+    font-size: 14px !important; /* ✅ REDUCED: dari 18px */
+    width: 24px !important; /* ✅ REDUCED: dari 32px */
+    height: 24px !important;
+  }
+  
+  .student-name {
+    font-size: 14px !important; /* ✅ REDUCED: dari 16px */
+  }
+  
+  .you-label {
+    font-size: 12px !important;
+  }
+  
+  .score-display {
+    font-size: 16px !important; /* ✅ REDUCED: dari 20px */
+    margin-left: 8px !important; /* ✅ REDUCED: dari 16px */
+  }
+  
+  /* ✅ Medal cards mobile - COMPACT */
+  .medals-grid {
+    gap: 12px !important; /* ✅ REDUCED: dari 16px */
+    margin-bottom: 24px !important; /* ✅ REDUCED: dari 48px */
+  }
+  
+  .medal-card {
+    padding: 12px !important; /* ✅ REDUCED: dari 20px */
+    border-radius: 12px !important;
+  }
+  
+  .medal-icon-container {
+    margin-right: 12px !important; /* ✅ REDUCED: dari 20px */
+  }
+  
+  .medal-icon {
+    width: 40px !important; /* ✅ REDUCED: dari 60px */
+    height: 40px !important;
+  }
+  
+  .medal-title {
+    font-size: 15px !important; /* ✅ REDUCED: dari 18px */
+    margin-bottom: 4px !important;
+  }
+  
+  .medal-description {
+    font-size: 12px !important; /* ✅ REDUCED: dari 14px */
+    margin-bottom: 6px !important;
+  }
+  
+  .medal-stats {
+    font-size: 11px !important; /* ✅ REDUCED: dari 12px */
+  }
+  
+  .completion-rate {
+    padding: 3px 6px !important;
+    font-size: 11px !important;
+    border-radius: 4px !important;
+  }
+  
+  /* ✅ Feedback section mobile - COMPACT */
+  .feedback-section {
+    margin-top: 20px !important; /* ✅ REDUCED: dari 32px */
+  }
+  
+  .feedback-icon-img {
+    width: 24px !important; /* ✅ REDUCED: dari 32px */
+    height: 24px !important;
+    margin-right: 8px !important;
+  }
+  
+  .feedback-list {
+    gap: 12px !important; /* ✅ REDUCED: dari 16px */
+  }
+  
+  .feedback-card {
+    padding: 12px !important; /* ✅ REDUCED: dari 20px */
+    border-radius: 8px !important;
+  }
+  
+  .feedback-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .feedback-title {
+    font-size: 14px !important; /* ✅ REDUCED: dari 16px */
+  }
+  
+  .feedback-category {
+    padding: 3px 6px !important;
+    font-size: 10px !important;
+    align-self: flex-start !important;
+  }
+  
+  .feedback-description {
+    font-size: 12px !important; /* ✅ REDUCED: dari 14px */
+    margin-bottom: 8px !important;
+    line-height: 1.4 !important;
+  }
+  
+  .feedback-meta {
+    font-size: 11px !important; /* ✅ REDUCED: dari 12px */
+    margin-bottom: 8px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 2px !important;
+  }
+  
+  .btn-go-to-material {
+    padding: 6px 12px !important;
+    font-size: 11px !important;
+    border-radius: 16px !important;
+  }
+  
+  .btn-go-to-material i {
+    font-size: 9px !important;
+  }
+  
+  /* ✅ Loading & Error mobile */
+  .loading-container, 
+  .error-container {
+    padding: 20px !important; /* ✅ REDUCED: dari 40px */
+  }
+  
+  .loading-container .spinner-border {
+    width: 2rem !important; /* ✅ REDUCED: dari 3rem */
+    height: 2rem !important;
+  }
+  
+  .error-container .alert {
+    padding: 12px !important;
+    font-size: 13px !important;
+  }
+  
+  /* ✅ No feedback mobile */
+  .no-feedback {
+    padding: 20px !important; /* ✅ REDUCED: dari 40px */
+    font-size: 13px !important;
+  }
+  
+  .no-feedback i {
+    font-size: 1.5rem !important;
+  }
+  
+  /* ✅ Alert congratulation mobile */
+  .alert-congratulation {
+    margin-bottom: 16px !important;
+    padding: 12px !important;
+    border-radius: 8px !important;
+  }
+  
+  .trophy-gif {
+    width: 32px !important; /* ✅ REDUCED: dari 48px */
+    height: 32px !important;
+  }
+  
+  .alert-congratulation .alert-heading {
+    font-size: 14px !important;
+  }
+  
+  .alert-congratulation p {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .alert-congratulation small {
+    font-size: 11px !important;
+  }
+}
+
+/* ✅ Small mobile adjustments */
+@media (max-width: 576px) {
+  .learning-history-container {
+    padding: 8px !important;
+  }
+  
+  .history-header {
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .history-title {
+    font-size: 1.2rem !important;
+  }
+  
+  .history-subtitle {
+    font-size: 0.8rem !important;
+  }
+  
+  .header-content {
+    gap: 8px !important;
   }
   
   .achievement-summary {
-    flex-direction: column;
-    width: 100%;
+    gap: 8px !important;
   }
   
   .summary-item {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    text-align: left;
+    padding: 8px 6px !important;
+    min-width: 60px !important;
+    margin: 0 2px !important;
+  }
+  
+  .summary-count {
+    font-size: 1.1rem !important;
+  }
+  
+  .summary-label {
+    font-size: 0.7rem !important;
+  }
+  
+  .history-content {
+    gap: 12px !important;
+  }
+  
+  .section-title,
+  .section-title-outside {
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .rankings-card {
+    padding: 12px !important;
+  }
+  
+  .medal-card {
+    padding: 8px !important;
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+  
+  .medal-icon-container {
+    margin-right: 0 !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .medal-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .medal-title {
+    font-size: 13px !important;
+  }
+  
+  .medal-description {
+    font-size: 11px !important;
+  }
+  
+  .ranking-item {
+    padding: 8px !important;
+  }
+  
+  .rank-badge-container {
+    width: 28px !important;
+    height: 28px !important;
+    margin-right: 8px !important;
+  }
+  
+  .rank-badge {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .rank-number {
+    font-size: 12px !important;
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  .student-name {
+    font-size: 12px !important;
+  }
+  
+  .you-label {
+    font-size: 10px !important;
+  }
+  
+  .score-display {
+    font-size: 14px !important;
+    margin-left: 4px !important;
+  }
+  
+  .feedback-card {
+    padding: 8px !important;
+  }
+  
+  .feedback-title {
+    font-size: 12px !important;
+  }
+  
+  .feedback-description {
+    font-size: 11px !important;
+  }
+  
+  .feedback-meta {
+    font-size: 10px !important;
+  }
+  
+  .btn-go-to-material {
+    padding: 4px 8px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* ✅ Very small mobile */
+@media (max-width: 480px) {
+  .learning-history-container {
+    padding: 4px !important;
+  }
+  
+  .history-header {
+    padding: 8px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .history-title {
+    font-size: 1rem !important;
+  }
+  
+  .history-subtitle {
+    font-size: 0.75rem !important;
+  }
+  
+  .achievement-summary {
+    gap: 4px !important;
+  }
+  
+  .summary-item {
+    padding: 6px 4px !important;
+    min-width: 50px !important;
+  }
+  
+  .summary-count {
+    font-size: 1rem !important;
+  }
+  
+  .summary-label {
+    font-size: 0.65rem !important;
+  }
+  
+  .section-title,
+  .section-title-outside {
+    font-size: 14px !important;
+  }
+  
+  .rankings-card {
+    padding: 8px !important;
+  }
+  
+  .medal-card {
+    padding: 6px !important;
+  }
+  
+  .medal-icon {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  .medal-title {
+    font-size: 12px !important;
+  }
+  
+  .medal-description {
+    font-size: 10px !important;
+  }
+}
+
+/* ✅ Desktop behavior - ensure normal display */
+@media (min-width: 769px) {
+  .learning-history-container {
+    padding: 24px;
+  }
+  
+  .history-content {
+    flex-direction: row !important;
+    gap: 32px !important;
+  }
+  
+  .medals-section {
+    order: 0 !important;
+  }
+  
+  .rankings-section {
+    order: 0 !important;
+    position: sticky !important;
+    top: 24px !important;
+  }
+  
+  .header-content {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+  
+  .achievement-summary {
+    flex-direction: row !important;
+    width: auto !important;
+  }
+}
+
+/* ✅ Enhanced touch interactions for mobile */
+@media (max-width: 768px) {
+  .medal-card,
+  .feedback-card,
+  .ranking-item,
+  .btn-go-to-material,
+  .summary-item {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  .medal-card:active {
+    transform: scale(0.98);
+  }
+  
+  .feedback-card:active {
+    transform: scale(0.98);
+  }
+  
+  .ranking-item:active {
+    transform: scale(0.98);
+  }
+  
+  .btn-go-to-material:active {
+    transform: scale(0.95);
+  }
+  
+  .summary-item:active {
+    transform: scale(0.98);
   }
 }

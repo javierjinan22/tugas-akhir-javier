@@ -9,7 +9,8 @@
 }
 
 .quiz-intro {
-  font-size: 14px;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .quiz-start-message {
@@ -25,6 +26,7 @@
   padding: 8px 24px;
   font-weight: 500;
   transition: background-color 0.2s ease;
+  min-height: 40px;
 }
 
 .btn-start:hover {
@@ -73,6 +75,7 @@
   color: #495057;
   font-size: 12px;
   padding: 4px 12px;
+  min-height: 32px;
 }
 
 .btn-view-detail:hover {
@@ -118,4 +121,341 @@
 .btn-start.retry:hover {
   background-color: #138496;
   border-color: #117a8b;
+}
+
+/* ✅ CRITICAL: Mobile responsive design untuk take-quiz */
+@media (max-width: 768px) {
+  /* ✅ Quiz specific mobile adjustments */
+  .quiz-section-title {
+    font-size: 16px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+  }
+  
+  .quiz-intro {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .quiz-start-message {
+    margin-top: 16px;
+    font-size: 14px;
+  }
+  
+  /* ✅ Button mobile adjustments */
+  .btn-start {
+    padding: 10px 20px;
+    font-size: 14px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 200px;
+    min-height: 44px; /* Touch-friendly */
+  }
+  
+  /* ✅ Quiz history table mobile - make it responsive */
+  .table-responsive {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 12px;
+  }
+  
+  .quiz-history-table {
+    font-size: 13px;
+    margin-top: 0;
+  }
+  
+  .quiz-history-table th,
+  .quiz-history-table td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+  
+  .quiz-history-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  /* ✅ Mobile table column widths */
+  .quiz-history-table th:nth-child(1),
+  .quiz-history-table td:nth-child(1) {
+    width: 30%;
+    font-size: 11px;
+  }
+  
+  .quiz-history-table th:nth-child(2),
+  .quiz-history-table td:nth-child(2) {
+    width: 15%;
+    font-weight: 600;
+  }
+  
+  .quiz-history-table th:nth-child(3),
+  .quiz-history-table td:nth-child(3) {
+    width: 25%;
+  }
+  
+  .quiz-history-table th:nth-child(4),
+  .quiz-history-table td:nth-child(4) {
+    width: 30%;
+  }
+  
+  /* ✅ Status badge mobile */
+  .status-badge {
+    padding: 3px 8px;
+    font-size: 10px;
+    border-radius: 12px;
+  }
+  
+  /* ✅ Button detail mobile */
+  .btn-view-detail {
+    font-size: 10px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    min-height: 32px;
+    white-space: nowrap;
+  }
+  
+  /* ✅ Quiz completed message mobile */
+  .quiz-completed-message {
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  
+  .alert-success {
+    gap: 6px;
+  }
+  
+  .alert-success i {
+    font-size: 1em;
+  }
+  
+  /* ✅ Text alignment mobile */
+  .text-end {
+    text-align: center !important;
+    margin: 16px 0;
+  }
+}
+
+/* ✅ Small mobile adjustments */
+@media (max-width: 576px) {
+  .quiz-section-title {
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+  
+  .quiz-intro {
+    font-size: 13px;
+  }
+  
+  .btn-start {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-height: 40px;
+    width: 100%;
+    max-width: 180px;
+  }
+  
+  /* ✅ Table even more compact */
+  .quiz-history-table {
+    font-size: 12px;
+  }
+  
+  .quiz-history-table th,
+  .quiz-history-table td {
+    padding: 6px 4px;
+    font-size: 11px;
+  }
+  
+  .quiz-history-table th {
+    font-size: 10px;
+  }
+  
+  /* ✅ Status badge smaller */
+  .status-badge {
+    padding: 2px 6px;
+    font-size: 9px;
+  }
+  
+  /* ✅ Button detail smaller */
+  .btn-view-detail {
+    font-size: 9px;
+    padding: 4px 8px;
+    min-height: 28px;
+  }
+  
+  /* ✅ Completed message smaller */
+  .quiz-completed-message {
+    padding: 8px;
+    font-size: 12px;
+  }
+}
+
+/* ✅ Very small mobile (≤480px) */
+@media (max-width: 480px) {
+  .quiz-section-title {
+    font-size: 14px;
+  }
+  
+  .quiz-intro {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  .btn-start {
+    font-size: 12px;
+    padding: 6px 12px;
+    min-height: 36px;
+  }
+  
+  /* ✅ Table ultra compact */
+  .quiz-history-table th,
+  .quiz-history-table td {
+    padding: 4px 2px;
+    font-size: 10px;
+  }
+  
+  .quiz-history-table th {
+    font-size: 9px;
+  }
+  
+  /* ✅ Mobile table becomes more compact */
+  .quiz-history-table th:nth-child(1),
+  .quiz-history-table td:nth-child(1) {
+    width: 35%;
+    font-size: 9px;
+  }
+  
+  /* ✅ Ultra small components */
+  .status-badge {
+    padding: 1px 4px;
+    font-size: 8px;
+  }
+  
+  .btn-view-detail {
+    font-size: 8px;
+    padding: 3px 6px;
+    min-height: 24px;
+  }
+  
+  /* ✅ Hide some text on very small screens */
+  .btn-view-detail {
+    /* Could show just an icon */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+  }
+}
+
+/* ✅ Horizontal scroll for very small screens if needed */
+@media (max-width: 400px) {
+  .table-responsive {
+    /* Allow horizontal scroll if content too wide */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .quiz-history-table {
+    min-width: 350px; /* Ensure minimum width */
+  }
+  
+  .btn-view-detail {
+    min-width: 50px;
+    font-size: 7px;
+    padding: 2px 4px;
+  }
+}
+
+/* ✅ Desktop behavior - ensure normal display */
+@media (min-width: 769px) {
+  .quiz-section-title {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  
+  .quiz-intro {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .btn-start {
+    width: auto;
+    max-width: none;
+    padding: 8px 24px;
+    font-size: 16px;
+  }
+  
+  .text-end {
+    text-align: right !important;
+  }
+  
+  .quiz-history-table {
+    font-size: 14px;
+  }
+  
+  .quiz-history-table th,
+  .quiz-history-table td {
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .status-badge {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+  
+  .btn-view-detail {
+    font-size: 12px;
+    padding: 4px 12px;
+  }
+}
+
+/* ✅ Enhanced mobile table styling */
+@media (max-width: 768px) {
+  /* ✅ Add alternating row colors for better readability */
+  .quiz-history-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  
+  .quiz-history-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+  
+  /* ✅ Add hover effect for mobile */
+  .quiz-history-table tbody tr:hover {
+    background-color: #e9ecef;
+  }
+  
+  /* ✅ Better spacing for empty state */
+  .quiz-history-table tbody tr td[colspan="4"] {
+    padding: 20px;
+    font-style: italic;
+    color: #6c757d;
+    font-size: 13px;
+  }
+}
+
+/* ✅ Loading and error states mobile */
+@media (max-width: 768px) {
+  .spinner-border {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .alert-danger {
+    margin: 10px;
+    padding: 12px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+  
+  .alert-danger .btn {
+    margin-top: 8px;
+    font-size: 12px;
+    padding: 6px 12px;
+  }
 }

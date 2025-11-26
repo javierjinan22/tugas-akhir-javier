@@ -1,132 +1,134 @@
-<div class="quiz-container">
-  <!-- ✅ Loading state -->
-  <div *ngIf="loading" class="text-center p-4">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-2">Memuat kuis...</p>
-  </div>
-
-  <!-- ✅ Error state -->
-  <div *ngIf="error && !loading" class="alert alert-danger m-4">
-    <i class="fas fa-exclamation-triangle"></i>
-    {{ error }}
-    <button class="btn btn-primary btn-sm ms-2" (click)="loadQuizData()">Coba Lagi</button>
-  </div>
-
-  <!-- ✅ Quiz content - hanya tampil jika data sudah dimuat -->
-  <div *ngIf="!loading && !error && quiz" class="quiz-content-wrapper">
-    <!-- Header with title and timer -->
-    <div class="quiz-header">
-      <div class="quiz-title-section">
-        <span class="close-button" (click)="confirmExit()">×</span>
-        <h2 class="quiz-title">Kuis {{ quiz.title }}</h2>
+<div class="view-quiz-container">
+  <div class="quiz-container">
+    <!-- ✅ Loading state -->
+    <div *ngIf="loading" class="text-center p-4">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
       </div>
-      <div class="timer">
-        <span class="time">{{ formatTime(remainingTime) }}</span>
-      </div>
+      <p class="mt-2">Memuat kuis...</p>
     </div>
-    
-    <hr class="divider">
-    
-    <!-- Quiz content -->
-    <div class="quiz-content">
-      <!-- Question navigation sidebar -->
-      <div class="question-nav">
-        <div class="nav-label">Soal</div>
-        <div class="question-numbers">
-          <div 
-            *ngFor="let question of quiz.questions; let i = index" 
-            class="question-number" 
-            [ngClass]="{'active': currentQuestionIndex === i, 'answered': isQuestionAnswered(i)}"
-            (click)="goToQuestion(i)">
-            {{ i + 1 }}
-          </div>
+
+    <!-- ✅ Error state -->
+    <div *ngIf="error && !loading" class="alert alert-danger m-4">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ error }}
+      <button class="btn btn-primary btn-sm ms-2" (click)="loadQuizData()">Coba Lagi</button>
+    </div>
+
+    <!-- ✅ Quiz content - hanya tampil jika data sudah dimuat -->
+    <div *ngIf="!loading && !error && quiz" class="quiz-content-wrapper">
+      <!-- Header with title and timer -->
+      <div class="quiz-header">
+        <div class="quiz-title-section">
+          <span class="close-button" (click)="confirmExit()">×</span>
+          <h2 class="quiz-title">Kuis {{ quiz.title }}</h2>
+        </div>
+        <div class="timer">
+          <span class="time">{{ formatTime(remainingTime) }}</span>
         </div>
       </div>
       
-      <!-- Question content -->
-      <div class="question-content" *ngIf="currentQuestion">
-        <div class="question-text" [innerHTML]="currentQuestion.question"></div>
-        
-        <!-- Multiple choice question -->
-        <ng-container *ngIf="currentQuestion.type === 'pilihan_ganda'">
-          <div class="options">
-            <div *ngFor="let option of currentQuestion.options; let i = index" class="option">
-              <label class="option-label">
-                <input 
-                  type="radio" 
-                  name="question{{currentQuestionIndex}}" 
-                  [value]="i"
-                  [(ngModel)]="currentQuestion.userAnswer"
-                  (change)="saveAnswer()">
-                <span class="option-checkmark"></span>
-                <span class="option-text">{{ option }}</span>
-              </label>
+      <hr class="divider">
+      
+      <!-- Quiz content -->
+      <div class="quiz-content">
+        <!-- Question navigation sidebar -->
+        <div class="question-nav">
+          <div class="nav-label">Soal</div>
+          <div class="question-numbers">
+            <div 
+              *ngFor="let question of quiz.questions; let i = index" 
+              class="question-number" 
+              [ngClass]="{'active': currentQuestionIndex === i, 'answered': isQuestionAnswered(i)}"
+              (click)="goToQuestion(i)">
+              {{ i + 1 }}
             </div>
           </div>
-        </ng-container>
+        </div>
+        
+        <!-- Question content -->
+        <div class="question-content" *ngIf="currentQuestion">
+          <div class="question-text" [innerHTML]="currentQuestion.question"></div>
+          
+          <!-- Multiple choice question -->
+          <ng-container *ngIf="currentQuestion.type === 'pilihan_ganda'">
+            <div class="options">
+              <div *ngFor="let option of currentQuestion.options; let i = index" class="option">
+                <label class="option-label">
+                  <input 
+                    type="radio" 
+                    name="question{{currentQuestionIndex}}" 
+                    [value]="i"
+                    [(ngModel)]="currentQuestion.userAnswer"
+                    (change)="saveAnswer()">
+                  <span class="option-checkmark"></span>
+                  <span class="option-text">{{ option }}</span>
+                </label>
+              </div>
+            </div>
+          </ng-container>
 
-        <!-- Benar/Salah question - tampilan mirip pilihan ganda -->
-        <ng-container *ngIf="currentQuestion.type === 'benar_salah'">
-          <div class="benar-salah-options">
-            <div class="row g-3">
-              <div class="col-6">
-                <button 
-                  type="button"
-                  class="btn-benar-salah btn-salah"
-                  [class.selected]="isBenarSalahSelected('Salah')"
-                  (click)="selectBenarSalah('Salah')">
-                  <span class="btn-text">Salah</span>
-                </button>
-              </div>
-              <div class="col-6">
-                <button 
-                  type="button"
-                  class="btn-benar-salah btn-benar"
-                  [class.selected]="isBenarSalahSelected('Benar')"
-                  (click)="selectBenarSalah('Benar')">
-                  <span class="btn-text">Benar</span>
-                </button>
+          <!-- Benar/Salah question - tampilan mirip pilihan ganda -->
+          <ng-container *ngIf="currentQuestion.type === 'benar_salah'">
+            <div class="benar-salah-options">
+              <div class="row g-3">
+                <div class="col-6">
+                  <button 
+                    type="button"
+                    class="btn-benar-salah btn-salah"
+                    [class.selected]="isBenarSalahSelected('Salah')"
+                    (click)="selectBenarSalah('Salah')">
+                    <span class="btn-text">Salah</span>
+                  </button>
+                </div>
+                <div class="col-6">
+                  <button 
+                    type="button"
+                    class="btn-benar-salah btn-benar"
+                    [class.selected]="isBenarSalahSelected('Benar')"
+                    (click)="selectBenarSalah('Benar')">
+                    <span class="btn-text">Benar</span>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </ng-container>
-        
-        <!-- Short answer question -->
-        <ng-container *ngIf="currentQuestion.type === 'isian_singkat'">
-          <div class="short-answer">
-            <div class="answer-label">Jawaban:</div>
-            <textarea 
-              class="answer-input" 
-              placeholder="Tulis jawaban Anda disini"
-              [(ngModel)]="currentQuestion.userAnswer"
-              (blur)="saveAnswer()"></textarea>
-          </div>
-        </ng-container>
-        
-        <!-- Navigation buttons -->
-        <div class="quiz-navigation">
-          <button 
-            class="nav-button prev-button" 
-            [disabled]="currentQuestionIndex === 0"
-            (click)="previousQuestion()">
-            <i class="fa fa-chevron-left"></i> Sebelumnya
-          </button>
+          </ng-container>
           
-          <button 
-            *ngIf="currentQuestionIndex < quiz.questions.length - 1" 
-            class="nav-button next-button" 
-            (click)="nextQuestion()">
-            Selanjutnya <i class="fa fa-chevron-right"></i>
-          </button>
+          <!-- Short answer question -->
+          <ng-container *ngIf="currentQuestion.type === 'isian_singkat'">
+            <div class="short-answer">
+              <div class="answer-label">Jawaban:</div>
+              <textarea 
+                class="answer-input" 
+                placeholder="Tulis jawaban Anda disini"
+                [(ngModel)]="currentQuestion.userAnswer"
+                (blur)="saveAnswer()"></textarea>
+            </div>
+          </ng-container>
           
-          <button 
-            *ngIf="currentQuestionIndex === quiz.questions.length - 1"
-            class="finish-button"
-            (click)="finishQuiz()">
-            Selesaikan
-          </button>
+          <!-- Navigation buttons -->
+          <div class="quiz-navigation">
+            <button 
+              class="nav-button prev-button" 
+              [disabled]="currentQuestionIndex === 0"
+              (click)="previousQuestion()">
+              <i class="fa fa-chevron-left"></i> Sebelumnya
+            </button>
+            
+            <button 
+              *ngIf="currentQuestionIndex < quiz.questions.length - 1" 
+              class="nav-button next-button" 
+              (click)="nextQuestion()">
+              Selanjutnya <i class="fa fa-chevron-right"></i>
+            </button>
+            
+            <button 
+              *ngIf="currentQuestionIndex === quiz.questions.length - 1"
+              class="finish-button"
+              (click)="finishQuiz()">
+              Selesaikan
+            </button>
+          </div>
         </div>
       </div>
     </div>

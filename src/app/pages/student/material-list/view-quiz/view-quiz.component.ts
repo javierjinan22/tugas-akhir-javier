@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { interval, Observable, Subscription } from 'rxjs';
 import { ModalEndQuizComponent } from '../modal-end-quiz/modal-end-quiz.component';
 import { StudentProgressService } from '../../../../service/student-progress.service';
+import { CanComponentDeactivate } from '../../../../guards/quiz-guard.service';
 
 interface QuizQuestion {
   id: number;
@@ -26,7 +27,7 @@ interface Quiz {
   templateUrl: './view-quiz.component.html',
   styleUrls: ['./view-quiz.component.css']
 })
-export class ViewQuizComponent implements OnInit, OnDestroy {
+export class ViewQuizComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   quiz: Quiz | null = null;
   currentQuestionIndex: number = 0;
   remainingTime: number = 0;
@@ -38,6 +39,9 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   get currentQuestion(): QuizQuestion | null {
     return this.quiz?.questions[this.currentQuestionIndex] || null;
   }
+
+  private quizCompleted: boolean = false;
+  private modalShown: boolean = false;
 
   constructor(
     private router: Router,
@@ -57,24 +61,84 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
     this.setupAutoSaveListeners();
   }
 
-  private setupAutoSaveListeners(): void {
-    // Save state saat tab tidak aktif
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden && this.quiz) {
-        this.forceSaveState();
-      } else if (!document.hidden && this.quiz) {
-        // Optional: reload state jika diperlukan
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if (this.quizCompleted || !this.quiz) {
+      return true;
+    }
+    return false;
+  }
+
+  isQuizActive(): boolean {
+    return !this.quizCompleted && !!this.quiz && this.remainingTime > 0;
+  }
+
+  // IMPLEMENTASI method untuk guard 
+  forceSaveAllAnswers(): void {
+    if (!this.quiz) return;
+
+    this.quiz.questions.forEach((question, index) => {
+      if (question.type === 'pilihan_ganda') {
+        const radioInput: any = document.querySelector(`input[name="question${index}"]:checked`);
+        if (radioInput) {
+          const value = parseInt(radioInput.value, 10);
+          question.userAnswer = value;
+        }
+      } else if (question.type === 'benar_salah') {
+        // Benar/salah sudah tersimpan via selectBenarSalah
+        console.log(`Benar/Salah question ${index}: ${question.userAnswer}`);
+      } else if (question.type === 'isian_singkat') {
+        const textArea: any = document.querySelector(`textarea[name="question${index}"]`);
+        if (textArea) {
+          question.userAnswer = textArea.value;
+          console.log(`Force saved isian singkat ${index}: ${textArea.value}`);
+        }
       }
     });
 
-    // Save state sebelum page unload
+    // Simpan final answers ke localStorage untuk modal
+    const finalAnswers = this.generateFinalAnswers();
+    localStorage.setItem(`quiz_${this.materialId}_final_answers`, JSON.stringify({
+      answers: finalAnswers
+    }));
+
+    // Simpan state
+    this.saveQuizState();
+    console.log('All answers force saved');
+  }
+
+  // Prevent browser back button
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event: any): void {
+    if (this.isQuizActive() && !this.modalShown) {
+      history.pushState(null, '', window.location.href);
+      this.modalShown = true; // Set flag
+      this.showEndModal();
+    }
+  }
+
+  // Prevent page refresh
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(event: any): void {
+    if (this.isQuizActive()) {
+      event.preventDefault();
+      event.returnValue = 'Kuis sedang berlangsung. Yakin ingin keluar?';
+      return event.returnValue;
+    }
+  }
+
+  private setupAutoSaveListeners(): void {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && this.quiz) {
+        this.forceSaveState();
+      }
+    });
+
     window.addEventListener('beforeunload', () => {
       if (this.quiz) {
         this.forceSaveState();
       }
     });
 
-    // Save state saat focus hilang dari window
     window.addEventListener('blur', () => {
       if (this.quiz) {
         this.forceSaveState();
@@ -83,7 +147,6 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // ✅ PERBAIKAN: Force save sebelum destroy
     if (this.quiz) {
       this.forceSaveState();
     }
@@ -92,82 +155,74 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
       this.timerSubscription.unsubscribe();
     }
 
-    // ✅ TAMBAH: Remove event listeners
     document.removeEventListener('visibilitychange', this.forceSaveState);
     window.removeEventListener('beforeunload', this.forceSaveState);
     window.removeEventListener('blur', this.forceSaveState);
   }
 
   loadQuizData(): void {
-  this.loading = true;
-  this.error = '';
+    this.loading = true;
+    this.error = '';
 
-  this.studentProgressService.getMateriDetailForViewing(this.materialId).subscribe({
-    next: (response) => {
-      if (response.success) {
-        const materialData = response.data.material;
-        const quizData = response.data.quiz;
+    this.studentProgressService.getMateriDetailForViewing(this.materialId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          const materialData = response.data.material;
+          const quizData = response.data.quiz;
 
-        // ✅ Transform API data ke format komponen
-        this.quiz = {
-          id: materialData.id,
-          title: materialData.title,
-          timeLimit: (materialData.waktu_pengerjaan || 10) * 60, // konversi menit ke detik
-          questions: quizData.questions.map((q: any, index: number) => ({
-            id: index,
-            type: q.type, // ✅ Langsung gunakan type dari API (pilihan_ganda, benar_salah, isian_singkat)
-            question: q.question,
-            options: q.options || [],
-            correctAnswer: q.correct_answer,
-            userAnswer: undefined
-          }))
-        };
+          this.quiz = {
+            id: materialData.id,
+            title: materialData.title,
+            timeLimit: (materialData.waktu_pengerjaan || 10) * 60,
+            questions: quizData.questions.map((q: any, index: number) => ({
+              id: index,
+              type: q.type,
+              question: q.question,
+              options: q.options || [],
+              correctAnswer: q.correct_answer,
+              userAnswer: undefined
+            }))
+          };
 
-        // ✅ TAMBAH: Set quiz start time jika belum ada
-        const startTimeKey = `quiz_${this.materialId}_start_time`;
-        if (!localStorage.getItem(startTimeKey)) {
-          const startTime = new Date().toISOString();
-          localStorage.setItem(startTimeKey, startTime);
-          console.log('🕐 Quiz start time set:', startTime);
+          // Set quiz start time
+          const startTimeKey = `quiz_${this.materialId}_start_time`;
+          if (!localStorage.getItem(startTimeKey)) {
+            const startTime = new Date().toISOString();
+            localStorage.setItem(startTimeKey, startTime);
+          }
+
+          this.loadQuizState();
+          this.startTimer();
+        } else {
+          this.error = 'Gagal memuat data kuis';
         }
-
-        this.loadQuizState();
-        this.startTimer();
-      } else {
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading quiz data:', error);
         this.error = 'Gagal memuat data kuis';
+        this.loading = false;
       }
-      this.loading = false;
-    },
-    error: (error) => {
-      console.error('Error loading quiz data:', error);
-      this.error = 'Gagal memuat data kuis';
-      this.loading = false;
-    }
-  });
-}
+    });
+  }
 
   loadQuizState(): void {
     if (!this.quiz) return;
 
-    // ✅ Check if quiz was completed - if yes, start fresh
     const completedResult = localStorage.getItem(`quiz_result_${this.materialId}`);
     if (completedResult) {
-      console.log('🔄 Quiz was completed before, starting fresh');
       this.clearQuizState();
       this.remainingTime = this.quiz.timeLimit;
-      // ✅ TAMBAH: Save initial timer state untuk fresh start
       this.saveTimerState();
       return;
     }
 
-    // Check localStorage for saved quiz state
     const savedState = localStorage.getItem(`quiz_${this.materialId}_state`);
 
     if (savedState) {
       const state = JSON.parse(savedState);
       this.currentQuestionIndex = state.currentQuestionIndex || 0;
 
-      // Load saved answers
       if (state.answers) {
         state.answers.forEach((answer: any, index: number) => {
           if (index < this.quiz!.questions.length) {
@@ -176,7 +231,6 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
         });
       }
 
-      // ✅ PERBAIKAN: Timer persistence yang lebih akurat
       const savedTimer = localStorage.getItem(`quiz_${this.materialId}_timer`);
       if (savedTimer) {
         try {
@@ -185,21 +239,12 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
           const elapsedTime = Math.floor((now - timerData.lastSavedTime) / 1000);
           const timeLeft = timerData.remainingTime - elapsedTime;
 
-          console.log('🕐 Timer recovery:', {
-            lastSavedTime: new Date(timerData.lastSavedTime),
-            remainingTimeWhenSaved: timerData.remainingTime,
-            elapsedSinceLastSave: elapsedTime,
-            calculatedTimeLeft: timeLeft
-          });
-
           if (timeLeft <= 0) {
-            console.log('⏰ Timer expired during absence, auto-finishing quiz');
             this.remainingTime = 0;
             setTimeout(() => this.finishQuiz(), 100);
             return;
           } else {
             this.remainingTime = timeLeft;
-            console.log(`✅ Timer resumed with ${timeLeft} seconds remaining`);
           }
         } catch (error) {
           console.error('Error parsing timer data:', error);
@@ -212,25 +257,6 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
       this.remainingTime = this.quiz.timeLimit;
       this.saveQuizState();
     }
-  }
-
-  private clearTimerState(): void {
-    localStorage.removeItem(`quiz_${this.materialId}_timer`);
-  }
-
-  isBenarSalahSelected(value: 'Benar' | 'Salah'): boolean {
-    if (!this.currentQuestion || this.currentQuestion.type !== 'benar_salah') return false;
-    return this.currentQuestion.userAnswer === value;
-  }
-
-  private saveTimerState(): void {
-    const timerData = {
-      remainingTime: this.remainingTime,
-      lastSavedTime: Date.now(),
-      totalTime: this.quiz?.timeLimit || 600
-    };
-
-    localStorage.setItem(`quiz_${this.materialId}_timer`, JSON.stringify(timerData));
   }
 
   saveQuizState(): void {
@@ -246,7 +272,25 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
 
     localStorage.setItem(`quiz_${this.materialId}_state`, JSON.stringify(stateData));
 
+    // Ensure start_time is saved
+    const startTimeKey = `quiz_${this.materialId}_start_time`;
+    if (!localStorage.getItem(startTimeKey)) {
+      const fallbackStartTime = new Date(Date.now() - ((this.quiz.timeLimit - this.remainingTime) * 1000));
+      localStorage.setItem(startTimeKey, fallbackStartTime.toISOString());
+      console.log('Saved fallback start time:', fallbackStartTime);
+    }
+
     this.saveTimerState();
+  }
+
+  private saveTimerState(): void {
+    const timerData = {
+      remainingTime: this.remainingTime,
+      lastSavedTime: Date.now(),
+      totalTime: this.quiz?.timeLimit || 600
+    };
+
+    localStorage.setItem(`quiz_${this.materialId}_timer`, JSON.stringify(timerData));
   }
 
   startTimer(): void {
@@ -254,7 +298,6 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
       this.timerSubscription.unsubscribe();
     }
 
-    //  Save initial timer state saat timer dimulai
     this.saveTimerState();
     this.timerSubscription = interval(1000).subscribe(() => {
       if (this.remainingTime > 0) {
@@ -273,7 +316,7 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   private forceSaveState(): void {
     this.saveQuizState();
     this.saveTimerState();
-    console.log('💾 Force saved quiz and timer state');
+    console.log('Force saved quiz and timer state');
   }
 
   formatTime(seconds: number): string {
@@ -306,20 +349,15 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   selectBenarSalah(value: 'Benar' | 'Salah'): void {
     if (!this.currentQuestion || this.currentQuestion.type !== 'benar_salah') return;
 
-    // Set jawaban langsung sebagai "Benar" atau "Salah"
     this.currentQuestion.userAnswer = value;
+    console.log(`Benar/Salah selected: "${value}"`);
 
-    console.log(`✅ Benar/Salah selected: "${value}"`);
-
-    // Add haptic feedback on mobile
     if ('vibrate' in navigator) {
       navigator.vibrate(50);
     }
 
-    // Save state
     this.saveQuizState();
   }
-
 
   saveAnswer(): void {
     if (!this.currentQuestion) return;
@@ -329,15 +367,6 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
       userAnswer: this.currentQuestion.userAnswer,
       typeof: typeof this.currentQuestion.userAnswer
     });
-
-    // Untuk pilihan ganda, pastikan userAnswer adalah number (index)
-    if (this.currentQuestion.type === 'pilihan_ganda') {
-      const selectedIndex = this.currentQuestion.userAnswer as number;
-      if (selectedIndex !== undefined && selectedIndex >= 0) {
-        const selectedOption = this.currentQuestion.options?.[selectedIndex];
-        console.log(`✅ Pilihan ganda selected: index ${selectedIndex} = "${selectedOption}"`);
-      }
-    }
 
     this.saveQuizState();
   }
@@ -349,16 +378,11 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
       let studentAnswer = question.userAnswer;
 
       if (question.type === 'pilihan_ganda') {
-        // Untuk pilihan ganda, convert index ke label (0 -> "A", 1 -> "B", etc.)
         if (typeof studentAnswer === 'number' && question.options) {
           const selectedOption = question.options[studentAnswer];
-          studentAnswer = selectedOption ? selectedOption.charAt(0) : undefined; // "A. Option" -> "A"
+          studentAnswer = selectedOption ? selectedOption.charAt(0) : undefined;
         }
-      } else if (question.type === 'benar_salah') {
-        // Untuk benar/salah, sudah dalam format "Benar" atau "Salah"
-        // Tidak perlu transform
       }
-      // Untuk isian_singkat, langsung gunakan text yang diinput
 
       return {
         question_index: index,
@@ -381,75 +405,31 @@ export class ViewQuizComponent implements OnInit, OnDestroy {
   }
 
   finishQuiz(): void {
-  if (!this.quiz) return;
+    if (!this.quiz) return;
 
-  console.log('🏁 Finishing quiz with current answers:', 
-    this.quiz.questions.map(q => ({ type: q.type, userAnswer: q.userAnswer }))
-  );
+    console.log('🏁 Finishing quiz with current answers:',
+      this.quiz.questions.map(q => ({ type: q.type, userAnswer: q.userAnswer }))
+    );
 
-  // ✅ PAKSA SIMPAN semua jawaban sebelum submit
-  this.forceSaveAllAnswers();
+    this.quizCompleted = true;
+    this.modalShown = true; // Set flag untuk prevent double
 
-  // ✅ PAKSA: Cek dan set jawaban dari DOM untuk semua soal
-  this.quiz.questions.forEach((question, questionIndex) => {
-    if (question.type === 'pilihan_ganda' && (question.userAnswer === undefined || question.userAnswer === null)) {
-      // Coba ambil dari DOM
-      const checkedRadio: any = document.querySelector(`input[name="question${questionIndex}"]:checked`);
-      if (checkedRadio) {
-        const selectedIndex = parseInt(checkedRadio.value, 10);
-        question.userAnswer = selectedIndex;
-        console.log(`🔧 Force set answer from DOM for question ${questionIndex}: index ${selectedIndex}`);
-      } else {
-        console.log(`❌ No DOM answer found for question ${questionIndex}`);
-      }
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
     }
-  });
 
-  // ✅ SAVE LAGI setelah force set
-  this.saveAnswer();
+    this.forceSaveAllAnswers();
 
-  // Generate final answers
-  const finalAnswers = this.generateFinalAnswers();
-  console.log('📝 Final quiz answers before modal:', finalAnswers);
+    const finalAnswers = this.generateFinalAnswers();
+    console.log('Final quiz answers before modal:', finalAnswers);
 
-  // Save final answers to localStorage untuk modal
-  localStorage.setItem(`quiz_${this.materialId}_final_answers`, JSON.stringify({
-    answers: finalAnswers
-  }));
+    localStorage.setItem(`quiz_${this.materialId}_final_answers`, JSON.stringify({
+      answers: finalAnswers
+    }));
 
-  this.saveQuizState();
-  this.showEndModal();
-}
-
-// ✅ TAMBAH: Method untuk paksa simpan semua jawaban
-private forceSaveAllAnswers(): void {
-  if (!this.quiz) return;
-
-  console.log('🔧 Force saving all answers...');
-  
-  this.quiz.questions.forEach((question, index) => {
-    if (question.type === 'pilihan_ganda') {
-      const radioInput: any = document.querySelector(`input[name="question${index}"]:checked`);
-      if (radioInput) {
-        const value = parseInt(radioInput.value, 10);
-        question.userAnswer = value;
-        console.log(`✅ Force saved question ${index}: ${value}`);
-      }
-    } else if (question.type === 'benar_salah') {
-      // Benar/salah sudah tersimpan via selectBenarSalah
-      console.log(`✅ Benar/Salah question ${index}: ${question.userAnswer}`);
-    } else if (question.type === 'isian_singkat') {
-      const textArea: any = document.querySelector(`textarea[name="question${index}"]`);
-      if (textArea) {
-        question.userAnswer = textArea.value;
-        console.log(`✅ Force saved isian singkat ${index}: ${textArea.value}`);
-      }
-    }
-  });
-
-  // Simpan ke localStorage
-  this.saveQuizState();
-}
+    this.saveQuizState();
+    this.showEndModal();
+  }
 
   private showEndModal(): void {
     const initialState = {
@@ -457,19 +437,22 @@ private forceSaveAllAnswers(): void {
       materialId: this.materialId,
     };
 
-    // this.modalService.show(ModalEndQuizComponent, {
-    //   class: 'modal-dialog-centered',
-    //   initialState
-    // });
-
     const modalRef = this.modalService.show(ModalEndQuizComponent, {
       class: 'modal-dialog-centered',
-      initialState
+      initialState,
+      ignoreBackdropClick: true,
+      keyboard: false
     });
 
     modalRef.onHidden?.subscribe(() => {
+      this.modalShown = false;
+
       const quizState = localStorage.getItem(`quiz_${this.materialId}_state`);
-      if (quizState && this.quiz) {
+      if (!quizState) {
+        this.quizCompleted = true;
+        console.log('✅ Quiz completed and data cleared');
+      } else if (this.quiz && !this.quizCompleted) {
+        console.log('⚠️ User cancelled modal, resuming quiz');
         this.startTimer();
       }
     });
@@ -477,13 +460,17 @@ private forceSaveAllAnswers(): void {
 
   private clearQuizState(): void {
     localStorage.removeItem(`quiz_${this.materialId}_state`);
-
     localStorage.removeItem(`quiz_${this.materialId}_timer`);
 
     if (this.timerSubscription) {
       this.timerSubscription.unsubscribe();
       this.timerSubscription = undefined;
     }
+  }
+
+  isBenarSalahSelected(value: 'Benar' | 'Salah'): boolean {
+    if (!this.currentQuestion || this.currentQuestion.type !== 'benar_salah') return false;
+    return this.currentQuestion.userAnswer === value;
   }
 
   getBenarSalahSelection(index: number): boolean {
@@ -494,8 +481,7 @@ private forceSaveAllAnswers(): void {
 
     if (!option || !userAnswer) return false;
 
-    // Check if the stored answer matches this option
-    const optionText = option.split('. ')[1]; // "A. Benar" -> "Benar"
+    const optionText = option.split('. ')[1];
     return userAnswer === optionText;
   }
 
@@ -504,23 +490,19 @@ private forceSaveAllAnswers(): void {
 
     const selectedOption = this.currentQuestion.options?.[selectedIndex];
     if (selectedOption) {
-      // Extract "Benar" atau "Salah" dari "A. Benar" atau "B. Salah"
       const answerText = selectedOption.split('. ')[1];
       this.currentQuestion.userAnswer = answerText;
 
-      console.log(`✅ Benar/Salah selected: ${selectedIndex} -> "${answerText}"`);
+      console.log(`Benar/Salah selected: ${selectedIndex} -> "${answerText}"`);
       this.saveQuizState();
     }
   }
 
   confirmExit(): void {
-    if (!this.quiz) return;
-
-    // if (this.timerSubscription) {
-    //   this.timerSubscription.unsubscribe();
-    // }
+    if (!this.quiz || this.modalShown) return; // Check flag
 
     this.saveQuizState();
+    this.modalShown = true; // Set flag
     this.showEndModal();
   }
 }

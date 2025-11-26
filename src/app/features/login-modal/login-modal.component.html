@@ -1,4 +1,4 @@
-<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1061;">
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1070;">
   <div class="toast align-items-center text-white border-0" 
        [class.show]="showToast" 
        [class.hide]="!showToast"
@@ -26,46 +26,56 @@
 </div>
 
 <div class="modal-body">
-  <!-- ✅ TAMBAH: Success message display -->
+  <!-- Success message display -->
   <div *ngIf="successMessage" class="alert alert-success text-center mb-3">
     <i class="fas fa-check-circle me-2"></i>{{ successMessage }}
   </div>
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <!-- ✅ USERNAME dengan styling selaras -->
+    <!-- USERNAME -->
     <div class="mb-3">
-      <label>Username <span class="text-danger">*</span></label>
+      <label for="username">Username <span class="text-danger">*</span></label>
       <input type="text" 
+             id="username"
              class="form-control" 
              formControlName="username" 
              placeholder="Masukkan username"
              [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
-             [class.is-valid]="loginForm.get('username')?.valid && loginForm.get('username')?.value" />
+             [class.is-valid]="loginForm.get('username')?.valid && loginForm.get('username')?.value"
+             autocomplete="username" />
       
       <small class="text-danger d-block mt-1" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
         Username harus diisi
       </small>
     </div>
 
-    <!-- ✅ PASSWORD dengan eye icon -->
+    <!-- PASSWORD dengan eye icon -->
     <div class="mb-3">
-      <label>Password <span class="text-danger">*</span></label>
+      <label for="password">Password <span class="text-danger">*</span></label>
       <div class="position-relative">
         <input
+          id="password"
           [type]="passwordVisible ? 'text' : 'password'"
           class="form-control password-input"
           formControlName="password"
           placeholder="Masukkan password"
           [class.is-valid]="loginForm.get('password')?.valid && loginForm.get('password')?.value"
+          autocomplete="current-password"
         />
-        <fa-icon
-          [icon]="passwordVisible ? faEyeSlash : faEye"
+        <span
           class="toggle-password-icon"
           (click)="togglePasswordVisibility()"
-        ></fa-icon>
+          (keydown.enter)="togglePasswordVisibility()"
+          (keydown.space)="togglePasswordVisibility()"
+          tabindex="0"
+          role="button"
+          [attr.aria-label]="passwordVisible ? 'Hide password' : 'Show password'"
+        >
+          <i [class]="passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+        </span>
       </div>
       
-      <!-- ✅ Error message tanpa icon exclamation -->
+      <!-- Error message -->
       <small class="text-danger d-block mt-1" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
         Password harus diisi
       </small>
@@ -78,7 +88,7 @@
 
     <!-- Registration link -->
     <p class="mb-3 text-center">Belum punya akun? 
-      <a (click)="onButtonRegistrationClicked()" class="link-daftar">Daftar</a>
+      <a (click)="onButtonRegistrationClicked()" class="link-daftar" role="button" tabindex="0">Daftar</a>
     </p>
     
     <!-- Submit button -->

@@ -52,7 +52,7 @@
   <!-- ✅ Main Content - Only show when material is loaded -->
   <div *ngIf="!isLoadingMaterial && originalMaterial">
     
-    <!-- ✅ CARD 1: Form Data Utama -->
+    <!-- Form Data Utama -->
     <div class="form-container p-4 p-md-5 mb-4">
       <!-- Error message display -->
       <div *ngIf="errorMsg" class="alert alert-danger mb-3">
@@ -97,7 +97,7 @@
           </div>
         </div>
 
-        <!-- ✅ TAMBAH: Row untuk kategori dan header gambar -->
+        <!-- Row untuk kategori dan header gambar -->
         <div class="row">
           <!-- Kategori materi -->
           <div class="col-md-6 mb-3">
@@ -178,13 +178,13 @@
         <div class="mb-4">
           <label class="form-label fw-semibold">Kelas yang ditautkan <span class="text-danger">*</span></label>
           
-          <!-- ✅ Loading state -->
+          <!-- Loading state -->
           <div *ngIf="isLoadingClasses" class="text-muted mb-2">
             <i class="fas fa-spinner fa-spin me-2"></i>
             Memuat data kelas...
           </div>
           
-          <!-- ✅ No classes available -->
+          <!-- No classes available -->
           <div *ngIf="!isLoadingClasses && kelasList.length === 0" class="text-muted mb-2">
             <i class="fas fa-info-circle me-2"></i>
             Tidak ada kelas aktif tersedia. 
@@ -193,7 +193,7 @@
             </button>
           </div>
           
-          <!-- ✅ Checkbox group -->
+          <!-- Checkbox group -->
           <div *ngIf="!isLoadingClasses && kelasList.length > 0" class="kelas-checkbox-group mb-2">
             <label *ngFor="let kelas of kelasList; trackBy: trackByKelasId" class="kelas-checkbox">
               <input
@@ -206,12 +206,12 @@
             </label>
           </div>
           
-          <!-- ✅ Validation error -->
+          <!-- Validation error -->
           <div *ngIf="materialForm.get('kelas')?.invalid && materialForm.get('kelas')?.touched" class="text-danger small">
             <i class="fas fa-exclamation-circle me-1"></i>Pilih minimal satu kelas
           </div>
           
-          <!-- ✅ DEBUG: Show selected kelas (optional, can be removed) -->
+          <!-- Show selected kelas (optional, can be removed) -->
           <div *ngIf="materialForm.value.kelas?.length > 0" class="mt-2">
             <small class="text-muted">
               Kelas terpilih: {{ getSelectedKelasNames().join(', ') }}
@@ -231,7 +231,7 @@
             </div>
           </div>
 
-          <!-- ✅ BARU: Flag akses -->
+          <!-- Flag akses -->
           <div class="col-md-6 mb-3">
             <div class="d-flex align-items-center">
               <label class="toggle-switch mb-0">
@@ -245,7 +245,7 @@
       </form>
     </div>
 
-    <!-- ✅ STEP WIZARD INDICATOR -->
+    <!-- STEP WIZARD INDICATOR -->
     <div class="wizard-container mb-4">
       <div class="wizard" [class.step-2]="currentStep === 2">
         <ul class="nav nav-tabs justify-content-between" role="tablist">
@@ -272,10 +272,25 @@
       </div>
     </div>
 
-    <!-- ✅ STEP 1: ISIAN MATERI -->
+    <!-- ISIAN MATERI -->
     <div *ngIf="currentStep === 1" class="step-content">
       <div class="form-container p-4 p-md-5">
         <form [formGroup]="materialForm" (ngSubmit)="onSubmitMaterial()">
+
+          <div class="education-infobox mb-4">
+            <div class="infobox-content">
+              <div class="infobox-icon">
+                <i class="fas fa-lightbulb"></i>
+              </div>
+              <div class="infobox-text">
+                <strong>Tips untuk Guru:</strong>
+                <p class="mb-0">
+                  Jika Anda mengambil konten dari sumber lain, mohon sertakan kredit dalam materi Anda. 
+                  Hal ini penting untuk menghormati hak cipta dan memberikan contoh yang baik kepada siswa.
+                </p>
+              </div>
+            </div>
+          </div>
           
           <!-- Form Array untuk BAB -->
           <div formArrayName="babList">
@@ -315,13 +330,13 @@
           </div>
 
           <!-- Izinkan unduh materi -->
-          <div class="mb-4 d-flex align-items-center">
+          <!-- <div class="mb-4 d-flex align-items-center">
             <label class="toggle-switch mb-0">
               <input type="checkbox" formControlName="izinkanUnduh">
               <span class="toggle-slider"></span>
             </label>
             <span class="ms-2">Izinkan unduh materi</span>
-          </div>
+          </div> -->
 
           <!-- Tombol aksi Step 1 -->
           <div class="d-flex gap-3 justify-content-center">

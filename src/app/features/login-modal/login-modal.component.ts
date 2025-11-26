@@ -285,7 +285,7 @@ export class LoginModalComponent implements OnInit {
 
   // ✅ Toast methods (sama seperti sebelumnya)
   private showSuccessToast(message: string): void {
-    this.hideToast(); // Clear any existing toast
+    this.hideToast(); 
     setTimeout(() => {
       this.toastMessage = message;
       this.toastClass = 'toast-success';

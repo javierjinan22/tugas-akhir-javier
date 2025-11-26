@@ -231,6 +231,21 @@
   <div *ngIf="currentStep === 1" class="step-content">
     <div class="form-container p-4 p-md-5">
       <form [formGroup]="materialForm" (ngSubmit)="onSubmitMaterial()">
+
+        <div class="education-infobox mb-4">
+          <div class="infobox-content">
+            <div class="infobox-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <div class="infobox-text">
+              <strong>Tips untuk Guru:</strong>
+              <p class="mb-0">
+                Jika Anda mengambil konten dari sumber lain, mohon sertakan kredit dalam materi Anda. 
+                Hal ini penting untuk menghormati hak cipta dan memberikan contoh yang baik kepada siswa.
+              </p>
+            </div>
+          </div>
+        </div>
         
         <!-- Form Array untuk BAB -->
         <div formArrayName="babList">

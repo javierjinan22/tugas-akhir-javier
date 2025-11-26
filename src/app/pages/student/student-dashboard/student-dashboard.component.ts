@@ -217,8 +217,8 @@ export class StudentDashboardComponent implements OnInit {
 
   // Navigation methods
   onMulaiBelajar(): void {
-    this.router.navigate(['/siswa/materi']);
-  }
+  this.router.navigate(['/siswa/materi']);
+}
 
   onViewUncompletedMaterials(): void {
     this.router.navigate(['/siswa/materi'], { 

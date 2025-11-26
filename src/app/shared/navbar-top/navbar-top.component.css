@@ -1,20 +1,30 @@
 .navbar {
+  background-color: white !important;
   border-bottom: 1px solid #f0f0f0;
-  z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 12px 20px;
+  z-index: 1050 !important; /* ✅ CONSISTENT: Below sidebar (9999) */
+  min-height: 60px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
 }
 
+/* ✅ Rest of navbar styles remain the same... */
 .logo-literadoo {
   margin-left: 40px;
   font-family: 'Poppins', sans-serif;
   font-size: 24px;
   font-weight: bold;
-  color: #004F99;
+  color: #004F99 !important;
   transition: all 0.3s ease;
   text-decoration: none;
 }
 
 .logo-literadoo:hover {
-  color: #004F99; 
+  color: #004F99 !important;
   text-shadow: 
     0 0 8px rgba(93, 221, 249, 0.7),
     0 0 15px rgba(60, 203, 205, 0.5),
@@ -22,11 +32,241 @@
   cursor: pointer;
 }
 
+.user-icon {
+  font-size: 32px !important;
+  color: #FFC107 !important;
+  transition: all 0.3s ease;
+}
+
+.user-icon:hover {
+  color: #FFB300 !important;
+  transform: scale(1.1);
+}
+
 .dropdown-menu {
   min-width: 160px;
   font-size: 14px;
+  z-index: 1060;
 }
 
 .dropdown-item {
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item.logout-item {
+  color: #dc3545 !important;
+  font-weight: 500;
+}
+
+.dropdown-item.logout-item:hover,
+.dropdown-item.logout-item:focus,
+.dropdown-item.logout-item:active {
+  background-color: #f8d7da !important;
+  color: #b02a37 !important;
+}
+
+.navbar-toggler {
+  border: none;
+  padding: 8px 12px;
+  background: transparent;
+  color: #004F99 !important;
+  font-size: 18px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  z-index: 1055;
+  position: relative;
+  cursor: pointer;
+}
+
+.navbar-toggler:hover,
+.navbar-toggler:focus,
+.navbar-toggler:active {
+  background-color: #f8f9fa;
+  color: #003d7a !important;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+.navbar-toggler i {
+  font-size: 20px;
+  color: inherit;
+  pointer-events: none;
+}
+
+.btn-link {
+  cursor: pointer;
+  z-index: 1055;
+  position: relative;
+}
+
+.btn-link:hover,
+.btn-link:focus {
+  color: #FFC107 !important;
+  text-decoration: none;
+}
+
+/* ✅ Mobile responsive - SAME AS BEFORE */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.5rem 1rem;
+    min-height: 60px;
+    background-color: white !important;
+    z-index: 1050 !important; /* ✅ Below sidebar */
+    position: fixed;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .logo-literadoo {
+    margin-left: 10px;
+    font-size: 20px;
+    color: #004F99 !important;
+  }
+
+  .user-icon {
+    font-size: 36px !important;
+    color: #FFC107 !important;
+  }
+
+  .navbar-toggler {
+    color: #004F99 !important;
+    background: transparent;
+    border: 1px solid transparent;
+    z-index: 1055;
+    display: block;
+    order: -1;
+    margin-right: 0.5rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 12px;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .navbar-toggler:hover,
+  .navbar-toggler:focus,
+  .navbar-toggler:active {
+    border-color: #dee2e6;
+    color: #003d7a !important;
+    background-color: #f8f9fa;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .btn-link {
+    padding: 12px;
+    z-index: 1055;
+    cursor: pointer;
+    min-width: 48px !important; 
+    min-height: 48px !important; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+
+  .btn-link:hover,
+  .btn-link:focus,
+  .btn-link:active {
+    background-color: #f8f9fa;
+    color: #FFC107 !important;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    z-index: 1060;
+    min-width: 180px;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+
+  .dropdown-item {
+    padding: 14px 18px !important; 
+    font-size: 16px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover,
+  .dropdown-item:focus,
+  .dropdown-item:active {
+    background-color: #f8f9fa;
+    color: #212529;
+  }
+
+  .dropdown-item.logout-item {
+    color: #dc3545 !important;
+    font-weight: 500;
+  }
+
+  .dropdown-item.logout-item:hover,
+  .dropdown-item.logout-item:focus,
+  .dropdown-item.logout-item:active {
+    background-color: #f8d7da !important;
+    color: #b02a37 !important;
+  }
+
+  .container-fluid {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .navbar-toggler {
+    display: none;
+  }
+  
+  .logo-literadoo {
+    color: #004F99 !important;
+    margin-left: 40px;
+  }
+  
+  .user-icon {
+    font-size: 32px !important; 
+    color: #FFC107 !important;
+  }
+}
+
+.navbar-brand {
+  color: #004F99 !important;
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus {
+  color: #004F99 !important;
+}
+
+.dropdown-toggle::after {
+  display: none;
+}
+
+fa-icon.user-icon {
+  color: #FFC107 !important;
+}
+
+fa-icon.fa-2x {
+  font-size: 2em !important; 
+}
+
+.dropdown {
+  position: relative;
+}
+
+.dropdown-toggle-custom {
+  transition: all 0.3s ease;
+}
+
+.dropdown-toggle-custom:hover {
+  transform: translateY(-1px);
 }

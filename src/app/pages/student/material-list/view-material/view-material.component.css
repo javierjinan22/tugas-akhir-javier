@@ -1,6 +1,7 @@
+/* ✅ TAMBAH: Container dengan padding konsisten */
 .view-material-container {
-  padding: 8px;
-  /* margin-top: 10px; */
+  padding: 24px;
+  min-height: 100vh;
 }
 
 /* Main content card */
@@ -11,8 +12,8 @@
   padding: 20px;
   height: 100%;
   position: relative;
-  overflow: hidden; /* ✅ TAMBAH: Prevent overflow */
-  word-wrap: break-word; /* ✅ TAMBAH: Handle long words */
+  overflow: hidden;
+  word-wrap: break-word;
 }
 
 .material-header {
@@ -49,47 +50,44 @@
   line-height: 1.6;
   padding: 0 10px;
   overflow-y: auto;
-  overflow-x: hidden; /* ✅ TAMBAH: Prevent horizontal scroll */
+  overflow-x: hidden;
   max-height: calc(100vh - 200px);
-  word-wrap: break-word; /* ✅ TAMBAH: Handle long text */
+  word-wrap: break-word;
 }
 
-/* ✅ PERBAIKI: Material page dengan container yang responsive */
+/* Material page dengan container yang responsive */
 .material-page {
   font-size: 16px;
-  max-width: 100%; /* ✅ TAMBAH: Prevent content overflow */
-  overflow-x: hidden; /* ✅ TAMBAH: Hide horizontal overflow */
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .material-page img {
-  max-width: 100% !important; /* ✅ Force responsive width */
-  height: auto !important; /* ✅ Maintain aspect ratio */
-  width: auto !important; /* ✅ Let width adjust naturally */
-  margin: 15px auto; /* ✅ Center images */
-  display: block; /* ✅ Make images block elements */
+  max-width: 100% !important;
+  height: auto !important;
+  width: auto !important;
+  margin: 15px auto;
+  display: block;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* ✅ Add subtle shadow */
-  cursor: pointer; /* ✅ Indicate clickable */
-  transition: transform 0.2s ease, box-shadow 0.2s ease; /* ✅ Smooth hover effect */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* ✅ TAMBAH: Hover effect untuk gambar */
 .material-page img:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* ✅ TAMBAH: Large image handling - mirip embed video */
 .material-page img[width], .material-page img[height] {
   max-width: 100% !important;
   width: 100% !important;
   height: auto !important;
-  max-height: 400px; /* ✅ Limit height seperti video embed */
-  object-fit: cover; /* ✅ Cover container while maintaining aspect ratio */
+  max-height: 400px;
+  object-fit: cover;
   border-radius: 12px;
 }
 
-/* ✅ TAMBAH: Wrapper untuk gambar besar */
 .material-page .image-wrapper {
   position: relative;
   width: 100%;
@@ -100,7 +98,6 @@
   background: #f8f9fa;
 }
 
-/* ✅ TAMBAH: Styling untuk video embeds agar konsisten */
 .material-page iframe,
 .material-page video,
 .material-page embed,
@@ -113,16 +110,14 @@
   margin: 15px 0;
 }
 
-/* ✅ TAMBAH: YouTube/video embed specific */
 .material-page iframe[src*="youtube"],
 .material-page iframe[src*="youtu.be"],
 .material-page iframe[src*="vimeo"] {
-  aspect-ratio: 16 / 9; /* ✅ Maintain video aspect ratio */
+  aspect-ratio: 16 / 9;
   height: auto !important;
   max-height: 400px;
 }
 
-/* ✅ TAMBAH: Table responsive handling */
 .material-page table {
   width: 100%;
   max-width: 100%;
@@ -139,7 +134,6 @@
   table-layout: fixed;
 }
 
-/* ✅ TAMBAH: Handle very wide content */
 .material-page pre,
 .material-page code {
   max-width: 100%;
@@ -148,7 +142,6 @@
   word-break: break-all;
 }
 
-/* ✅ TAMBAH: Image zoom modal styling (optional) */
 .image-zoom-overlay {
   position: fixed;
   top: 0;
@@ -313,6 +306,7 @@
   align-items: center;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  display: flex;
 }
 
 .btn-quiz i {
@@ -329,7 +323,6 @@
   background-color: #f0c926;
 }
 
-/* ✅ TAMBAH: Style untuk button quiz completed */
 .btn-quiz-completed {
   background-color: #28a745;
   border-color: #28a745;
@@ -346,7 +339,6 @@
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
 }
 
-/* ✅ TAMBAH: Style untuk button disabled */
 .btn-quiz.disabled {
   background-color: #6c757d;
   border-color: #6c757d;
@@ -410,7 +402,7 @@
   font-weight: 500;
 }
 
-/* ✅ TAMBAH: Loading States CSS */
+/* Loading States CSS */
 .loading-container {
   display: flex;
   justify-content: center;
@@ -486,7 +478,6 @@
   border-width: 1px;
 }
 
-/* Spinner customization */
 .spinner-border {
   color: #1BB6C1;
 }
@@ -497,7 +488,6 @@
   border-width: 0.1em;
 }
 
-/* Button loading state */
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
@@ -514,7 +504,6 @@
   cursor: not-allowed;
 }
 
-/* Enhanced error styling */
 .alert-danger {
   background: linear-gradient(135deg, #ffe6e6 0%, #fff0f0 100%);
   border: 1px solid #ffcccc;
@@ -536,12 +525,10 @@
   box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
 }
 
-/* Loading animation for progress bar */
 .progress-bar {
   transition: width 0.6s ease-in-out;
 }
 
-/* Enhanced visual feedback */
 .material-content-card {
   transition: all 0.3s ease;
 }
@@ -550,27 +537,6 @@
   opacity: 0.8;
 }
 
-/* Responsive loading states */
-@media (max-width: 768px) {
-  .bab-item {
-    padding: 6px 8px;
-  }
-  
-  .bab-text {
-    font-size: 12px;
-  }
-  
-  .error-container .alert {
-    padding: 20px;
-    margin: 10px;
-  }
-  
-  .page-loading-container {
-    min-height: 150px;
-  }
-}
-
-/* Skeleton loading animation (optional enhancement) */
 @keyframes skeleton-loading {
   0% {
     background-position: -200px 0;
@@ -584,4 +550,342 @@
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200px 100%;
   animation: skeleton-loading 1.5s infinite;
+}
+
+/* ✅ CRITICAL: Mobile responsive design */
+@media (max-width: 768px) {
+  /* ✅ Container mobile padding */
+  .view-material-container {
+    padding: 16px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  /* ✅ Stack layout vertically */
+  .view-material-container .row {
+    flex-direction: column !important;
+  }
+  
+  .view-material-container .col-md-8,
+  .view-material-container .col-md-4 {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    padding: 0 !important;
+    margin-bottom: 16px;
+  }
+  
+  /* ✅ Material content card mobile */
+  .material-content-card {
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+  
+  .material-header {
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+  
+  .back-button {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    margin-right: 8px;
+  }
+  
+  .material-title {
+    font-size: 16px;
+    line-height: 1.3;
+  }
+  
+  /* ✅ Material content mobile */
+  .material-content {
+    min-height: 300px;
+    padding: 0 5px;
+    max-height: 60vh;
+  }
+  
+  .material-page {
+    font-size: 14px;
+  }
+  
+  /* ✅ Enhanced image handling for mobile */
+  .material-page img {
+    margin: 10px auto;
+    border-radius: 6px;
+    max-height: 250px;
+  }
+  
+  .material-page iframe,
+  .material-page video {
+    min-height: 200px;
+    margin: 10px 0;
+    border-radius: 8px;
+  }
+  
+  /* ✅ Pagination controls mobile */
+  .pagination-controls {
+    gap: 10px;
+    padding: 16px 0;
+    margin-top: 16px;
+  }
+  
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .page-indicator {
+    font-size: 14px;
+  }
+  
+  /* ✅ Progress sidebar mobile - stacked below content */
+  .progress-sidebar {
+    padding: 16px;
+    border-radius: 8px;
+    min-height: auto;
+    position: relative;
+    margin-bottom: 16px;
+  }
+  
+  .progress-header {
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+  
+  .completion-status {
+    font-size: 0.8rem;
+  }
+  
+  .progress-bar-wrapper {
+    height: 6px;
+  }
+  
+  /* ✅ Status section mobile */
+  .status-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .status-item {
+    margin-bottom: 12px;
+  }
+  
+  .status-circle {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+  }
+  
+  .status-circle.small {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+  }
+  
+  .status-circle.small i {
+    font-size: 8px;
+  }
+  
+  .status-text {
+    font-size: 14px;
+  }
+  
+  /* ✅ Bab list mobile */
+  .bab-list-section {
+    margin: 12px 0;
+    padding-top: 12px;
+  }
+  
+  .bab-title {
+    font-size: 14px;
+  }
+  
+  .bab-item {
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+  }
+  
+  .bab-text {
+    font-size: 13px;
+    line-height: 1.2;
+  }
+  
+  /* ✅ Action section mobile - not absolute positioned */
+  .action-section {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    margin-top: 16px;
+  }
+  
+  .btn-quiz {
+    padding: 10px 20px;
+    border-radius: 16px;
+    font-size: 14px;
+    min-height: 44px;
+  }
+  
+  /* ✅ Loading states mobile */
+  .loading-container {
+    min-height: 50vh;
+    margin: 10px;
+    border-radius: 12px;
+  }
+  
+  .loading-text {
+    font-size: 1rem;
+  }
+  
+  .error-container {
+    min-height: 40vh;
+    margin: 10px;
+  }
+  
+  .error-container .alert {
+    padding: 20px;
+    margin: 0;
+  }
+  
+  .page-loading-container {
+    min-height: 150px;
+    margin: 8px 0;
+  }
+}
+
+/* ✅ Small mobile adjustments */
+@media (max-width: 576px) {
+  .view-material-container {
+    padding: 12px;
+  }
+  
+  .material-content-card {
+    padding: 12px;
+  }
+  
+  .material-header {
+    margin-bottom: 12px;
+  }
+  
+  .back-button {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+    margin-right: 6px;
+  }
+  
+  .material-title {
+    font-size: 15px;
+  }
+  
+  .material-content {
+    min-height: 250px;
+    max-height: 50vh;
+  }
+  
+  .material-page {
+    font-size: 13px;
+  }
+  
+  .material-page img {
+    max-height: 200px;
+    margin: 8px auto;
+  }
+  
+  .progress-sidebar {
+    padding: 12px;
+  }
+  
+  .btn-quiz {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-height: 40px;
+  }
+  
+  .bab-text {
+    font-size: 12px;
+  }
+  
+  .status-text {
+    font-size: 13px;
+  }
+}
+
+/* ✅ Very small mobile */
+@media (max-width: 480px) {
+  .view-material-container {
+    padding: 8px;
+  }
+  
+  .material-content-card {
+    padding: 10px;
+  }
+  
+  .material-title {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  
+  .material-content {
+    padding: 0;
+    max-height: 45vh;
+  }
+  
+  .material-page {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  
+  .btn-quiz {
+    font-size: 12px;
+    padding: 6px 12px;
+    min-height: 36px;
+  }
+  
+  .pagination-controls {
+    gap: 8px;
+    padding: 12px 0;
+  }
+  
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .page-indicator {
+    font-size: 12px;
+  }
+}
+
+/* ✅ Desktop behavior - ensure normal display */
+@media (min-width: 769px) {
+  .view-material-container {
+    padding: 24px;
+  }
+  
+  .view-material-container .row {
+    flex-direction: row !important;
+  }
+  
+  .view-material-container .col-md-8,
+  .view-material-container .col-md-4 {
+    padding: 0 15px !important;
+  }
+  
+  .action-section {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    right: 20px !important;
+    width: calc(100% - 40px) !important;
+  }
+  
+  .progress-sidebar {
+    min-height: 320px;
+  }
 }

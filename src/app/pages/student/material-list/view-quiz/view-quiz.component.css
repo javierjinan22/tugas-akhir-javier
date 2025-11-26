@@ -1,11 +1,19 @@
+/* ✅ Container dengan padding konsisten seperti view-material */
+.view-quiz-container {
+  padding: 24px;
+  min-height: 100vh;
+}
+
 .quiz-container {
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin: 30px auto;
+  margin: 0 auto;
   max-width: 1300px;
   min-height: 600px;
   overflow: hidden;
+  position: relative;
+  word-wrap: break-word;
 }
 
 /* Header styling */
@@ -14,6 +22,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .quiz-title-section {
@@ -26,12 +35,18 @@
   font-weight: bold;
   margin-right: 16px;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: #dc3545;
 }
 
 .quiz-title {
   font-size: 18px;
   font-weight: bold;
   margin: 0;
+  word-wrap: break-word;
 }
 
 .timer {
@@ -67,7 +82,7 @@
 
 .nav-label {
   font-weight: 600;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   margin-left: 12px;
 }
 
@@ -77,6 +92,7 @@
   justify-content: start;
   gap: 8px;
   padding: 0 12px;
+  margin-top: 8px;
 }
 
 .question-number {
@@ -107,12 +123,16 @@
   padding: 24px 32px;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
+  word-wrap: break-word;
 }
 
 .question-text {
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 24px;
+  line-height: 1.6;
+  word-wrap: break-word;
 }
 
 /* Multiple choice options */
@@ -124,12 +144,16 @@
 
 .option-label {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   position: relative;
   padding-left: 36px;
   cursor: pointer;
   font-size: 16px;
   user-select: none;
+  line-height: 1.5;
+  padding-top: 2px;
+  padding-bottom: 8px;
+  word-wrap: break-word;
 }
 
 .option-label input {
@@ -142,13 +166,22 @@
 
 .option-checkmark {
   position: absolute;
-  top: 0;
+  top: 2px;
   left: 0;
   height: 24px;
   width: 24px;
   background-color: white;
   border: 2px solid #1BB6C1;
   border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.option-text {
+  margin-left: 12px;
+  line-height: 1.5;
+  padding-top: 1px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .option-label:hover input ~ .option-checkmark {
@@ -272,12 +305,13 @@
   box-shadow: 0 0 0 2px rgba(27, 182, 193, 0.2);
 }
 
-/* Navigation buttons */
+/* ✅ Navigation buttons - FIXED: Remove margin-top auto di mobile */
 .quiz-navigation {
-  margin-top: auto;
+  margin-top: 32px; /* ✅ CHANGED: dari "auto" ke fixed "32px" */
   display: flex;
   justify-content: space-between;
-  padding-top: 32px;
+  padding-top: 16px; /* ✅ REDUCED: dari 32px ke 16px */
+  border-top: 1px solid #f0f0f0; /* ✅ ADDED: separator line */
 }
 
 .nav-button {
@@ -320,21 +354,6 @@
   background-color: #f7c431;
 }
 
-@media (max-width: 768px) {
-  .btn-benar-salah {
-    height: 60px;
-    font-size: 18px;
-  }
-  
-  .benar-salah-options .row {
-    margin: 0 -8px;
-  }
-  
-  .benar-salah-options .col-6 {
-    padding: 0 8px;
-  }
-}
-
 /* Animation ketika dipilih */
 .btn-benar-salah.selected::before {
   content: '';
@@ -347,4 +366,604 @@
   border-radius: 16px;
   transform: translate(-50%, -50%);
   animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Loading States CSS - consistent with view-material */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
+
+.error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  margin: 20px;
+}
+
+.error-container .alert {
+  border: none;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  padding: 30px;
+}
+
+.error-container .alert i {
+  color: #dc3545;
+}
+
+.error-container .alert h5 {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.error-container .alert p {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.spinner-border {
+  color: #1BB6C1;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.1em;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #ffe6e6 0%, #fff0f0 100%);
+  border: 1px solid #ffcccc;
+  color: #721c24;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1BB6C1 0%, #189AA3 100%);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #189AA3 0%, #177A82 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
+}
+
+/* ✅ CRITICAL: Mobile responsive design - FIXED navigation position */
+@media (max-width: 768px) {
+  /* ✅ Container mobile padding - SAMA seperti view-material */
+  .view-quiz-container {
+    padding: 16px !important;
+    min-height: calc(100vh - 60px);
+  }
+  
+  /* ✅ Quiz container mobile - COMPACT seperti material-content-card */
+  .quiz-container {
+    margin: 0 !important;
+    border-radius: 8px;
+    min-height: calc(100vh - 32px);
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: hidden;
+  }
+  
+  /* ✅ Header mobile - COMPACT seperti material-header */
+  .quiz-header {
+    padding: 8px 16px !important;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .quiz-title-section {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .close-button {
+    font-size: 16px !important;
+    margin-right: 6px !important;
+    padding: 2px;
+  }
+  
+  .quiz-title {
+    font-size: 14px !important;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+  
+  .timer {
+    padding: 3px 6px !important;
+    font-size: 12px !important;
+    border-radius: 4px;
+  }
+  
+  /* ✅ Quiz content - stack vertically seperti view-material */
+  .quiz-content {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  /* ✅ Question navigation - horizontal on top - COMPACT */
+  .question-nav {
+    width: 100%;
+    padding: 6px 12px !important;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    margin-left: 0;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: #f8f9fa;
+    gap: 6px !important;
+  }
+  
+  /* ✅ Nav label mobile spacing - COMPACT */
+  .nav-label {
+    margin-bottom: 0;
+    margin-left: 0;
+    font-size: 12px !important;
+    flex-shrink: 0;
+    margin-right: 8px !important;
+  }
+  
+  .question-numbers {
+    padding: 0;
+    gap: 3px !important;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+    margin-bottom: -2px;
+    margin-top: 0;
+    margin-left: 4px !important;
+  }
+  
+  .question-number {
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 11px !important;
+    flex-shrink: 0;
+    border-radius: 4px;
+  }
+  
+  /* ✅ Question content mobile - COMPACT seperti material-content */
+  .question-content {
+    padding: 8px 12px !important;
+    min-height: auto !important; /* ✅ CHANGED: dari calc(100vh - 120px) ke auto */
+    overflow-x: hidden;
+  }
+  
+  .question-text {
+    font-size: 12px !important;
+    margin-bottom: 12px !important;
+    line-height: 1.3;
+  }
+  
+  /* ✅ Multiple choice mobile - COMPACT */
+  .options {
+    gap: 6px !important;
+  }
+  
+  /* ✅ Option alignment mobile - COMPACT */
+  .option-label {
+    font-size: 11px !important;
+    padding-left: 20px !important;
+    line-height: 1.2;
+    min-height: 28px !important;
+    padding-top: 3px !important;
+    padding-bottom: 3px !important;
+  }
+  
+  .option-checkmark {
+    width: 12px !important;
+    height: 12px !important;
+    border-width: 1px !important;
+    top: 3px !important;
+  }
+  
+  .option-text {
+    margin-left: 4px !important;
+    padding-top: 0;
+    font-size: 11px !important;
+  }
+  
+  .option-label .option-checkmark:after {
+    left: 3px !important;
+    top: 1px !important;
+    width: 3px !important;
+    height: 6px !important;
+  }
+  
+  /* ✅ Benar/Salah mobile - COMPACT */
+  .benar-salah-options {
+    margin-top: 10px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .btn-benar-salah {
+    height: 36px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+    min-height: 36px;
+  }
+  
+  .benar-salah-options .row {
+    margin: 0 -3px !important;
+  }
+  
+  .benar-salah-options .col-6 {
+    padding: 0 3px !important;
+  }
+  
+  /* ✅ Short answer mobile - COMPACT */
+  .short-answer {
+    margin-top: 8px !important;
+  }
+  
+  .answer-label {
+    font-size: 11px !important;
+    margin-bottom: 3px !important;
+  }
+  
+  .answer-input {
+    height: 50px !important;
+    padding: 6px !important;
+    font-size: 10px !important;
+    border-radius: 4px;
+  }
+  
+  /* ✅ Navigation mobile - FIXED positioning seperti desktop */
+  .quiz-navigation {
+    margin-top: 16px !important; /* ✅ FIXED: consistent spacing seperti desktop */
+    padding-top: 12px !important; /* ✅ REDUCED: tapi tetap ada spacing */
+    gap: 6px !important;
+    flex-wrap: nowrap; /* ✅ CHANGED: keep horizontal layout */
+    border-top: 1px solid #e0e0e0; /* ✅ ADDED: separator */
+  }
+  
+  .nav-button {
+    padding: 6px 10px !important; /* ✅ REDUCED: tapi tidak terlalu kecil */
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    min-height: 32px !important;
+    flex: 1; /* ✅ KEEP: equal width distribution */
+    min-width: 80px !important;
+  }
+  
+  .nav-button i {
+    margin: 0 2px !important;
+  }
+  
+  .finish-button {
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+    min-height: 32px !important;
+    flex: 1; /* ✅ ADDED: same width as nav buttons */
+  }
+  
+  /* ✅ Loading and error states mobile - COMPACT */
+  .loading-container {
+    min-height: 30vh !important;
+    margin: 4px !important;
+    border-radius: 8px;
+  }
+  
+  .loading-text {
+    font-size: 0.8rem !important;
+  }
+  
+  .error-container {
+    min-height: 25vh !important;
+    margin: 4px !important;
+  }
+  
+  .error-container .alert {
+    padding: 12px !important;
+    margin: 0;
+  }
+}
+
+/* ✅ Small mobile adjustments - KEEP navigation horizontal */
+@media (max-width: 576px) {
+  .view-quiz-container {
+    padding: 8px !important;
+  }
+  
+  .quiz-container {
+    border-radius: 6px;
+  }
+  
+  .quiz-header {
+    padding: 4px 8px !important;
+    gap: 3px;
+  }
+  
+  .quiz-title {
+    font-size: 12px !important;
+  }
+  
+  .close-button {
+    font-size: 14px !important;
+  }
+  
+  .timer {
+    font-size: 10px !important;
+    padding: 2px 4px !important;
+  }
+  
+  .question-nav {
+    padding: 4px 8px !important;
+    gap: 4px;
+  }
+  
+  .nav-label {
+    font-size: 10px !important;
+    margin-right: 4px !important;
+  }
+  
+  .question-numbers {
+    margin-left: 2px !important;
+    gap: 2px !important;
+  }
+  
+  .question-number {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 9px !important;
+  }
+  
+  .question-content {
+    padding: 4px 8px !important;
+  }
+  
+  .question-text {
+    font-size: 10px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .option-label {
+    font-size: 9px !important;
+    padding-left: 16px !important;
+    min-height: 24px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+  }
+  
+  .option-checkmark {
+    width: 10px !important;
+    height: 10px !important;
+    top: 2px !important;
+  }
+  
+  .option-text {
+    margin-left: 3px !important;
+    font-size: 9px !important;
+  }
+  
+  .btn-benar-salah {
+    height: 28px !important;
+    font-size: 9px !important;
+    min-height: 28px;
+  }
+  
+  .answer-input {
+    height: 40px !important;
+    padding: 4px !important;
+    font-size: 9px !important;
+  }
+  
+  /* ✅ Navigation small mobile - KEEP horizontal */
+  .quiz-navigation {
+    margin-top: 12px !important;
+    padding-top: 8px !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important; /* ✅ KEEP: horizontal layout */
+  }
+  
+  .nav-button {
+    padding: 4px 6px !important;
+    font-size: 9px !important;
+    min-height: 28px !important;
+    min-width: 60px !important;
+  }
+  
+  .finish-button {
+    padding: 4px 8px !important;
+    font-size: 9px !important;
+    min-height: 28px !important;
+  }
+}
+
+/* ✅ Very small mobile - ONLY stack if absolutely necessary */
+@media (max-width: 400px) {
+  .view-quiz-container {
+    padding: 4px !important;
+  }
+  
+  .quiz-container {
+    min-height: calc(100vh - 8px);
+  }
+  
+  .question-content {
+    padding: 2px 4px !important;
+  }
+  
+  /* ✅ Navigation very small - ONLY stack on extremely narrow screens */
+  .quiz-navigation {
+    flex-direction: column !important;
+    gap: 4px !important;
+    margin-top: 8px !important;
+    padding-top: 6px !important;
+  }
+  
+  .nav-button,
+  .finish-button {
+    width: 100% !important;
+    min-width: unset !important;
+    flex: none !important;
+  }
+}
+
+/* ✅ Question numbers horizontal scroll styling */
+@media (max-width: 768px) {
+  .question-numbers::-webkit-scrollbar {
+    height: 2px !important;
+  }
+  
+  .question-numbers::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 1px;
+  }
+  
+  .question-numbers::-webkit-scrollbar-thumb {
+    background: #1BB6C1;
+    border-radius: 1px;
+  }
+  
+  .question-numbers::-webkit-scrollbar-thumb:hover {
+    background: #0e8e98;
+  }
+}
+
+/* ✅ Desktop behavior - ensure normal display */
+@media (min-width: 769px) {
+  .view-quiz-container {
+    padding: 24px;
+  }
+  
+  .quiz-container {
+    margin: 0 auto;
+    max-width: 1300px;
+  }
+  
+  .quiz-content {
+    flex-direction: row;
+  }
+  
+  .question-nav {
+    flex-direction: column;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: none;
+    background-color: transparent;
+  }
+  
+  .nav-label {
+    margin-bottom: 20px;
+    margin-left: 12px;
+    font-size: 16px;
+  }
+  
+  .question-numbers {
+    flex-wrap: wrap;
+    justify-content: start;
+    overflow-x: visible;
+    margin-top: 8px;
+  }
+  
+  .option-label {
+    align-items: flex-start;
+    padding-top: 2px;
+    padding-bottom: 8px;
+  }
+  
+  .option-checkmark {
+    top: 2px;
+  }
+  
+  .option-text {
+    margin-left: 12px;
+  }
+  
+  /* ✅ Desktop navigation - back to margin-top auto */
+  .quiz-navigation {
+    margin-top: auto !important; /* ✅ RESTORED: untuk desktop tetap di bawah */
+    flex-wrap: nowrap;
+    flex-direction: row !important;
+    padding-top: 32px !important;
+  }
+  
+  .nav-button {
+    flex: none;
+    min-width: auto;
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  .finish-button {
+    width: auto;
+    flex: none;
+    padding: 10px 24px;
+    font-size: 14px;
+  }
+}
+
+/* ✅ Enhanced touch interactions for mobile */
+@media (max-width: 768px) {
+  .question-number,
+  .option-label,
+  .btn-benar-salah,
+  .nav-button,
+  .finish-button {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* ✅ Active states for better mobile feedback */
+  .question-number:active {
+    background-color: #0e8e98;
+    transform: scale(0.95);
+  }
+  
+  .btn-benar-salah:active {
+    transform: scale(0.98);
+  }
+  
+  .nav-button:active:not(:disabled),
+  .finish-button:active {
+    transform: scale(0.98);
+  }
 }

@@ -219,7 +219,7 @@ export class TeacherProgressService {
 
   constructor(private http: HttpClient) { }
 
-  // ✅ Helper method untuk get headers dengan token
+  // Helper method untuk get headers dengan token
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
@@ -228,7 +228,7 @@ export class TeacherProgressService {
     });
   }
 
-  // ✅ GET /api/teacher-progress/classes-summary
+  // GET /api/teacher-progress/classes-summary
   // Mendapatkan ringkasan kelas yang memiliki materi dari guru
   getClassesSummary(): Observable<ClassesSummaryResponse> {
     const headers = this.getAuthHeaders();
@@ -267,7 +267,7 @@ export class TeacherProgressService {
     );
   }
 
-  // ✅ GET /api/teacher-progress/classes/:classId/materials
+  // GET /api/teacher-progress/classes/:classId/materials
   // Mendapatkan daftar materi dan progress per kelas
   getClassMaterialsProgress(classId: string): Observable<ClassMaterialsProgressResponse> {
     const headers = this.getAuthHeaders();
@@ -289,7 +289,7 @@ export class TeacherProgressService {
     );
   }
 
-  // ✅ POST /api/teacher-progress/feedback
+  // POST /api/teacher-progress/feedback
   // Mengirim feedback ke siswa
   sendStudentFeedback(feedbackData: FeedbackPayload): Observable<SendFeedbackResponse> {
     const headers = this.getAuthHeaders();

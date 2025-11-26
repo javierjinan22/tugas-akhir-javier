@@ -1,4 +1,8 @@
-/* ✅ Dashboard Banner */
+.student-dashboard-container {
+  padding: 24px;
+  min-height: 100vh;
+}
+
 .dashboard-banner {
   background: linear-gradient(90deg, #1267b2 0%, #41c8b1 100%);
   border-radius: 16px;
@@ -26,6 +30,9 @@
   box-shadow: none;
   margin-top: 20px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+  outline: none;
+  cursor: pointer;
 }
 
 .btn-tambah:hover {
@@ -33,6 +40,14 @@
   color: #212121;
   transform: translateY(-2px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.btn-tambah:focus,
+.btn-tambah:active {
+  outline: none;
+  background: #ffea00;
+  color: #212121;
+  transform: scale(0.98);
 }
 
 .btn-tambah i {
@@ -317,6 +332,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  outline: none;
 }
 
 .btn-go-to-material:hover {
@@ -326,11 +342,18 @@
   text-decoration: none;
 }
 
+.btn-go-to-material:focus,
+.btn-go-to-material:active {
+  outline: none;
+  color: white;
+  text-decoration: none;
+  transform: scale(0.98);
+}
+
 .btn-go-to-material i {
   font-size: 9px;
 }
 
-/* ✅ Empty States */
 .empty-rankings-state,
 .no-feedback-dashboard {
   background: #f8f9fa;
@@ -352,6 +375,7 @@
   font-size: 13px;
   cursor: pointer;
   transition: all 0.3s ease;
+  outline: none;
 }
 
 .btn-outline-primary:hover {
@@ -359,6 +383,14 @@
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
+}
+
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  outline: none;
+  background: #1BB6C1;
+  color: white;
+  transform: scale(0.98);
 }
 
 /* ✅ Loading States */
@@ -404,121 +436,130 @@
   border-radius: 10px;
 }
 
-/* ✅ Responsive Design */
+/* ✅ MOBILE RESPONSIVE - SIMPLE APPROACH */
 @media (max-width: 768px) {
+
+  .student-dashboard-container {
+    padding: 16px;
+    min-height: calc(100vh - 60px);
+  }
+
   .page-section {
-    padding-left: 10px;
-    padding-right: 10px;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-bottom: 16px;
   }
   
   .dashboard-banner {
-    padding: 24px 20px;
+    padding: 20px 16px;
+    margin-bottom: 16px;
   }
   
   .dashboard-banner h3 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    line-height: 1.2;
   }
   
-  .feedback-section-dashboard {
-    min-height: 250px;
-    padding: 16px;
+  .dashboard-banner p {
+    font-size: 1rem;
   }
   
-  .feedback-list-dashboard {
-    max-height: 180px;
+  /* ✅ SIMPLE: Button mobile styling WITHOUT conflicting z-index */
+  .btn-tambah {
+    font-size: 0.95rem;
+    padding: 14px 24px;
+    margin-top: 16px;
+    min-height: 48px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 214, 0, 0.3);
+    touch-action: manipulation;
+    user-select: none;
+    border: none;
+    outline: none;
+    display: inline-block;
+    background: #ffd600 !important;
+    color: #212121 !important;
   }
   
-  .ranking-card-new {
-    padding: 12px 16px;
-    min-height: 60px;
-  }
-  
-  .rank-badge-new {
-    width: 36px;
-    height: 36px;
-    left: 10px;
-  }
-  
-  .badge-image {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .student-name-new {
-    margin-left: 50px;
-    font-size: 15px;
-  }
-  
-  .score-new {
-    font-size: 20px;
-  }
-  
-  .feedback-card-dashboard {
-    padding: 14px;
-  }
-  
-  .feedback-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
-  .feedback-category {
-    align-self: flex-start;
-  }
-  
-  .d-flex.justify-content-between {
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-  }
-  
-  .d-flex.justify-content-between .btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 576px) {
-  .summary-card-custom {
-    padding: 18px 15px 0 15px;
-    min-height: 150px;
-  }
-  
-  .icon-bg {
-    width: 50px;
-    height: 50px;
-    font-size: 1.8rem;
-  }
-  
-  .summary-value-custom {
-    font-size: 1.3rem;
-  }
-  
-  .summary-label-custom {
-    font-size: 1.05rem;
-  }
-  
-  .feedback-section-dashboard {
-    min-height: 220px;
-    padding: 14px;
+  .btn-tambah:hover,
+  .btn-tambah:focus,
+  .btn-tambah:active {
+    outline: none !important;
+    background: #ffea00 !important;
+    color: #212121 !important;
+    box-shadow: 0 0 0 3px rgba(255, 214, 0, 0.4);
+    transform: scale(0.98);
   }
   
   .sub-title {
     font-size: 18px;
+    margin-bottom: 12px;
   }
   
-  .empty-rankings-state,
-  .no-feedback-dashboard {
-    min-height: 120px;
+  /* ✅ Section header */
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
   }
   
-  .feedback-list-dashboard {
-    max-height: 150px;
+  .section-header h3 {
+    margin-bottom: 0;
   }
   
+  .section-header .btn {
+    width: 100%;
+    min-height: 48px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(27, 182, 193, 0.3);
+    touch-action: manipulation;
+  }
+  
+  /* ✅ SIMPLE: Summary cards WITHOUT z-index conflicts */
+  .summary-card-custom {
+    padding: 16px 14px 14px 14px;
+    min-height: 140px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+    touch-action: manipulation;
+    user-select: none;
+    overflow: hidden;
+  }
+  
+  .summary-card-custom:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+  
+  /* ✅ Hide icon background on mobile */
+  .icon-bg {
+    display: none;
+  }
+  
+  .summary-value-custom {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+  
+  .summary-label-custom {
+    font-size: 0.95rem;
+    margin-top: 2px;
+  }
+  
+  /* ✅ SIMPLE: Ranking cards */
   .ranking-card-new {
-    padding: 10px 14px;
-    min-height: 55px;
+    padding: 12px 14px;
+    min-height: 60px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    touch-action: manipulation;
+    user-select: none;
+  }
+  
+  .ranking-card-new:active {
+    transform: scale(0.98);
   }
   
   .rank-badge-new {
@@ -533,376 +574,283 @@
   }
   
   .student-name-new {
-    margin-left: 45px;
+    margin-left: 44px;
     font-size: 14px;
   }
   
   .score-new {
     font-size: 18px;
   }
-}
-
-/* ✅ FIX: Grid gap untuk spacing yang konsisten */
-.row.g-3 {
-  --bs-gutter-x: 1rem;
-  --bs-gutter-y: 1rem;
-}
-
-/* ✅ FIX: Dashboard Rankings Section - Style seperti Learning History */
-.rankings-section-dashboard {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  min-height: 350px;
-  height: 100%;
-}
-
-.rankings-list-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.ranking-item-dashboard {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  background: #f8f9fa;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-}
-
-.ranking-item-dashboard:hover {
-  background: #e3f2fd;
-  transform: translateX(4px);
-}
-
-.rank-badge-container {
-  margin-right: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-}
-
-.rank-badge {
-  width: 32px;
-  height: 32px;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-.rank-number {
-  font-size: 18px;
-  font-weight: 700;
-  color: #FF9A00;
-  background: white;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #1BB6C1;
-}
-
-.student-info {
-  flex: 1;
-}
-
-.student-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-}
-
-.you-label {
-  color: #715A5A;
-  font-weight: 500;
-}
-
-.score-display {
-  font-size: 20px;
-  font-weight: 700;
-  color: #715A5A;
-  margin-left: 16px;
-}
-
-.feedback-section-dashboard {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  min-height: 350px;
-  height: 100%;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-}
-
-.section-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 20px;
-  font-weight: 600;
-  color: #212121;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.feedback-emoji {
-  font-size: 24px;
-}
-
-.feedback-list-dashboard {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.feedback-card-dashboard {
-  background: white;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease;
-}
-
-.feedback-card-dashboard:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.feedback-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-  gap: 10px;
-}
-
-.feedback-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-  margin: 0;
-  flex: 1;
-  line-height: 1.3;
-}
-
-.feedback-category {
-  background: #1BB6C1;
-  color: white;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 10px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-}
-
-.feedback-description {
-  font-size: 13px;
-  color: #555;
-  margin: 0 0 12px 0;
-  line-height: 1.4;
-}
-
-.feedback-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-  color: #999;
-  margin-bottom: 10px;
-}
-
-.feedback-teacher {
-  font-weight: 500;
-}
-
-.feedback-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.btn-go-to-material {
-  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.btn-go-to-material:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
-  color: white;
-  text-decoration: none;
-}
-
-.btn-go-to-material i {
-  font-size: 9px;
-}
-
-/* ✅ FIX: Empty States */
-.empty-rankings-state,
-.no-feedback-dashboard {
-  background: #f8f9fa;
-  border-radius: 12px;
-  border: 2px dashed #dee2e6;
-  min-height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ✅ FIX: Enhanced Button Styling */
-.btn-outline-primary {
-  border: 2px solid #1BB6C1;
-  color: #1BB6C1;
-  background: transparent;
-  border-radius: 20px;
-  font-weight: 600;
-  padding: 6px 16px;
-  font-size: 13px;
-  transition: all 0.3s ease;
-}
-
-.btn-outline-primary:hover {
-  background: #1BB6C1;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
-}
-
-/* ✅ FIX: Responsive Design untuk 50/50 Layout */
-@media (max-width: 768px) {
-  .page-section {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
   
-  .dashboard-banner {
-    padding: 24px 20px;
-  }
-  
-  .dashboard-banner h3 {
-    font-size: 1.8rem;
-  }
-  
-  .rankings-section-dashboard,
-  .feedback-section-dashboard {
-    min-height: 300px;
-    padding: 16px;
-  }
-  
-  .rankings-list-dashboard,
-  .feedback-list-dashboard {
-    max-height: 220px;
-  }
-  
-  .ranking-item-dashboard {
-    padding: 12px;
-  }
-  
+  /* ✅ SIMPLE: Feedback cards */
   .feedback-card-dashboard {
-    padding: 14px;
+    padding: 12px;
   }
   
   .feedback-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 6px;
   }
   
   .feedback-category {
     align-self: flex-start;
   }
   
-  .d-flex.justify-content-between {
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
+  /* ✅ SIMPLE: Button inside feedback cards */
+  .btn-go-to-material {
+    width: 100%;
+    justify-content: center;
+    min-height: 48px;
+    font-size: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(116, 185, 255, 0.3);
+    touch-action: manipulation;
+    user-select: none;
+    border: none;
+    outline: none;
+    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%) !important;
+    color: white !important;
   }
   
-  .d-flex.justify-content-between .btn {
-    width: 100%;
+  .btn-go-to-material:hover,
+  .btn-go-to-material:focus,
+  .btn-go-to-material:active {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(116, 185, 255, 0.4);
+    transform: scale(0.98);
+    background: linear-gradient(135deg, #5aa3ff 0%, #0770c7 100%) !important;
+    color: white !important;
+    text-decoration: none !important;
+  }
+  
+  /* ✅ SIMPLE: Outline buttons */
+  .btn-outline-primary {
+    min-height: 48px;
+    padding: 12px 16px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(27, 182, 193, 0.3);
+    touch-action: manipulation;
+    user-select: none;
+    border: 2px solid #1BB6C1 !important;
+    background: transparent !important;
+    color: #1BB6C1 !important;
+  }
+  
+  .btn-outline-primary:hover,
+  .btn-outline-primary:focus,
+  .btn-outline-primary:active {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(27, 182, 193, 0.4);
+    transform: scale(0.98);
+    background: #1BB6C1 !important;
+    color: white !important;
+  }
+  
+  /* ✅ Error retry button */
+  .btn-outline-danger {
+    min-height: 48px;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  
+  /* ✅ Empty states */
+  .empty-rankings-state,
+  .no-feedback-dashboard {
+    min-height: 120px;
+    padding: 16px;
+  }
+  
+  /* ✅ MINIMAL touch optimization */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  /* ✅ Keep text selection for inputs */
+  input, textarea, select {
+    -webkit-user-select: text !important;
+    user-select: text !important;
   }
 }
 
+/* ✅ Rest of breakpoints without z-index conflicts... */
 @media (max-width: 576px) {
-  .summary-card-custom {
-    padding: 18px 15px 0 15px;
-    min-height: 150px;
+
+  .student-dashboard-container {
+    padding: 12px;
+    min-height: calc(100vh - 60px);
+  }
+
+  .container-fluid {
+    padding-left: 8px;
+    padding-right: 8px;
   }
   
-  .icon-bg {
-    width: 50px;
-    height: 50px;
-    font-size: 1.8rem;
+  .page-section {
+    padding-left: 4px;
+    padding-right: 4px;
+    margin-bottom: 12px;
+  }
+  
+  .dashboard-banner {
+    padding: 16px 12px;
+    margin-bottom: 12px;
+  }
+  
+  .dashboard-banner h3 {
+    font-size: 1.4rem;
+  }
+  
+  .dashboard-banner p {
+    font-size: 0.9rem;
+  }
+  
+  .btn-tambah {
+    font-size: 0.9rem;
+    padding: 12px 20px;
+  }
+  
+  .summary-card-custom {
+    padding: 14px 12px 12px 12px;
+    min-height: 120px;
   }
   
   .summary-value-custom {
-    font-size: 1.3rem;
+    font-size: 1.1rem;
+    margin-bottom: 6px;
   }
   
   .summary-label-custom {
-    font-size: 1.05rem;
+    font-size: 0.9rem;
+    margin-top: 0;
   }
   
-  .rankings-section-dashboard,
-  .feedback-section-dashboard {
-    min-height: 250px;
-    padding: 14px;
+  .sub-title {
+    font-size: 16px;
+    margin-bottom: 10px;
   }
   
-  .section-title {
-    font-size: 18px;
+  .row.g-3 {
+    --bs-gutter-x: 0.5rem;
+    --bs-gutter-y: 0.5rem;
+  }
+  
+  .ranking-card-new {
+    padding: 10px 12px;
+    min-height: 50px;
+  }
+  
+  .rank-badge-new {
+    width: 28px;
+    height: 28px;
+    left: 6px;
+  }
+  
+  .badge-image {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .student-name-new {
+    margin-left: 38px;
+    font-size: 13px;
+  }
+  
+  .score-new {
+    font-size: 16px;
+  }
+  
+  .feedback-card-dashboard {
+    padding: 10px;
+  }
+  
+  .feedback-title {
+    font-size: 12px;
+  }
+  
+  .feedback-description {
+    font-size: 11px;
+  }
+  
+  .feedback-meta {
+    font-size: 10px;
+  }
+  
+  .btn-go-to-material {
+    font-size: 11px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .dashboard-banner {
+    padding: 12px 16px;
+  }
+  
+  .dashboard-banner h3 {
+    font-size: 1.3rem;
+  }
+  
+  .summary-card-custom {
+    min-height: 110px;
   }
   
   .empty-rankings-state,
   .no-feedback-dashboard {
-    min-height: 120px;
+    min-height: 100px;
+  }
+}
+
+/* ✅ DESKTOP BEHAVIOR - Reset untuk desktop */
+@media (min-width: 769px) {
+  .student-dashboard-container {
+    padding: 24px; 
+  }
+
+  .section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
   }
   
-  .rankings-list-dashboard,
-  .feedback-list-dashboard {
-    max-height: 180px;
+  .section-header h3 {
+    margin-bottom: 0;
+    flex: 1;
+  }
+  
+  .section-header .btn {
+    width: auto;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+  
+  /* ✅ Show icon background on desktop */
+  .icon-bg {
+    display: flex;
   }
 }
 
-/* ✅ FIX: Scroll styling untuk feedback */
-.feedback-list-dashboard::-webkit-scrollbar {
-  width: 4px;
-}
-
-.feedback-list-dashboard::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.feedback-list-dashboard::-webkit-scrollbar-thumb {
-  background: #1BB6C1;
-  border-radius: 10px;
+/* ✅ ENHANCED BUTTON FEEDBACK FOR MOBILE */
+@media (max-width: 768px) {
+  button:active,
+  .btn:active,
+  .summary-card-custom:active,
+  .ranking-card-new:active {
+    transform: scale(0.95) !important;
+    transition: transform 0.1s ease !important;
+  }
+  
+  /* ✅ Prevent double-tap zoom on buttons */
+  button,
+  .btn,
+  .summary-card-custom,
+  .ranking-card-new {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
 }

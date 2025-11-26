@@ -62,7 +62,7 @@ export interface PublicMaterial {
   deskripsi_singkat: string;
   kategori_materi?: string;
   header_gambar?: string;
-  flag_akses: number; 
+  flag_akses: number;
   total_bab: number;
   total_soal: number;
   has_quiz: boolean;
@@ -109,7 +109,7 @@ export class MaterialService {
     private classService: ClassService
   ) { }
 
-  // ✨ Helper method untuk headers
+  // Helper method untuk headers
   private getHeaders(token?: string): HttpHeaders {
     const jwtToken = token || localStorage.getItem('token') || '';
     return new HttpHeaders({
@@ -119,95 +119,93 @@ export class MaterialService {
   }
 
   private createFormDataForMaterial(materialData: any, headerImage: File): FormData {
-  const formData = new FormData();
-  
-  // Append file dengan nama field yang sesuai backend expectation
-  formData.append('header_gambar', headerImage);
-  
-  // Semua field material data secara individual (bukan sebagai JSON)
-  // Backend controller expects individual fields, not nested JSON
-  
-  if (materialData.judul) formData.append('judul', materialData.judul);
-  if (materialData.deskripsi) formData.append('deskripsi', materialData.deskripsi);
-  if (materialData.kategori) formData.append('kategori', materialData.kategori);
-  if (materialData.sekolah) formData.append('sekolah', materialData.sekolah);
-  
-  // Arrays dan Objects harus di-stringify
-  if (materialData.kelas && Array.isArray(materialData.kelas)) {
-    formData.append('kelas', JSON.stringify(materialData.kelas));
-  }
-  
-  if (materialData.babList && Array.isArray(materialData.babList)) {
-    formData.append('babList', JSON.stringify(materialData.babList));
-  }
-  
-  if (materialData.quiz && Array.isArray(materialData.quiz)) {
-    formData.append('quiz', JSON.stringify(materialData.quiz));
-  }
-  
-  // ✅ Boolean dan Number values
-  if (materialData.izinkanUnduh !== undefined) {
-    formData.append('izinkanUnduh', materialData.izinkanUnduh.toString());
-  }
+    const formData = new FormData();
 
-  if (materialData.flag_akses !== undefined) {
-    formData.append('flagAkses', materialData.flag_akses.toString());
+    // Append file dengan nama field yang sesuai backend expectation
+    formData.append('header_gambar', headerImage);
+
+    // Semua field material data secara individual (bukan sebagai JSON)
+    // Backend controller expects individual fields, not nested JSON
+
+    if (materialData.judul) formData.append('judul', materialData.judul);
+    if (materialData.deskripsi) formData.append('deskripsi', materialData.deskripsi);
+    if (materialData.kategori) formData.append('kategori', materialData.kategori);
+    if (materialData.sekolah) formData.append('sekolah', materialData.sekolah);
+
+    // Arrays dan Objects harus di-stringify
+    if (materialData.kelas && Array.isArray(materialData.kelas)) {
+      formData.append('kelas', JSON.stringify(materialData.kelas));
+    }
+
+    if (materialData.babList && Array.isArray(materialData.babList)) {
+      formData.append('babList', JSON.stringify(materialData.babList));
+    }
+
+    if (materialData.quiz && Array.isArray(materialData.quiz)) {
+      formData.append('quiz', JSON.stringify(materialData.quiz));
+    }
+
+    // Boolean dan Number values
+    if (materialData.izinkanUnduh !== undefined) {
+      formData.append('izinkanUnduh', materialData.izinkanUnduh.toString());
+    }
+
+    if (materialData.flag_akses !== undefined) {
+      formData.append('flagAkses', materialData.flag_akses.toString());
+    }
+
+    if (materialData.waktu_pengerjaan) {
+      formData.append('waktu_pengerjaan', materialData.waktu_pengerjaan.toString());
+    }
+
+    return formData;
   }
-  
-  if (materialData.waktu_pengerjaan) {
-    formData.append('waktu_pengerjaan', materialData.waktu_pengerjaan.toString());
-  }
-  
-  return formData;
-}
 
   addMaterial(materialData: any, headerImage?: File): Observable<any> {
-  if (headerImage) {
-    // ✅ Kirim sebagai FormData multipart untuk file upload
-    const formData = this.createFormDataForMaterial(materialData, headerImage);
-    const headers = this.getMultipartHeaders();
+    if (headerImage) {
+      // Kirim sebagai FormData multipart untuk file upload
+      const formData = this.createFormDataForMaterial(materialData, headerImage);
+      const headers = this.getMultipartHeaders();
 
-    return this.http.post(`${this.apiUrl}`, formData, { headers }).pipe(
-      catchError(error => {
-        console.error('Error in addMaterial with file:', error);
-        return throwError(() => error);
-      })
-    );
-  } else {
-    // ✅ Kirim sebagai JSON biasa jika tidak ada file
-    const headers = this.getHeaders();
-    return this.http.post(`${this.apiUrl}`, materialData, { headers }).pipe(
-      catchError(error => {
-        console.error('Error in addMaterial:', error);
-        return throwError(() => error);
-      })
-    );
+      return this.http.post(`${this.apiUrl}`, formData, { headers }).pipe(
+        catchError(error => {
+          console.error('Error in addMaterial with file:', error);
+          return throwError(() => error);
+        })
+      );
+    } else {
+      // Kirim sebagai JSON biasa jika tidak ada file
+      const headers = this.getHeaders();
+      return this.http.post(`${this.apiUrl}`, materialData, { headers }).pipe(
+        catchError(error => {
+          console.error('Error in addMaterial:', error);
+          return throwError(() => error);
+        })
+      );
+    }
   }
-}
 
 
 
   private buildFormData(materialData: any, headerImage: File): FormData {
-  const formData = new FormData();
-  
-  formData.append('headerImage', headerImage);
-  formData.append('materialData', JSON.stringify(materialData));
-  
-  return formData;
-}
+    const formData = new FormData();
+
+    formData.append('headerImage', headerImage);
+    formData.append('materialData', JSON.stringify(materialData));
+
+    return formData;
+  }
 
   private getMultipartHeaders(token?: string): HttpHeaders {
-  const jwtToken = token || localStorage.getItem('token') || '';
-  
-  // ✅ CRITICAL: Jangan set Content-Type untuk multipart
-  // Browser akan set Content-Type: multipart/form-data dengan boundary otomatis
-  return new HttpHeaders({
-    'Authorization': `Bearer ${jwtToken}`
-    // ✅ JANGAN tambahkan 'Content-Type': browser yang handle
-  });
-}
+    const jwtToken = token || localStorage.getItem('token') || '';
 
-  // ✅ SESUAI: router.get('/my-materi', auth, isGuru, materiController.getAllMateri);
+    // Browser akan set Content-Type: multipart/form-data dengan boundary otomatis
+    return new HttpHeaders({
+      'Authorization': `Bearer ${jwtToken}`
+    });
+  }
+
+  // router.get('/my-materi', auth, isGuru, materiController.getAllMateri);
   getMyMaterials(token?: string): Observable<MaterialsResponse> {
     const headers = this.getHeaders(token);
 
@@ -240,7 +238,7 @@ export class MaterialService {
     );
   }
 
-  // ✅ SESUAI: router.get('/stats', auth, isGuru, materiController.getMateriStats);
+  // router.get('/stats', auth, isGuru, materiController.getMateriStats);
   getMaterialStats(token?: string): Observable<MaterialStatsResponse> {
     const headers = this.getHeaders(token);
 
@@ -252,7 +250,7 @@ export class MaterialService {
     );
   }
 
-  // ✅ SESUAI: router.get('/:id', auth, materiController.getMateriById);
+  // router.get('/:id', auth, materiController.getMateriById);
   getMaterialById(materialId: string, token?: string): Observable<any> {
     const headers = this.getHeaders(token);
 
@@ -265,30 +263,30 @@ export class MaterialService {
   }
 
   updateMaterial(materialId: string, materialData: any, headerImage?: File, token?: string): Observable<any> {
-  if (headerImage) {
-    // ✅ Kirim sebagai FormData multipart untuk file upload
-    const formData = this.createFormDataForMaterial(materialData, headerImage);
-    const headers = this.getMultipartHeaders(token);
-    
-    return this.http.put(`${this.apiUrl}/${materialId}`, formData, { headers }).pipe(
-      catchError(error => {
-        console.error('Error in updateMaterial with file:', error);
-        return throwError(() => error);
-      })
-    );
-  } else {
-    // ✅ Kirim sebagai JSON biasa jika tidak ada file
-    const headers = this.getHeaders(token);
-    return this.http.put(`${this.apiUrl}/${materialId}`, materialData, { headers }).pipe(
-      catchError(error => {
-        console.error('Error in updateMaterial:', error);
-        return throwError(() => error);
-      })
-    );
-  }
-}
+    if (headerImage) {
+      // Kirim sebagai FormData multipart untuk file upload
+      const formData = this.createFormDataForMaterial(materialData, headerImage);
+      const headers = this.getMultipartHeaders(token);
 
-  // ✅ SESUAI: router.delete('/:id', auth, isGuru, materiController.deleteMateri);
+      return this.http.put(`${this.apiUrl}/${materialId}`, formData, { headers }).pipe(
+        catchError(error => {
+          console.error('Error in updateMaterial with file:', error);
+          return throwError(() => error);
+        })
+      );
+    } else {
+      // Kirim sebagai JSON biasa jika tidak ada file
+      const headers = this.getHeaders(token);
+      return this.http.put(`${this.apiUrl}/${materialId}`, materialData, { headers }).pipe(
+        catchError(error => {
+          console.error('Error in updateMaterial:', error);
+          return throwError(() => error);
+        })
+      );
+    }
+  }
+
+  // router.delete('/:id', auth, isGuru, materiController.deleteMateri);
   deleteMaterial(materialId: string, token: string): Observable<any> {
     const headers = this.getHeaders(token);
 
@@ -311,7 +309,7 @@ export class MaterialService {
     );
   }
 
-  // ✅ SESUAI: router.get('/kelas/:classId', auth, materiController.getMateriByClass);
+  // router.get('/kelas/:classId', auth, materiController.getMateriByClass);
   getMaterialsByClass(classId: string, token?: string): Observable<any> {
     const headers = this.getHeaders(token);
 
@@ -323,7 +321,6 @@ export class MaterialService {
     );
   }
 
-  // ❌ TIDAK ADA DI ROUTER - Kemungkinan perlu endpoint terpisah untuk toggle status
   // Atau bisa menggunakan updateMaterial dengan field is_active saja
   toggleMaterialStatus(materialId: string, isActive: boolean, token: string): Observable<any> {
     const headers = this.getHeaders(token);
@@ -386,26 +383,26 @@ export class MaterialService {
     );
   }
 
-  // ✅ BARU: Copy public material to own school
+  // Copy public material to own school
   copyPublicMaterial(materialId: string, kelasTujuan: string[], token?: string): Observable<CopyMaterialResponse> {
-  const headers = this.getHeaders(token);
-  const payload = {
-    kelas_tujuan: kelasTujuan
-  };
+    const headers = this.getHeaders(token);
+    const payload = {
+      kelas_tujuan: kelasTujuan
+    };
 
-  return this.http.post<CopyMaterialResponse>(`${this.apiUrl}/public/${materialId}/copy`, payload, { headers }).pipe(
-    catchError(error => {
-      console.error('Error in copyPublicMaterial:', error);
-      return throwError(() => error);
-    })
-  );
-}
+    return this.http.post<CopyMaterialResponse>(`${this.apiUrl}/public/${materialId}/copy`, payload, { headers }).pipe(
+      catchError(error => {
+        console.error('Error in copyPublicMaterial:', error);
+        return throwError(() => error);
+      })
+    );
+  }
 
-// ✅ TAMBAH: Method helper untuk format content dengan styles
-public formatContentWithResponsiveStyles(content: string): string {
-  if (!content) return '';
-  
-  const responsiveStyles = `
+  // Method helper untuk format content dengan styles
+  public formatContentWithResponsiveStyles(content: string): string {
+    if (!content) return '';
+
+    const responsiveStyles = `
     <style>
       .ck-content img,
       .material-content img,
@@ -471,7 +468,7 @@ public formatContentWithResponsiveStyles(content: string): string {
       }
     </style>
   `;
-  
-  return responsiveStyles + content;
-}
+
+    return responsiveStyles + content;
+  }
 }

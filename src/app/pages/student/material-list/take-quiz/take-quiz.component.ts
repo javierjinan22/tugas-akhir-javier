@@ -234,7 +234,7 @@ export class TakeQuizComponent implements OnInit {
           <li>Durasi ujian : ${waktuText}</li>
         </ul>
         <p>
-          Apabila tidak memenuhi syarat kelulusan, maka Anda harus menunggu selama 1 menit untuk
+          Apabila tidak memenuhi syarat kelulusan, maka Anda dapat
           mengulang pengerjaan ujian kembali.
         </p>
         <p class="quiz-start-message">Selamat Mengerjakan!</p>

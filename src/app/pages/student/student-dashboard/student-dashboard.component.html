@@ -1,18 +1,17 @@
-<div class="container mt-1">
-
+<div class="student-dashboard-container">
   <!-- Loading State -->
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary mb-3" role="status">
+  <div *ngIf="loading" class="text-center py-4">
+    <div class="spinner-border text-primary mb-2" role="status" style="width: 2rem; height: 2rem;">
       <span class="visually-hidden">Loading...</span>
     </div>
-    <p class="text-muted">Memuat dashboard...</p>
+    <p class="text-muted small">Memuat dashboard...</p>
   </div>
 
   <!-- Error State -->
-  <div *ngIf="error && !loading" class="alert alert-danger mb-4">
-    <div class="d-flex align-items-center">
-      <i class="fas fa-exclamation-triangle me-2"></i>
-      <div class="flex-grow-1">{{ error }}</div>
+  <div *ngIf="error && !loading" class="alert alert-danger mb-3">
+    <div class="d-flex align-items-center flex-column flex-md-row gap-2">
+      <i class="fas fa-exclamation-triangle"></i>
+      <div class="flex-grow-1 text-center text-md-start">{{ error }}</div>
       <button class="btn btn-sm btn-outline-danger" (click)="retryLoadData()">
         <i class="fas fa-redo me-1"></i>
         Coba Lagi
@@ -36,7 +35,8 @@
         <p class="mb-1" style="font-size:1.18rem;font-weight:500;">
           Semangat belajar literasi digital!
         </p>
-        <button class="btn btn-tambah mt-2" (click)="onMulaiBelajar()">
+        <button class="btn btn-tambah mt-2" 
+                (click)="onMulaiBelajar()">
           Mulai belajar
           <i class="fa-solid fa-angle-right"></i>
         </button>
@@ -47,11 +47,12 @@
     <div class="page-section">
       <h3 class="sub-title">Ringkasan</h3>
       
-      <div class="row g-4">
+      <div class="row g-3">
         <div class="col-md-6 col-12">
           <div class="summary-card-custom summary-on-progress" 
                (click)="onViewUncompletedMaterials()"
-               style="cursor: pointer;">
+               (touchend)="onViewUncompletedMaterials()"
+               >
             <div class="d-flex align-items-center mb-2">
               <div class="icon-bg me-3">
                 <i class="fa-solid fa-book-open"></i>
@@ -71,8 +72,7 @@
 
         <div class="col-md-6 col-12">
           <div class="summary-card-custom summary-selesai"
-               (click)="onViewCompletedMaterials()"
-               style="cursor: pointer;">
+               (click)="onViewCompletedMaterials()">
             <div class="d-flex align-items-center mb-2">
               <div class="icon-bg me-3">
                 <i class="fa-solid fa-archive"></i>
@@ -92,39 +92,34 @@
       </div>
     </div>
 
-    <!-- Content Section dengan Top 3 dan Feedback - 50/50 Layout -->
+    <!-- Content Section - Top 3 dan Feedback -->
     <div class="page-section">
-      <div class="row g-3">
+      <div class="row g-2">
         
-        <!-- ✅ Left Section: Top 3 Siswa di Kelasmu - col-6 -->
-        <div class="col-md-6 col-12">
-          <!-- ✅ Title dan Button di luar card -->
-          <!-- <div class="d-flex justify-content-between align-items-center mb-3"> -->
-          <div class="section-header d-flex justify-content-between align-items-center">
+        <!-- Left Section: Top 3 Siswa -->
+        <div class="col-lg-6 col-12 mb-3">
+          <div class="section-header">
             <h3 class="sub-title">Top 3 Siswa di Kelasmu</h3>
-            <!-- ✅ PERBAIKI: Button hanya muncul jika ada data ranking yang valid -->
             <button *ngIf="hasValidRankingsData()" 
-                    class="btn btn-outline-primary btn-sm mb-3" 
+                    class="btn btn-outline-primary btn-sm" 
                     (click)="onViewAllRankings()">
               <i class="fas fa-trophy me-1"></i>
               Lihat Semua Peringkat
             </button>
           </div>
 
-          <!-- Rankings Loading State -->
-          <div *ngIf="rankingsLoading" class="text-center py-4">
-            <div class="spinner-border spinner-border-sm text-primary mb-2" role="status">
+          <!-- Rankings Content -->
+          <div *ngIf="rankingsLoading" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary mb-2">
               <span class="visually-hidden">Loading...</span>
             </div>
             <p class="small text-muted mb-0">Memuat peringkat...</p>
           </div>
 
-          <!-- ✅ PERBAIKI: Empty State untuk Rankings -->
           <div *ngIf="!rankingsLoading && !hasValidRankingsData()" class="empty-rankings-state">
-            <div class="text-center py-4">
-              <i class="fas fa-trophy fa-3x text-muted mb-3"></i>
-              <!-- ✅ PERBAIKI: Pesan yang lebih akurat -->
-              <h6 class="text-muted">
+            <div class="text-center py-3">
+              <i class="fas fa-trophy fa-2x text-muted mb-2"></i>
+              <h6 class="text-muted mb-1">
                 <span *ngIf="totalStudentsInClass > 1; else soloStudent">
                   Belum ada siswa yang menyelesaikan kuis
                 </span>
@@ -132,7 +127,7 @@
                   Belum ada kuis yang dikerjakan
                 </ng-template>
               </h6>
-              <p class="small text-muted mb-3">
+              <p class="small text-muted mb-0">
                 <span *ngIf="totalStudentsInClass > 1; else soloStudentDesc">
                   Peringkat akan muncul setelah ada siswa di kelas yang menyelesaikan kuis
                 </span>
@@ -143,7 +138,6 @@
             </div>
           </div>
           
-          <!-- ✅ Rankings List - hanya tampil jika ada data valid -->
           <div *ngIf="!rankingsLoading && hasValidRankingsData()" class="rankings-container">
             <div *ngFor="let ranking of topRankings; trackBy: trackByStudentId; let i = index" 
                 class="ranking-card-new"
@@ -153,19 +147,16 @@
                   'rank-3-card': ranking.rank === 3
                 }">
               
-              <!-- Badge selalu muncul -->
               <div class="rank-badge-new">
                 <img [src]="getRankBadge(ranking.rank)" 
                     [alt]="'Badge rank ' + ranking.rank" 
                     class="badge-image">
               </div>
               
-              <!-- Student name -->
               <div class="student-name-new">
                 {{ ranking.nama_siswa }}
               </div>
               
-              <!-- Score -->
               <div class="score-new">
                 {{ ranking.score }}
               </div>
@@ -173,56 +164,50 @@
           </div>
         </div>
 
-        <!-- ✅ Right Section: Feedback dari guru - col-6 -->
-        <div class="col-md-6 col-12">
+        <!-- Right Section: Feedback dari guru -->
+        <div class="col-lg-6 col-12">
           <div class="section-header">
-          <h3 class="sub-title">Feedback dari guru</h3>
-          <img src="assets/img/feedback.png" alt="Feedback" class="feedback-icon-img ms-2">
-          
-        </div>
+            <h3 class="sub-title">Feedback dari guru</h3>
+            <img src="assets/img/feedback.png" alt="Feedback" class="feedback-icon-img ms-2">
+          </div>
 
-          <!-- <div class="feedback-section-dashboard"> -->
-            <!-- Feedback Loading State -->
-            <div *ngIf="feedbacksLoading" class="text-center py-4">
-              <div class="spinner-border spinner-border-sm text-primary mb-2" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              <p class="small text-muted mb-0">Memuat feedback...</p>
+          <div *ngIf="feedbacksLoading" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary mb-2">
+              <span class="visually-hidden">Loading...</span>
             </div>
+            <p class="small text-muted mb-0">Memuat feedback...</p>
+          </div>
 
-            <!-- ✅ Feedback List -->
-            <div class="feedback-list-dashboard" *ngIf="!feedbacksLoading && feedbacks.length > 0">
-              <div *ngFor="let feedback of feedbacks; trackBy: trackByFeedbackId" class="feedback-card-dashboard">
-                <div class="feedback-header">
-                  <h4 class="feedback-title">{{ feedback.judul_materi }}</h4>
-                  <span class="feedback-category" 
-                        [style.background-color]="getCategoryColor(feedback.kategori_materi)">
-                    {{ feedback.kategori_materi }}
-                  </span>
-                </div>
-                <p class="feedback-description">{{ feedback.feedback_text }}</p>
-                <div class="feedback-meta">
-                  <span class="feedback-teacher">{{ feedback.guru_name }}</span>
-                  <span class="feedback-date">{{ formatDate(feedback.created_at) }}</span>
-                </div>
-                <div class="feedback-actions">
-                  <button class="btn-go-to-material" (click)="viewMaterial(feedback)">
-                    Lihat Materi
-                    <i class="fas fa-arrow-right"></i>
-                  </button>
-                </div>
+          <div class="feedback-list-dashboard" *ngIf="!feedbacksLoading && feedbacks.length > 0">
+            <div *ngFor="let feedback of feedbacks; trackBy: trackByFeedbackId" class="feedback-card-dashboard">
+              <div class="feedback-header">
+                <h4 class="feedback-title">{{ feedback.judul_materi }}</h4>
+                <span class="feedback-category" 
+                      [style.background-color]="getCategoryColor(feedback.kategori_materi)">
+                  {{ feedback.kategori_materi }}
+                </span>
+              </div>
+              <p class="feedback-description">{{ feedback.feedback_text }}</p>
+              <div class="feedback-meta">
+                <span class="feedback-teacher">{{ feedback.guru_name }}</span>
+                <span class="feedback-date">{{ formatDate(feedback.created_at) }}</span>
+              </div>
+              <div class="feedback-actions">
+                <button class="btn-go-to-material" (click)="viewMaterial(feedback)">
+                  Lihat Materi
+                  <i class="fas fa-arrow-right"></i>
+                </button>
               </div>
             </div>
+          </div>
 
-            <!-- Empty State untuk Feedback -->
-            <div *ngIf="!feedbacksLoading && feedbacks.length === 0" class="no-feedback-dashboard">
-              <div class="text-center py-4">
-                <i class="fas fa-comment-slash fa-3x mb-3 text-muted"></i>
-                <h6 class="text-muted mb-2">Belum ada feedback</h6>
-                <p class="small text-muted mb-3">Feedback dari guru akan muncul di sini setelah kamu menyelesaikan materi</p>
-              </div>
+          <div *ngIf="!feedbacksLoading && feedbacks.length === 0" class="no-feedback-dashboard">
+            <div class="text-center py-3">
+              <i class="fas fa-comment-slash fa-2x mb-2 text-muted"></i>
+              <h6 class="text-muted mb-1">Belum ada feedback</h6>
+              <p class="small text-muted mb-0">Feedback dari guru akan muncul di sini setelah kamu menyelesaikan materi</p>
             </div>
-          <!-- </div> -->
+          </div>
         </div>
 
       </div>

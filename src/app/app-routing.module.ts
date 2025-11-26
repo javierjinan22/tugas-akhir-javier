@@ -32,6 +32,7 @@ import { LearningHistoryComponent } from './pages/student/learning-history/learn
 import { RankingViewComponent } from './pages/teacher/ranking-view/ranking-view.component';
 import { BankMaterialsComponent } from './pages/teacher/manage-materials/bank-materials/bank-materials.component';
 import { PreviewMaterialsComponent } from './pages/teacher/manage-materials/preview-materials/preview-materials.component';
+import { QuizGuardService } from './guards/quiz-guard.service';
 
 // const routes: Routes = [];
 // const routes: Routes = [
@@ -39,7 +40,7 @@ import { PreviewMaterialsComponent } from './pages/teacher/manage-materials/prev
 // ];
 
 const routes: Routes = [
-  { path: '', component: LandingPageComponent }, // tetap
+  { path: '', component: LandingPageComponent }, 
 
   {
     path: 'guru',
@@ -87,7 +88,7 @@ const routes: Routes = [
       { path: 'materi', component: MaterialListComponent},
       { path: 'materi/lihat-materi/:id', component: ViewMaterialComponent},
       { path: 'materi/lihat-materi/:id/kuis', component: TakeQuizComponent},
-      { path: 'materi/lihat-materi/:id/kuis/kerjakan', component: ViewQuizComponent},
+      { path: 'materi/lihat-materi/:id/kuis/kerjakan', component: ViewQuizComponent, canDeactivate: [QuizGuardService]},
       { path: 'materi/lihat-materi/:id/kuis/hasil', component: DetailHistoryQuizComponent},
       { path: 'riwayat', component: LearningHistoryComponent }
     ]

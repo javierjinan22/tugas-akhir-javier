@@ -27,7 +27,7 @@
     <button class="btn-back-icon me-3" (click)="backToManageMaterials()" title="Kembali ke daftar materi">
       <i class="fas fa-arrow-left"></i>
     </button>
-    <div class="flex-grow-1">
+    <div class="grow">
       <h2 class="fw-bold mb-1" style="font-size: 24px;">Bank Materi Publik</h2>
       <p class="text-muted mb-0">Temukan dan salin materi dari guru lain untuk digunakan di sekolah Anda</p>
     </div>
@@ -52,7 +52,7 @@
 
   <!-- Filters and Search Section -->
   <div class="row mb-4" *ngIf="!loading && !errorMsg">
-    <!-- ✅ UBAH: Category Filter - gunakan ngx-select -->
+    <!-- Category Filter - gunakan ngx-select -->
     <div class="col-md-4 mb-3 mb-md-0">
       <label class="form-label fw-semibold small">Filter Kategori</label>
       <ngx-select
@@ -130,7 +130,7 @@
           
           <!-- Action buttons -->
           <div class="button-group">
-            <!-- ✅ UPDATE: Button Lihat Materi - navigasi ke detail-materials -->
+            <!-- Button Lihat Materi - navigasi ke detail-materials -->
             <button 
               class="btn btn-view"
               (click)="previewMaterial(materi)"

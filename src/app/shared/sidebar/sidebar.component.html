@@ -1,26 +1,78 @@
 <div class="sidebar-container d-flex flex-column bg-light" [class.collapsed]="collapsed">
+  <!-- ✅ MOBILE: External toggle button (always visible when collapsed) -->
   <button class="btn btn-outline-secondary toggle-btn" (click)="toggleSidebar()">
-    <!-- <i class="fa" [class.fa-chevron-left]="!collapsed" [class.fa-chevron-right]="collapsed"></i> -->
-     <i class="fa" [ngClass]="collapsed ? 'fa-bars' : 'fa-chevron-left'"></i>
+    <i class="fa fa-bars"></i>
+  </button>
+
+  <!-- ✅ MOBILE: Close button inside sidebar -->
+  <button class="btn btn-outline-secondary close-btn" (click)="closeSidebar()">
+    <i class="fa fa-times"></i>
   </button>
 
   <div class="sidebar-content mt-4" *ngIf="!collapsed">
     <ng-container *ngIf="role === 'guru'; else studentMenu">
       <ul class="nav flex-column px-3">
-        <li class="nav-item mb-2"><a routerLink="dashboard" class="nav-link" routerLinkActive="active">Dashboard</a></li>
-        <li class="nav-item mb-2"><a routerLink="kelola-kelas" class="nav-link" routerLinkActive="active">Kelola Kelas</a></li>
-        <li class="nav-item mb-2"><a routerLink="kelola-materi" class="nav-link" routerLinkActive="active">Kelola Materi</a></li>
-        <li class="nav-item mb-2"><a routerLink="hasil-belajar" class="nav-link" routerLinkActive="active">Lihat hasil belajar</a></li>
-        <li class="nav-item"><a routerLink="peringkat" class="nav-link" routerLinkActive="active">Peringkat</a></li>
+        <li class="nav-item mb-2">
+          <a routerLink="dashboard" class="nav-link" routerLinkActive="active">
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a routerLink="kelola-kelas" class="nav-link" routerLinkActive="active">
+            <span>Kelola Kelas</span>
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a routerLink="kelola-materi" class="nav-link" routerLinkActive="active">
+            <span>Kelola Materi</span>
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a routerLink="hasil-belajar" class="nav-link" routerLinkActive="active">
+            <span>Lihat hasil belajar</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="peringkat" class="nav-link" routerLinkActive="active">
+            <span>Peringkat</span>
+          </a>
+        </li>
       </ul>
     </ng-container>
 
     <ng-template #studentMenu>
       <ul class="nav flex-column px-3">
-        <li class="nav-item mb-2"><a routerLink="dashboard" class="nav-link" routerLinkActive="active">Dashboard</a></li>
-        <li class="nav-item mb-2"><a routerLink="materi" class="nav-link" routerLinkActive="active">Daftar Materi</a></li>
-        <li class="nav-item"><a routerLink="riwayat" class="nav-link" routerLinkActive="active">Capaian Belajar</a></li>
+        <li class="nav-item mb-2">
+          <a (click)="navigateWithQuizCheck('dashboard')" 
+             class="nav-link" 
+             [class.disabled]="isQuizActive"
+             [class.active]="router.url.includes('/siswa/dashboard')">
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item mb-2">
+          <a (click)="navigateWithQuizCheck('materi')" 
+             class="nav-link" 
+             [class.disabled]="isQuizActive"
+             [class.active]="router.url.includes('/siswa/materi')">
+            <span>Daftar Materi</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a (click)="navigateWithQuizCheck('riwayat')" 
+             class="nav-link" 
+             [class.disabled]="isQuizActive"
+             [class.active]="router.url.includes('/siswa/riwayat')">
+            <span>Capaian Belajar</span>
+          </a>
+        </li>
       </ul>
     </ng-template>
+  </div>
+
+  <!-- ✅ BACKDROP: Clickable area to close sidebar -->
+  <div *ngIf="shouldShowBackdrop()" 
+       class="mobile-backdrop" 
+       (click)="closeSidebar()">
   </div>
 </div>

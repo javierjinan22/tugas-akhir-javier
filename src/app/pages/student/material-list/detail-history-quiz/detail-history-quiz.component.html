@@ -1,164 +1,154 @@
-<div class="quiz-result-container">
-  <!-- Header -->
-  <div class="result-header">
-    <div class="header-left">
-      <span class="close-button" (click)="goBack()">×</span>
-      <h2 class="result-title">Hasil Kuis</h2>
-    </div>
-  </div>
-  
-  <hr class="divider">
-  
-  <!-- ✅ EXISTING: Loading state -->
-  <div *ngIf="loading" class="loading-container">
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary mb-3" role="status">
-        <span class="visually-hidden">Loading...</span>
+<div class="view-detail-quiz-container">
+  <div class="quiz-result-container">
+    <!-- Header -->
+    <div class="result-header">
+      <div class="header-left">
+        <span class="close-button" (click)="goBack()">×</span>
+        <h2 class="result-title">Hasil Kuis</h2>
       </div>
-      <p>Memuat detail hasil kuis...</p>
     </div>
-  </div>
+    
+    <hr class="divider">
+    
+    <!-- ✅ EXISTING: Loading state -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p>Memuat detail hasil kuis...</p>
+      </div>
+    </div>
 
-  <!-- ✅ EXISTING: Error state -->
-  <div *ngIf="error && !loading" class="error-container">
-    <div class="text-center py-5">
-      <div class="alert alert-danger" role="alert">
-        <i class="fas fa-exclamation-triangle mb-2"></i>
-        <p>{{ error }}</p>
-        <button class="btn btn-primary btn-sm" (click)="goBack()">Kembali</button>
+    <!-- ✅ EXISTING: Error state -->
+    <div *ngIf="error && !loading" class="error-container">
+      <div class="text-center py-5">
+        <div class="alert alert-danger" role="alert">
+          <i class="fas fa-exclamation-triangle mb-2"></i>
+          <p>{{ error }}</p>
+          <button class="btn btn-primary btn-sm" (click)="goBack()">Kembali</button>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <!-- ✅ EXISTING: Result content - hanya tampil jika tidak loading dan tidak error -->
-  <div *ngIf="!loading && !error" class="result-content">
-    <!-- Left sidebar with quiz info -->
-    <div class="quiz-info-sidebar">
-      <div class="quiz-info">
-        <div class="info-item">
-          <strong>Tanggal Ujian :</strong> {{ formatDate(quizResult.completedAt) }}
-        </div>
-        <div class="info-item">
-          <strong>Jumlah Soal :</strong> {{ quizResult.totalQuestions }}
-        </div>
-      </div>
+    
+    <!-- ✅ PERBAIKI: Result content dengan container yang lebih ketat -->
+    <div *ngIf="!loading && !error" class="result-content">
+      <!-- ✅ Left sidebar with quiz info - TAMBAH container wrapper -->
+      <div class="quiz-info-sidebar">
+        <div class="quiz-info-wrapper">
+          <div class="quiz-info">
+            <div class="info-item">
+              <strong>Tanggal Ujian :</strong> {{ formatDate(quizResult.completedAt) }}
+            </div>
+            <div class="info-item">
+              <strong>Jumlah Soal :</strong> {{ quizResult.totalQuestions }}
+            </div>
+          </div>
 
-      <div class="predikat-card" [ngClass]="getPredikatClass()">
-        <div class="predikat-icon-container">
-          <img [src]="getPredikatIconPath()" [alt]="getPredikatTitle()" class="predikat-icon">
-        </div>
-        <div class="predikat-content">
-          <div class="predikat-label">Predikat</div>
-          <div class="predikat-title">{{ getPredikatTitle() }}</div>
-          <div class="predikat-description">{{ getPredikatDescription() }}</div>
+          <div class="predikat-card" [ngClass]="getPredikatClass()">
+            <div class="predikat-icon-container">
+              <img [src]="getPredikatIconPath()" [alt]="getPredikatTitle()" class="predikat-icon">
+            </div>
+            <div class="predikat-content">
+              <div class="predikat-label">Predikat</div>
+              <div class="predikat-title">{{ getPredikatTitle() }}</div>
+              <div class="predikat-description">{{ getPredikatDescription() }}</div>
+            </div>
+          </div>
+          
+          <div class="achievement-header" [ngClass]="getAchievementHeaderClass()">
+            <div class="score-label">Kamu mendapatkan nilai</div>
+            <div class="score-value">{{ quizResult.score }}</div>
+          </div>
+
+          <button class="btn-view-enhanced" (click)="goPredicate()">
+              <span class="btn-text">Lihat semua pencapaian</span>
+          </button>
         </div>
       </div>
       
-      <div class="achievement-header" [ngClass]="getAchievementHeaderClass()">
-        <div class="score-label">Kamu mendapatkan nilai</div>
-        <div class="score-value">{{ quizResult.score }}</div>
-      </div>
-
-      <button class="btn-view-enhanced" (click)="goPredicate()">
-          Lihat semua pencapaian
-      </button>
-    </div>
-    
-    <!-- Right content with questions -->
-    <div class="questions-review">
-      <div *ngFor="let question of quizResult.questions; let i = index" class="question-item">
-        <div class="question-header">
-          <div class="question-number-circle">{{ i + 1 }}</div>
-          
-          <!-- ✅ PERBAIKAN: Render question dengan HTML content jika ada -->
-          <div class="question-text-container">
-            <!-- ✅ Render HTML content jika question mengandung HTML/gambar -->
-            <div *ngIf="hasHtmlContent(question.question); else plainQuestionText" 
-                 class="question-text-html" 
-                 [innerHTML]="question.questionHtml">
-            </div>
-            
-            <!-- ✅ Fallback untuk plain text -->
-            <ng-template #plainQuestionText>
-              <span class="question-text">{{ question.question }}</span>
-            </ng-template>
-          </div>
-          
-          <!-- <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
-            {{ getQuestionScore(question) }}
-          </div> -->
-          <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
-            <i [class]="getQuestionScoreIcon(question)"></i>
-          </div>
-          
-        </div>
-        
-        <!-- Multiple choice question display -->
-        <div *ngIf="question.type === 'multiple-choice'" class="options-review">
-          <div *ngFor="let option of question.options; let optionIndex = index" 
-              class="option-item"
-              [ngClass]="getOptionClass(question, optionIndex)">
-            <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
-              <!-- ✅ PERBAIKI: Hanya tampilkan icon untuk jawaban user -->
-              <i *ngIf="shouldShowCorrectAnswer(question, optionIndex)" class="fas fa-check"></i>
-              <i *ngIf="shouldShowIncorrectAnswer(question, optionIndex)" class="fas fa-times"></i>
-            </span>
-            
-            <div class="option-text-container">
-              <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
-                  class="option-text-html" 
-                  [innerHTML]="question.optionsHtml[optionIndex]">
+      <!-- ✅ Right content with questions - TAMBAH wrapper untuk width control -->
+      <div class="questions-review">
+        <div class="questions-wrapper">
+          <div *ngFor="let question of quizResult.questions; let i = index" class="question-item">
+            <div class="question-header">
+              <div class="question-number-circle">{{ i + 1 }}</div>
+              
+              <!-- ✅ PERBAIKI: Question text container dengan width control -->
+              <div class="question-text-container">
+                <!-- ✅ Render HTML content jika question mengandung HTML/gambar -->
+                <div *ngIf="hasHtmlContent(question.question); else plainQuestionText" 
+                     class="question-text-html" 
+                     [innerHTML]="question.questionHtml">
+                </div>
+                
+                <!-- ✅ Fallback untuk plain text -->
+                <ng-template #plainQuestionText>
+                  <span class="question-text">{{ question.question }}</span>
+                </ng-template>
               </div>
               
-              <ng-template #plainOptionText>
-                <span class="option-text">{{ getCleanOption(option) }}</span>
-              </ng-template>
-            </div>
-          </div>
-        </div>
-
-        <!-- ✅ TAMBAH: Benar/Salah question display - mirip dengan multiple choice -->
-        <div *ngIf="question.type === 'benar-salah'" class="options-review benar-salah-review">
-          <div *ngFor="let option of question.options; let optionIndex = index" 
-              class="option-item benar-salah-option"
-              [ngClass]="getOptionClass(question, optionIndex)">
-            <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
-              <!-- ✅ PERBAIKI: Hanya tampilkan icon untuk jawaban user -->
-              <i *ngIf="shouldShowCorrectAnswer(question, optionIndex)" class="fas fa-check"></i>
-              <i *ngIf="shouldShowIncorrectAnswer(question, optionIndex)" class="fas fa-times"></i>
-            </span>
-            
-            <div class="option-text-container">
-              <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
-                  class="option-text-html" 
-                  [innerHTML]="question.optionsHtml[optionIndex]">
+              <div class="score-badge" [ngClass]="getScoreBadgeClass(question)">
+                <i [class]="getQuestionScoreIcon(question)"></i>
               </div>
-              
-              <ng-template #plainOptionText>
-                <span class="option-text benar-salah-text" 
-                      [ngClass]="getBenarSalahTextClass(option)">
-                  {{ getCleanOption(option) }}
-                </span>
-              </ng-template>
+            </div>
+            
+            <!-- ✅ Multiple choice question display dengan wrapper -->
+            <div *ngIf="question.type === 'multiple-choice'" class="options-review">
+              <div class="options-wrapper">
+                <div *ngFor="let option of question.options; let optionIndex = index" 
+                    class="option-item"
+                    [ngClass]="getOptionClass(question, optionIndex)">
+                  <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
+                    <!-- ✅ PERBAIKI: Hanya tampilkan icon untuk jawaban user -->
+                    <i *ngIf="shouldShowCorrectAnswer(question, optionIndex)" class="fas fa-check"></i>
+                    <i *ngIf="shouldShowIncorrectAnswer(question, optionIndex)" class="fas fa-times"></i>
+                  </span>
+                  
+                  <div class="option-text-container">
+                    <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
+                        class="option-text-html" 
+                        [innerHTML]="question.optionsHtml[optionIndex]">
+                    </div>
+                    
+                    <ng-template #plainOptionText>
+                      <span class="option-text">{{ getCleanOption(option) }}</span>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ PERBAIKI: Benar/Salah question display dengan wrapper -->
+            <div *ngIf="question.type === 'benar-salah'" class="options-review benar-salah-review">
+              <div class="benar-salah-wrapper">
+                <div *ngFor="let option of question.options; let optionIndex = index" 
+                    class="option-item benar-salah-option"
+                    [ngClass]="getOptionClass(question, optionIndex)">
+                  <span class="option-indicator" [ngClass]="getOptionIndicatorClass(question, optionIndex)">
+                    <!-- ✅ PERBAIKI: Hanya tampilkan icon untuk jawaban user -->
+                    <i *ngIf="shouldShowCorrectAnswer(question, optionIndex)" class="fas fa-check"></i>
+                    <i *ngIf="shouldShowIncorrectAnswer(question, optionIndex)" class="fas fa-times"></i>
+                  </span>
+                  
+                  <div class="option-text-container">
+                    <div *ngIf="hasHtmlContent(option) && question.optionsHtml && question.optionsHtml[optionIndex]; else plainOptionText" 
+                        class="option-text-html" 
+                        [innerHTML]="question.optionsHtml[optionIndex]">
+                    </div>
+                    
+                    <ng-template #plainOptionText>
+                      <span class="option-text benar-salah-text" 
+                            [ngClass]="getBenarSalahTextClass(option)">
+                        {{ getCleanOption(option) }}
+                      </span>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        <!-- Short answer question display -->
-        <!-- <div *ngIf="question.type === 'short-answer'" class="short-answer-review">
-          <div class="user-answer">
-            <strong>Jawaban Anda:</strong>
-            <div class="answer-text">{{ question.userAnswer || 'Tidak dijawab' }}</div>
-          </div>
-          <div class="grading-note">
-            <small class="text-muted">
-              <i class="fas fa-info-circle"></i>
-              Jawaban isian singkat akan dinilai secara manual oleh pengajar
-            </small>
-          </div>
-        </div> -->
-
-
       </div>
     </div>
   </div>

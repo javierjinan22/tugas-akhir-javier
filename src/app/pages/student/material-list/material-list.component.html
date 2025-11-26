@@ -1,28 +1,26 @@
+<!-- ✅ TAMBAH: Container wrapper dengan class untuk consistent padding -->
+<div class="material-list-container">
+  <ul class="nav nav-tabs" id="materialTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="learning-tab" data-bs-toggle="tab" data-bs-target="#learning" 
+              type="button" role="tab" aria-controls="learning" aria-selected="true">
+        Materi yang dipelajari
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" 
+              type="button" role="tab" aria-controls="completed" aria-selected="false">
+        Materi yang diselesaikan
+      </button>
+    </li>
+  </ul>
 
-<ul class="nav nav-tabs" id="materialTabs" role="tablist">
-  <li class="nav-item" role="presentation">
-    <button class="nav-link active" id="learning-tab" data-bs-toggle="tab" data-bs-target="#learning" 
-            type="button" role="tab" aria-controls="learning" aria-selected="true">
-      Materi yang dipelajari
-    </button>
-  </li>
-  <li class="nav-item" role="presentation">
-    <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed" 
-            type="button" role="tab" aria-controls="completed" aria-selected="false">
-      Materi yang diselesaikan
-    </button>
-  </li>
-</ul>
-
-<div class="tab-content" id="materialTabsContent">
-  <div class="tab-pane fade show active" id="learning" role="tabpanel" aria-labelledby="learning-tab">
-    <app-material-studied>
-
-    </app-material-studied>
-  </div>
-  <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
-    <app-material-finished>
-
-    </app-material-finished>
+  <div class="tab-content" id="materialTabsContent">
+    <div class="tab-pane fade show active" id="learning" role="tabpanel" aria-labelledby="learning-tab">
+      <app-material-studied></app-material-studied>
+    </div>
+    <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+      <app-material-finished></app-material-finished>
+    </div>
   </div>
 </div>

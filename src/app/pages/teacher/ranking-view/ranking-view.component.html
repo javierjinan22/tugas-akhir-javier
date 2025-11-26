@@ -13,7 +13,7 @@
   <div *ngIf="errorMsg && !loading" class="alert alert-danger mb-4">
     <div class="d-flex align-items-center">
       <i class="fas fa-exclamation-triangle me-2"></i>
-      <div class="flex-grow-1">
+      <div class="grow">
         <div class="mt-1">{{ errorMsg }}</div>
       </div>
       <button class="btn btn-sm btn-outline-danger" (click)="refreshAllData()">
@@ -132,7 +132,7 @@
         <div *ngIf="classRankingError && !classRankingLoading" class="alert alert-warning mb-4">
           <div class="d-flex align-items-center">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            <div class="flex-grow-1">
+            <div class="grow">
               <strong>Error Peringkat Siswa:</strong>
               <div class="mt-1 small">{{ classRankingError }}</div>
             </div>
@@ -172,7 +172,7 @@
                 <td class="text-start">
                   <div>
                     <div class="fw-semibold">{{ student.nama_siswa }}</div>
-                    <small class="text-muted">{{ student.username }}</small>
+                    <!-- <small class="text-muted">{{ student.username }}</small> -->
                   </div>
                 </td>
                 
@@ -279,7 +279,7 @@
         <div *ngIf="schoolRankingError && !schoolRankingLoading" class="alert alert-warning mb-4">
           <div class="d-flex align-items-center">
             <i class="fas fa-exclamation-triangle me-2"></i>
-            <div class="flex-grow-1">
+            <div class="grow">
               <strong>Error Peringkat Sekolah:</strong>
               <div class="mt-1 small">{{ schoolRankingError }}</div>
             </div>

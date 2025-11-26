@@ -11,5 +11,4 @@ export class StudentLayoutComponent implements OnInit {
 
   ngOnInit(): void {
   }
-
 }

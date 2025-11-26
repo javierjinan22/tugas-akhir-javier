@@ -21,7 +21,13 @@ export class NavbarTopComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  goToProfile() {
+  goToProfile(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    
     this.bsModalRef = this.modalService.show(ModalViewProfileComponent, {
       class: 'modal-lg modal-dialog-centered',
       backdrop: 'static',
@@ -29,10 +35,26 @@ export class NavbarTopComponent implements OnInit {
     });
   }
 
-  logout() {
-    // Tambahkan logika logout jika perlu
+  logout(event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     localStorage.clear();
     this.router.navigate(['/']);
   }
 
+  toggleMobileSidebar(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    const customEvent = new CustomEvent('toggleMobileSidebar', { 
+      bubbles: true,
+      detail: { action: 'toggle' }
+    });
+    document.dispatchEvent(customEvent);
+  }
 }

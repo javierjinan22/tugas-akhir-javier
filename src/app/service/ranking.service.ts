@@ -100,7 +100,7 @@ export class RankingService {
   private apiUrl = environment.apiUrl + '/literadoo/rankings';
 
   constructor(private http: HttpClient) {
-    console.log('🏆 Ranking Service initialized with URL:', this.apiUrl);
+    // console.log('Ranking Service initialized with URL:', this.apiUrl);
   }
 
   private getAuthHeaders(): HttpHeaders {
@@ -111,7 +111,7 @@ export class RankingService {
     });
   }
 
-  // ✅ Get School Rankings (Public)
+  // Get School Rankings (Public)
   getSchoolRankings(
     filter?: string, 
     value?: string, 
@@ -126,12 +126,12 @@ export class RankingService {
     if (limit) params = params.set('limit', limit.toString());
     if (page) params = params.set('page', page.toString());
 
-    console.log('📊 Getting school rankings with params:', params.toString());
+    console.log(' Getting school rankings with params:', params.toString());
 
     return this.http.get<SchoolRankingResponse>(`${this.apiUrl}/schools`, { params });
   }
 
-  // ✅ Get Student Rankings (Requires Auth)
+  // Get Student Rankings (Requires Auth)
   getStudentRankings(
     kelasId?: string, 
     kategori?: string
@@ -151,7 +151,7 @@ export class RankingService {
     });
   }
 
-  // ✅ Get Locations for Dropdown (Public)
+  // Get Locations for Dropdown (Public)
   getLocations(type: 'provinsi' | 'kabupaten_kota' | 'kecamatan'): Observable<LocationsResponse> {
     let params = new HttpParams();
     params = params.set('type', type);
@@ -161,17 +161,17 @@ export class RankingService {
     return this.http.get<LocationsResponse>(`${this.apiUrl}/locations`, { params });
   }
 
-  // ✅ Helper method untuk mendapatkan provinsi
+  // Helper method untuk mendapatkan provinsi
   getProvinsi(): Observable<LocationsResponse> {
     return this.getLocations('provinsi');
   }
 
-  // ✅ Helper method untuk mendapatkan kabupaten/kota
+  // Helper method untuk mendapatkan kabupaten/kota
   getKabupatenKota(): Observable<LocationsResponse> {
     return this.getLocations('kabupaten_kota');
   }
 
-  // ✅ Helper method untuk mendapatkan kecamatan
+  // Helper method untuk mendapatkan kecamatan
   getKecamatan(): Observable<LocationsResponse> {
     return this.getLocations('kecamatan');
   }

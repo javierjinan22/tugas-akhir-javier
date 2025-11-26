@@ -1,15 +1,22 @@
+/* ✅ TAMBAH: Container padding yang konsisten seperti learning-history */
+.material-list-container {
+  padding: 24px;
+  min-height: 100vh;
+}
+
 .nav-tabs {
   border: none;
   background: transparent;
   border-radius: 16px;
   overflow: hidden;
-  display: auto;
+  display: auto; /* ✅ KEMBALI: ke auto untuk desktop */
   margin-bottom: 24px;
   cursor: pointer;
 }
 
 .nav-tabs .nav-item {
   margin-bottom: 0;
+  /* ✅ HAPUS: flex: 1 dari desktop */
 }
 
 .nav-tabs .nav-link {
@@ -21,6 +28,7 @@
   border-radius: 0;
   text-align: center;
   transition: background-color 0.3s ease;
+  /* ✅ HAPUS: width: 100% dari desktop */
 }
 
 .nav-tabs .nav-link:hover {
@@ -35,7 +43,6 @@
   border: none;
 }
 
-
 .nav-tabs .nav-item:first-child .nav-link {
   border-top-left-radius: 16px;
   border-bottom-left-radius: 16px;
@@ -44,4 +51,134 @@
 .nav-tabs .nav-item:last-child .nav-link {
   border-top-right-radius: 16px;
   border-bottom-right-radius: 16px;
+}
+
+/* ✅ PERBAIKI: Mobile responsive styles dengan ukuran tab yang lebih kecil */
+@media (max-width: 768px) {
+  /* ✅ CRITICAL: Adjust padding untuk mobile seperti learning-history */
+  .material-list-container {
+    padding: 16px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .nav-tabs {
+    display: flex; /* ✅ HANYA di mobile yang flex */
+    margin-bottom: 16px;
+    border-radius: 10px; /* ✅ SMALLER: Radius lebih kecil */
+    /* ✅ TAMBAH: Margin left untuk ruang hamburger button */
+    margin-left: 0;
+  }
+  
+  .nav-tabs .nav-item {
+    flex: 1; /* ✅ HANYA di mobile yang equal width */
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 8px 12px; /* ✅ SMALLER: Padding dikurangi dari 10px ke 8px */
+    font-size: 13px; /* ✅ SMALLER: Font size dikurangi */
+    font-weight: 500;
+    width: 100%; /* ✅ HANYA di mobile yang full width */
+    line-height: 1.2; /* ✅ SMALLER: Line height lebih compact */
+    min-height: auto; /* ✅ REMOVE: Fixed height constraint */
+  }
+  
+  .nav-tabs .nav-item:first-child .nav-link {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+  }
+  
+  .nav-tabs .nav-item:last-child .nav-link {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  /* ✅ CRITICAL: Small mobile padding */
+  .material-list-container {
+    padding: 12px;
+    min-height: calc(100vh - 60px);
+  }
+  
+  .nav-tabs {
+    display: flex; /* ✅ Tetap flex di small mobile */
+    margin-bottom: 12px;
+    border-radius: 8px; /* ✅ SMALLER: Radius lebih kecil lagi */
+    margin-left: 0;
+  }
+  
+  .nav-tabs .nav-item {
+    flex: 1; /* ✅ Equal width di small mobile */
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 6px 8px; /* ✅ MUCH SMALLER: Padding dikurangi lagi */
+    font-size: 12px; /* ✅ SMALLER: Font size lebih kecil */
+    line-height: 1.1; /* ✅ COMPACT: Line height lebih compact */
+    width: 100%; /* ✅ Full width di small mobile */
+    font-weight: 500;
+    min-height: auto; /* ✅ REMOVE: Fixed height */
+  }
+  
+  .nav-tabs .nav-item:first-child .nav-link {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+  
+  .nav-tabs .nav-item:last-child .nav-link {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+}
+
+/* ✅ TAMBAH: Pastikan desktop behavior normal */
+@media (min-width: 769px) {
+  .material-list-container {
+    padding: 24px; /* ✅ Konsisten dengan learning-history */
+  }
+  
+  .nav-tabs {
+    display: auto; /* ✅ Desktop menggunakan auto display */
+    margin-left: 0;
+  }
+  
+  .nav-tabs .nav-item {
+    flex: none; /* ✅ Desktop tidak menggunakan flex */
+  }
+  
+  .nav-tabs .nav-link {
+    width: auto; /* ✅ Desktop width auto */
+    padding: 12px 24px; /* ✅ Desktop padding normal */
+    font-size: 16px; /* ✅ Desktop font size normal */
+    line-height: 1.4; /* ✅ Desktop line height normal */
+  }
+}
+
+/* ✅ TAMBAH: Enhanced mobile optimizations */
+@media (max-width: 480px) {
+  .material-list-container {
+    padding: 8px 12px;
+  }
+  
+  .nav-tabs {
+    margin-bottom: 10px;
+    border-radius: 6px;
+  }
+  
+  .nav-tabs .nav-link {
+    padding: 5px 6px; /* ✅ VERY SMALL: Ultra compact untuk layar sangat kecil */
+    font-size: 11px;
+    line-height: 1;
+    font-weight: 500;
+  }
+  
+  .nav-tabs .nav-item:first-child .nav-link {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+  
+  .nav-tabs .nav-item:last-child .nav-link {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
 }

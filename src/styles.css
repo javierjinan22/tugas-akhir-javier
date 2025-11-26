@@ -1,4 +1,5 @@
 @import './app/shared/toast-styles.css';
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 .ngx-select__item.active,
 .ngx-select__item:focus {
@@ -46,4 +47,21 @@
   aspect-ratio: 16/9 !important;
   border-radius: 12px !important;
   margin: 15px 0 !important;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+@media (max-width: 768px) {
+  body.mobile-sidebar-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  
+  body:not(.mobile-sidebar-open) * {
+    pointer-events: auto !important;
+  }
 }

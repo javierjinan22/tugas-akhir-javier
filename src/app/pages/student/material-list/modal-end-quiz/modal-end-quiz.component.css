@@ -7,22 +7,22 @@
 
 .icon-warning-wrapper {
   position: absolute;
-  top: -40px; /* Perbesar jarak overlapping */
+  top: -40px;
   left: 50%;
   transform: translateX(-50%);
   background-color: #EFE51B;
   border-radius: 50%;
-  padding: 1rem; /* Lebih besar untuk circle */
+  padding: 1rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 70px; /* Lebar lingkaran */
-  height: 70px; /* Tinggi lingkaran */
+  width: 70px;
+  height: 70px;
 }
 
 .icon-warning-wrapper fa-icon {
   color: #fff;
-  font-size: 2.3rem; /* Lebih besar dan tebal */
+  font-size: 2.3rem;
   font-weight: 900;
 }
 
@@ -60,7 +60,6 @@ label {
   box-shadow: none;
   border-color: #1BB6C1;
 }
-
 
 .d-flex.justify-content-between.mt-4.px-3 > button {
   width: 48%; 
@@ -101,3 +100,203 @@ label {
   color: white;
 }
 
+/* ✅ Loading spinner in button */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.1em;
+}
+
+/* ✅ Disabled button styling */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ✅ Mobile responsive design */
+@media (max-width: 768px) {
+  .modal-body {
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+  }
+  
+  .icon-warning-wrapper {
+    top: -30px;
+    width: 60px;
+    height: 60px;
+    padding: 0.75rem;
+  }
+  
+  .icon-warning-wrapper fa-icon {
+    font-size: 2rem;
+  }
+  
+  .modal-title {
+    font-size: 15px;
+    margin-top: 0.75rem;
+    line-height: 1.3;
+    padding: 0 0.5rem;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 {
+    margin-top: 1.5rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    gap: 8px;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 > button {
+    width: calc(50% - 4px);
+    height: 44px;
+    font-size: 13px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-body {
+    padding: 1rem 0.75rem;
+    border-radius: 12px;
+  }
+  
+  .icon-warning-wrapper {
+    top: -25px;
+    width: 50px;
+    height: 50px;
+    padding: 0.5rem;
+  }
+  
+  .icon-warning-wrapper fa-icon {
+    font-size: 1.75rem;
+  }
+  
+  .modal-title {
+    font-size: 14px;
+    margin-top: 0.5rem;
+    padding: 0 0.25rem;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 {
+    margin-top: 1.25rem !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+    gap: 6px;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 > button {
+    width: calc(50% - 3px);
+    height: 40px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+}
+
+/* ✅ iPhone XR specific (414px) */
+@media (max-width: 414px) {
+  .modal-body {
+    padding: 0.75rem 0.5rem;
+    border-radius: 8px;
+  }
+  
+  .icon-warning-wrapper {
+    top: -20px;
+    width: 45px;
+    height: 45px;
+    padding: 0.4rem;
+  }
+  
+  .icon-warning-wrapper fa-icon {
+    font-size: 1.5rem;
+  }
+  
+  .modal-title {
+    font-size: 13px;
+    margin-top: 0.4rem;
+    line-height: 1.25;
+    padding: 0;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 {
+    margin-top: 1rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    gap: 4px;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 > button {
+    width: calc(50% - 2px);
+    height: 38px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+}
+
+/* ✅ Very small mobile (375px) */
+@media (max-width: 375px) {
+  .d-flex.justify-content-between.mt-4.px-3 {
+    flex-direction: column !important;
+    gap: 8px;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 > button {
+    width: 100% !important;
+    height: 40px;
+    font-size: 12px;
+  }
+  
+  /* ✅ Button order - Submit first, Cancel second */
+  .d-flex.justify-content-between.mt-4.px-3 > button:first-child {
+    order: 2;
+  }
+  
+  .d-flex.justify-content-between.mt-4.px-3 > button:last-child {
+    order: 1;
+  }
+}
+
+@media (max-width: 320px) {
+  .modal-body {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .icon-warning-wrapper {
+    width: 40px;
+    height: 40px;
+    top: -15px;
+    padding: 0.3rem;
+  }
+  
+  .icon-warning-wrapper fa-icon {
+    font-size: 1.25rem;
+  }
+  
+  .modal-title {
+    font-size: 12px;
+    margin-top: 0.25rem;
+  }
+}
+
+/* ✅ Enhanced touch interactions for mobile */
+@media (max-width: 768px) {
+  .btn-outline-primary,
+  .btn-primary,
+  .btn-rounded {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  .btn-outline-primary:active {
+    transform: scale(0.98);
+  }
+  
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+  
+  .btn-rounded:active {
+    transform: scale(0.98);
+  }
+}

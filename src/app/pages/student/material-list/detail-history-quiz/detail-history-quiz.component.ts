@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { StudentProgressService } from '../../../../service/student-progress.service';
 
+// ✅ INTERFACES - Data Models
 interface QuizResultQuestion {
   id: number;
   question: string;
@@ -31,6 +32,7 @@ interface QuizResult {
 })
 export class DetailHistoryQuizComponent implements OnInit {
 
+  // STATE PROPERTIES - Data & Loading State
   quizResult: QuizResult = {
     quizId: 1,
     materialId: '1',
@@ -51,6 +53,10 @@ export class DetailHistoryQuizComponent implements OnInit {
     private sanitizer: DomSanitizer
   ) { }
 
+  /**
+   * ENTRY POINT - Inisialisasi komponen
+   * ALUR: URL Params → Query Params → Load Data Strategy
+   */
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.materialId = params['id'] || '1';
@@ -64,6 +70,9 @@ export class DetailHistoryQuizComponent implements OnInit {
           hasAttemptId: !!attemptId
         });
 
+        // STRATEGI LOADING DATA:
+        // 1. Jika ada attemptId → Load attempt spesifik
+        // 2. Jika tidak ada attemptId → Load attempt terbaru
         if (attemptId) {
           console.log('✅ DetailHistory: Loading specific attempt:', attemptId);
           this.loadAttemptFromAPI(attemptId);
@@ -75,6 +84,15 @@ export class DetailHistoryQuizComponent implements OnInit {
     });
   }
 
+  // ═══════════════════════════════════════════════════════════════
+  // 📊 DATA LOADING METHODS - Backend API Integration
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * ✅ LOAD LATEST ATTEMPT - Ambil attempt terbaru jika tidak ada attemptId
+   * ALUR: API Material Detail → Get Latest Attempt → Load Specific Attempt
+   * FALLBACK: LocalStorage jika API gagal
+   */
   loadLatestAttemptFromAPI(): void {
     console.log('🔍 DetailHistory: Loading latest attempt from API...');
     this.loading = true;
@@ -89,7 +107,6 @@ export class DetailHistoryQuizComponent implements OnInit {
           const attemptId = latestAttempt._id || latestAttempt.attempt_id;
 
           console.log('✅ DetailHistory: Found latest attempt:', attemptId);
-          // Load detail attempt tersebut
           this.loadAttemptFromAPI(attemptId);
         } else {
           console.log('⚠️ DetailHistory: No attempts found, fallback to localStorage');
@@ -106,6 +123,11 @@ export class DetailHistoryQuizComponent implements OnInit {
     });
   }
 
+  /**
+   * ✅ LOAD SPECIFIC ATTEMPT - Ambil detail attempt berdasarkan attemptId
+   * ALUR: API Attempt Detail → Build Quiz Result → Display
+   * FALLBACK: LocalStorage jika API gagal
+   */
   loadAttemptFromAPI(attemptId: string): void {
     this.loading = true;
     this.error = '';
@@ -126,130 +148,16 @@ export class DetailHistoryQuizComponent implements OnInit {
         console.error('❌ Error loading attempt detail:', error);
         this.error = 'Gagal memuat detail attempt';
         this.loading = false;
-
-        // Fallback ke localStorage
-        this.loadQuizResult();
+        this.loadQuizResult(); // Fallback ke localStorage
       }
     });
   }
 
-  buildQuizResultFromAPI(attempt: any): void {
-    console.log('🔧 DetailHistory: Building quiz result from API:', attempt);
-    console.log('🔍 DetailHistory: Detailed answers:', attempt.detailed_answers);
-
-    // ✅ VALIDASI: Pastikan ada detailed_answers dan tidak kosong
-    if (!attempt.detailed_answers || !Array.isArray(attempt.detailed_answers) || attempt.detailed_answers.length === 0) {
-      console.log('❌ DetailHistory: No detailed_answers found, fallback to localStorage');
-      this.loadQuizResult();
-      return;
-    }
-
-    // ✅ VALIDASI: Cek jika jumlah detailed_answers sesuai dengan total_questions
-    const expectedQuestions = attempt.total_questions || 2;
-    const actualAnswers = attempt.detailed_answers.length;
-
-    if (actualAnswers < expectedQuestions) {
-      console.log(`⚠️ DetailHistory: Incomplete data (${actualAnswers}/${expectedQuestions}), checking localStorage...`);
-
-      // Cek apakah localStorage punya data yang lebih lengkap
-      const savedResult = localStorage.getItem(`quiz_result_${this.materialId}`);
-      if (savedResult) {
-        try {
-          const localData = JSON.parse(savedResult);
-          if (localData.questions && localData.questions.length === expectedQuestions) {
-            console.log('✅ DetailHistory: Found complete data in localStorage, using it');
-            this.loadQuizResult();
-            return;
-          }
-        } catch (e) {
-          console.error('Error parsing localStorage:', e);
-        }
-      }
-
-      console.log('⚠️ DetailHistory: Proceeding with incomplete API data...');
-    }
-
-    this.quizResult = {
-      quizId: attempt.attempt_number || 1,
-      materialId: this.materialId,
-      completedAt: attempt.completed_at,
-      totalQuestions: expectedQuestions, // Gunakan expected, bukan actual
-      score: attempt.score,
-      questions: attempt.detailed_answers.map((answer: any, index: number) => {
-        const originalQuestion = answer.question_data?.question || `Soal ${index + 1}`;
-        const originalOptions = answer.question_data?.options || [];
-
-        console.log(`🔍 DetailHistory: Processing question ${index}:`, {
-          index: answer.question_index,
-          type: answer.question_data?.type,
-          correctAnswer: answer.question_data?.correct_answer,
-          studentAnswer: answer.student_answer,
-          isCorrect: answer.is_correct,
-          hasQuestionData: !!answer.question_data
-        });
-
-        // Handle missing question_data
-        if (!answer.question_data) {
-          return {
-            id: answer.question_index + 1,
-            question: `Soal ${index + 1}`,
-            questionHtml: this.sanitizeHtml(`Soal ${index + 1}`),
-            type: 'multiple-choice' as const,
-            options: [],
-            optionsHtml: [],
-            correctAnswer: -1,
-            userAnswer: -1,
-            isCorrect: answer.is_correct || false
-          };
-        }
-
-        let questionType: 'multiple-choice' | 'short-answer' | 'benar-salah';
-        let correctAnswer: string | number;
-        let userAnswer: string | number;
-
-        if (answer.question_data.type === 'pilihan_ganda') {
-          questionType = 'multiple-choice';
-          correctAnswer = answer.question_data.correct_answer ?
-            answer.question_data.correct_answer.charCodeAt(0) - 65 : -1;
-
-          if (answer.student_answer && answer.student_answer.length > 0) {
-            userAnswer = answer.student_answer.charCodeAt(0) - 65;
-          } else {
-            userAnswer = -1;
-          }
-        } else if (answer.question_data.type === 'benar_salah') {
-          questionType = 'benar-salah';
-          correctAnswer = answer.question_data.correct_answer || '';
-          userAnswer = answer.student_answer || '';
-        } else {
-          questionType = 'short-answer';
-          correctAnswer = answer.question_data.correct_answer || '';
-          userAnswer = answer.student_answer || '';
-        }
-
-        const question: QuizResultQuestion = {
-          id: answer.question_index + 1,
-          question: originalQuestion,
-          questionHtml: this.sanitizeHtml(originalQuestion),
-          type: questionType,
-          options: originalOptions,
-          optionsHtml: originalOptions.map((opt: string) => this.sanitizeHtml(opt)),
-          correctAnswer: correctAnswer,
-          userAnswer: userAnswer,
-          isCorrect: answer.is_correct
-        };
-
-        return question;
-      })
-    };
-
-    console.log('✅ DetailHistory: Complete quiz result built:', {
-      totalQuestions: this.quizResult.totalQuestions,
-      actualQuestions: this.quizResult.questions.length,
-      score: this.quizResult.score
-    });
-  }
-
+  /**
+   * ✅ FALLBACK DATA LOADER - Load dari localStorage jika API gagal
+   * ALUR: localStorage → Parse JSON → Process HTML Content → Display
+   * KEGUNAAN: Backup data source, offline capability
+   */
   loadQuizResult(): void {
     console.log('🔍 Loading quiz result from localStorage for material:', this.materialId);
 
@@ -260,22 +168,14 @@ export class DetailHistoryQuizComponent implements OnInit {
 
       try {
         this.quizResult = JSON.parse(savedResult);
-
         console.log('✅ Parsed quiz result:', this.quizResult);
 
-        // ✅ Process existing questions to add HTML content dan type validation
+        // Process existing questions untuk backward compatibility
         this.quizResult.questions = this.quizResult.questions.map(question => {
-          // ✅ TAMBAH: Ensure type compatibility untuk backward compatibility
+          // Type validation untuk backward compatibility
           let questionType = question.type;
-          if (questionType !== 'multiple-choice' && questionType !== 'short-answer' && questionType !== 'benar-salah') {
-            // Fallback logic untuk detect type
-            if (question.options && question.options.length === 2) {
-              questionType = 'benar-salah';
-            } else if (question.options && question.options.length > 2) {
-              questionType = 'multiple-choice';
-            } else {
-              questionType = 'short-answer';
-            }
+          if (!['multiple-choice', 'short-answer', 'benar-salah'].includes(questionType)) {
+            questionType = this.detectQuestionType(question);
           }
 
           return {
@@ -293,55 +193,308 @@ export class DetailHistoryQuizComponent implements OnInit {
       }
     } else {
       console.log('⚠️ No saved result found in localStorage');
-      console.log('🔍 Available localStorage keys:', Object.keys(localStorage));
       this.error = 'No quiz result found. Please take the quiz first.';
     }
   }
 
-  // Method untuk sanitize HTML content
+  // ═══════════════════════════════════════════════════════════════
+  // 🔄 DATA TRANSFORMATION METHODS - API Response to UI Data
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * ✅ BUILD QUIZ RESULT FROM API - Transform API response ke format UI
+   * ALUR: API Response → Validation → Transform → Set Quiz Result
+   * KEGUNAAN: Convert backend data format ke frontend data format
+   */
+  buildQuizResultFromAPI(attempt: any): void {
+    console.log('🔧 DetailHistory: Building quiz result from API:', attempt);
+
+    // VALIDASI 1: Cek ketersediaan detailed_answers
+    if (!attempt.detailed_answers || !Array.isArray(attempt.detailed_answers) || attempt.detailed_answers.length === 0) {
+      console.log('❌ DetailHistory: No detailed_answers found, fallback to localStorage');
+      this.loadQuizResult();
+      return;
+    }
+
+    // VALIDASI 2: Cek kelengkapan data
+    const expectedQuestions = attempt.total_questions || 2;
+    const actualAnswers = attempt.detailed_answers.length;
+
+    if (actualAnswers < expectedQuestions) {
+      console.log(`⚠️ DetailHistory: Incomplete data (${actualAnswers}/${expectedQuestions}), checking localStorage...`);
+      
+      // Cek localStorage untuk data yang lebih lengkap
+      const savedResult = localStorage.getItem(`quiz_result_${this.materialId}`);
+      if (savedResult) {
+        try {
+          const localData = JSON.parse(savedResult);
+          if (localData.questions && localData.questions.length === expectedQuestions) {
+            console.log('✅ DetailHistory: Found complete data in localStorage, using it');
+            this.loadQuizResult();
+            return;
+          }
+        } catch (e) {
+          console.error('Error parsing localStorage:', e);
+        }
+      }
+    }
+
+    // TRANSFORMASI DATA: API Response → Quiz Result Format
+    this.quizResult = {
+      quizId: attempt.attempt_number || 1,
+      materialId: this.materialId,
+      completedAt: attempt.completed_at,
+      totalQuestions: expectedQuestions,
+      score: attempt.score, // SKOR DARI BACKEND
+      questions: attempt.detailed_answers.map((answer: any, index: number) => 
+        this.transformAnswerToQuestion(answer, index)
+      )
+    };
+
+    console.log('✅ DetailHistory: Complete quiz result built:', {
+      totalQuestions: this.quizResult.totalQuestions,
+      actualQuestions: this.quizResult.questions.length,
+      score: this.quizResult.score
+    });
+  }
+
+  /**
+   * ✅ TRANSFORM SINGLE ANSWER - Convert API answer format ke question format
+   * ALUR: API Answer Data → Type Detection → Format Conversion → Question Object
+   * KEGUNAAN: Handle berbagai tipe soal (pilihan ganda, benar/salah, isian)
+   */
+  private transformAnswerToQuestion(answer: any, index: number): QuizResultQuestion {
+    const originalQuestion = answer.question_data?.question || `Soal ${index + 1}`;
+    const originalOptions = answer.question_data?.options || [];
+
+    console.log(`🔍 DetailHistory: Processing question ${index}:`, {
+      index: answer.question_index,
+      type: answer.question_data?.type,
+      correctAnswer: answer.question_data?.correct_answer,
+      studentAnswer: answer.student_answer,
+      isCorrect: answer.is_correct
+    });
+
+    // Handle missing question_data
+    if (!answer.question_data) {
+      return this.createEmptyQuestion(answer, index);
+    }
+
+    // DETEKSI TIPE SOAL & KONVERSI FORMAT
+    const { questionType, correctAnswer, userAnswer } = this.processAnswerByType(answer);
+
+    return {
+      id: answer.question_index + 1,
+      question: originalQuestion,
+      questionHtml: this.sanitizeHtml(originalQuestion),
+      type: questionType,
+      options: originalOptions,
+      optionsHtml: originalOptions.map((opt: string) => this.sanitizeHtml(opt)),
+      correctAnswer: correctAnswer,
+      userAnswer: userAnswer,
+      isCorrect: answer.is_correct
+    };
+  }
+
+  /**
+   * ✅ PROCESS ANSWER BY TYPE - Handle berbagai tipe soal
+   * KEGUNAAN: Convert format jawaban backend ke format frontend berdasarkan tipe
+   */
+  private processAnswerByType(answer: any): {
+    questionType: 'multiple-choice' | 'short-answer' | 'benar-salah',
+    correctAnswer: string | number,
+    userAnswer: string | number
+  } {
+    let questionType: 'multiple-choice' | 'short-answer' | 'benar-salah';
+    let correctAnswer: string | number;
+    let userAnswer: string | number;
+
+    if (answer.question_data.type === 'pilihan_ganda') {
+      questionType = 'multiple-choice';
+      // Convert A,B,C,D ke index 0,1,2,3
+      correctAnswer = answer.question_data.correct_answer ?
+        answer.question_data.correct_answer.charCodeAt(0) - 65 : -1;
+      userAnswer = (answer.student_answer && answer.student_answer.length > 0) ?
+        answer.student_answer.charCodeAt(0) - 65 : -1;
+    } else if (answer.question_data.type === 'benar_salah') {
+      questionType = 'benar-salah';
+      correctAnswer = answer.question_data.correct_answer || '';
+      userAnswer = answer.student_answer || '';
+    } else {
+      questionType = 'short-answer';
+      correctAnswer = answer.question_data.correct_answer || '';
+      userAnswer = answer.student_answer || '';
+    }
+
+    return { questionType, correctAnswer, userAnswer };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // UTILITY METHODS - Helper Functions
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * HTML SANITIZER - Bersihkan dan amankan HTML content
+   * KEGUNAAN: Render HTML content dengan aman (gambar, formatting)
+   */
   sanitizeHtml(html: string): SafeHtml {
     if (!html) return this.sanitizer.bypassSecurityTrustHtml('');
-
-    console.log('🧹 Sanitizing HTML:', html.substring(0, 100) + '...');
-
-    // Bypass security untuk semua HTML content
-    const sanitizedHtml = this.sanitizer.bypassSecurityTrustHtml(html);
-
-    return sanitizedHtml;
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
-  // Method untuk cek apakah question mengandung HTML/gambar
+  /**
+   * HTML CONTENT DETECTOR - Deteksi apakah string mengandung HTML
+   * KEGUNAAN: Tentukan rendering strategy (HTML vs plain text)
+   */
   hasHtmlContent(content: string): boolean {
     if (!content) return false;
-
-    const hasHtml = content.includes('<img') ||
-      content.includes('<figure') ||
-      content.includes('<p>') ||
-      content.includes('<div>') ||
-      content.includes('<') ||
-      content.includes('base64');
-
-    return hasHtml;
+    
+    return content.includes('<img') ||
+           content.includes('<figure') ||
+           content.includes('<p>') ||
+           content.includes('<div>') ||
+           content.includes('<') ||
+           content.includes('base64');
   }
 
-  hasOptionHtmlContent(option: string): boolean {
-    if (!option) return false;
-    return this.hasHtmlContent(option);
-  }
-
+  /**
+   * HTML STRIPPER - Hapus tag HTML, ambil text saja
+   * KEGUNAAN: Clean text untuk display fallback
+   */
   stripHtmlTags(text: string): string {
     if (!text) return '';
-
     const div = document.createElement('div');
     div.innerHTML = text;
-
     return div.textContent || div.innerText || '';
   }
 
-  getCleanOption(option: string): string {
-    return this.stripHtmlTags(option);
+  /**
+   * QUESTION TYPE DETECTOR - Deteksi tipe soal untuk backward compatibility
+   * KEGUNAAN: Handle data lama yang tidak ada type field
+   */
+  private detectQuestionType(question: any): 'multiple-choice' | 'short-answer' | 'benar-salah' {
+    if (question.options && question.options.length === 2) {
+      return 'benar-salah';
+    } else if (question.options && question.options.length > 2) {
+      return 'multiple-choice';
+    } else {
+      return 'short-answer';
+    }
   }
 
+  /**
+   * EMPTY QUESTION CREATOR - Buat question object kosong untuk data yang hilang
+   * KEGUNAAN: Handle missing data gracefully
+   */
+  private createEmptyQuestion(answer: any, index: number): QuizResultQuestion {
+    return {
+      id: answer.question_index + 1,
+      question: `Soal ${index + 1}`,
+      questionHtml: this.sanitizeHtml(`Soal ${index + 1}`),
+      type: 'multiple-choice' as const,
+      options: [],
+      optionsHtml: [],
+      correctAnswer: -1,
+      userAnswer: -1,
+      isCorrect: answer.is_correct || false
+    };
+  }
+
+  /**
+   * OPTION CLASS GENERATOR - Tentukan CSS class untuk styling option
+   * KEGUNAAN: Visual feedback untuk jawaban benar/salah
+   */
+  getOptionClass(question: QuizResultQuestion, optionIndex: number): string {
+    if (question.type === 'short-answer') return '';
+
+    // Hanya styling pada jawaban yang dipilih user
+    if (this.isUserSelectedOption(question, optionIndex)) {
+      return question.isCorrect === true ? 'correct-answer' : 'user-incorrect';
+    }
+    return '';
+  }
+
+  /**
+   * OPTION INDICATOR CLASS - Tentukan icon indicator (check/X)
+   * KEGUNAAN: Visual indicator untuk jawaban
+   */
+  getOptionIndicatorClass(question: QuizResultQuestion, optionIndex: number): string {
+    if (question.type === 'short-answer') return 'neutral';
+
+    if (this.isUserSelectedOption(question, optionIndex)) {
+      return question.isCorrect === true ? 'correct' : 'incorrect';
+    }
+    return 'neutral';
+  }
+
+  /**
+   * ✅ USER SELECTION CHECKER - Cek apakah option dipilih oleh user
+   * KEGUNAAN: Tentukan mana jawaban yang dipilih user
+   */
+  isUserSelectedOption(question: QuizResultQuestion, optionIndex: number): boolean {
+    if (question.type === 'multiple-choice') {
+      return optionIndex === question.userAnswer;
+    } else if (question.type === 'benar-salah') {
+      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
+      return optionText === question.userAnswer;
+    }
+    return false;
+  }
+
+  /**
+   * ACHIEVEMENT CALCULATORS - Hitung dan tampilkan pencapaian
+   * KEGUNAAN: Visual feedback performa user
+   */
+  getPredikatTitle(): string {
+    const score = this.quizResult.score;
+    if (score < 75) return 'Pemula Literasi Digital';
+    if (score >= 75 && score < 90) return 'Sahabat Literasi Digital';
+    return 'Jagoan Literasi Digital';
+  }
+
+  getPredikatIconPath(): string {
+    const score = this.quizResult.score;
+    if (score < 75) return 'assets/img/3rd-place.png';
+    if (score >= 75 && score < 90) return 'assets/img/2nd-place.png';
+    return 'assets/img/1st-place.png';
+  }
+
+  getAchievementHeaderClass(): string {
+    const score = this.quizResult.score;
+    if (score < 75) return 'achievement-low';
+    if (score < 90) return 'achievement-mid';
+    return 'achievement-high';
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 🚦 NAVIGATION METHODS - Route Management
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * ✅ NAVIGATION HANDLERS - Handle user navigation
+   */
+  goBack(): void {
+    this.router.navigate(['/siswa/materi/lihat-materi', this.materialId, 'kuis']);
+  }
+
+  goPredicate(): void {
+    this.router.navigate(['/siswa/riwayat'], {
+      queryParams: {
+        from: 'quiz-result',
+        materialId: this.materialId,
+        score: this.quizResult.score,
+        timestamp: new Date().toISOString()
+      }
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // 📅 FORMATTING METHODS - Data Display Formatters
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * ✅ DATE FORMATTER - Format tanggal untuk display
+   */
   formatDate(dateString: string): string {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
@@ -352,40 +505,29 @@ export class DetailHistoryQuizComponent implements OnInit {
       minute: '2-digit',
       hour12: false
     };
-
-    return date.toLocaleDateString('id-ID', options).replace(',', ' pukul').replace(/(\d{2})\.(\d{2})/, '$1:$2');
+    return date.toLocaleDateString('id-ID', options)
+              .replace(',', ' pukul')
+              .replace(/(\d{2})\.(\d{2})/, '$1:$2');
   }
 
-  getScoreBadgeClass(question: QuizResultQuestion): string {
-    if (question.type === 'short-answer') {
-      return 'not-graded';
-    }
-    return question.isCorrect ? 'correct' : 'incorrect';
+  // ═══════════════════════════════════════════════════════════════
+  // 🔧 ADDITIONAL UTILITY METHODS
+  // ═══════════════════════════════════════════════════════════════
+
+  getCleanOption(option: string): string {
+    return this.stripHtmlTags(option);
   }
 
-  getQuestionScore(question: QuizResultQuestion): string {
-    if (question.type === 'short-answer') {
-      return '-';
-    }
-    return question.isCorrect ? '1' : '0';
-  }
-
-  getQuestionScoreIcon(question: QuizResultQuestion): string {
-    if (question.type === 'short-answer') {
-      return 'fas fa-minus';
-    }
-    return question.isCorrect ? 'fas fa-check' : 'fas fa-times';
+  getBenarSalahOptionText(option: string): string {
+    if (!option) return '';
+    const parts = option.split('. ');
+    return parts.length > 1 ? parts[1] : option;
   }
 
   getBenarSalahTextClass(option: string): string {
     const optionText = this.getBenarSalahOptionText(option);
-
-    if (optionText === 'Benar') {
-      return 'text-benar';
-    } else if (optionText === 'Salah') {
-      return 'text-salah';
-    }
-
+    if (optionText === 'Benar') return 'text-benar';
+    if (optionText === 'Salah') return 'text-salah';
     return '';
   }
 
@@ -393,121 +535,30 @@ export class DetailHistoryQuizComponent implements OnInit {
     return this.isUserSelectedOption(question, optionIndex) && question.isCorrect === true;
   }
 
-  getBenarSalahOptionText(option: string): string {
-    if (!option) return '';
-
-    // Extract "Benar" dari "A. Benar" atau "B. Salah"
-    const parts = option.split('. ');
-    return parts.length > 1 ? parts[1] : option;
-  }
-
   shouldShowIncorrectAnswer(question: QuizResultQuestion, optionIndex: number): boolean {
     return this.isUserSelectedOption(question, optionIndex) && question.isCorrect === false;
   }
 
-  shouldShowNeutralOption(question: QuizResultQuestion, optionIndex: number): boolean {
-    return !this.isUserSelectedOption(question, optionIndex);
+  getQuestionScoreIcon(question: QuizResultQuestion): string {
+    if (question.type === 'short-answer') return 'fas fa-minus';
+    return question.isCorrect ? 'fas fa-check' : 'fas fa-times';
   }
 
-  isUserSelectedOption(question: QuizResultQuestion, optionIndex: number): boolean {
-    if (question.type === 'multiple-choice') {
-      // Untuk multiple choice, bandingkan index dengan userAnswer
-      return optionIndex === question.userAnswer;
-    } else if (question.type === 'benar-salah') {
-      // Untuk benar_salah, bandingkan text option dengan userAnswer
-      const optionText = this.getBenarSalahOptionText(question.options[optionIndex]);
-      return optionText === question.userAnswer;
-    }
-    return false;
+  getScoreBadgeClass(question: QuizResultQuestion): string {
+    if (question.type === 'short-answer') return 'not-graded';
+    return question.isCorrect ? 'correct' : 'incorrect';
   }
 
-  getOptionClass(question: QuizResultQuestion, optionIndex: number): string {
-    if (question.type === 'short-answer') {
-      return '';
-    }
-
-    // ✅ LOGIKA BARU: Hanya styling pada jawaban yang dipilih user
-    if (this.isUserSelectedOption(question, optionIndex)) {
-      // Jika user pilih option ini dan jawabannya benar -> hijau
-      if (question.isCorrect === true) {
-        return 'correct-answer';
-      }
-      // Jika user pilih option ini dan jawabannya salah -> merah
-      else if (question.isCorrect === false) {
-        return 'user-incorrect';
-      }
-    }
-
-    // Sisanya tetap netral (tidak ada styling khusus)
-    return '';
+  getCorrectCount(): number {
+    return this.quizResult.questions.filter(q => q.isCorrect === true).length;
   }
 
-  getOptionIndicatorClass(question: QuizResultQuestion, optionIndex: number): string {
-    if (question.type === 'short-answer') {
-      return 'neutral';
-    }
-
-    // ✅ LOGIKA BARU: Hanya tampilkan icon pada jawaban yang dipilih user
-    if (this.isUserSelectedOption(question, optionIndex)) {
-      // Jika user pilih option ini dan jawabannya benar -> check
-      if (question.isCorrect === true) {
-        return 'correct';
-      }
-      // Jika user pilih option ini dan jawabannya salah -> X
-      else if (question.isCorrect === false) {
-        return 'incorrect';
-      }
-    }
-
-    // Sisanya netral (tidak ada icon)
-    return 'neutral';
-  }
-
-  goBack(): void {
-    this.router.navigate(['/siswa/materi/lihat-materi', this.materialId, 'kuis']);
-  }
-
-  goPredicate(): void {
-    console.log('🎯 Navigating to learning history with context...');
-
-    // Navigate dengan informasi konteks quiz yang baru selesai
-    this.router.navigate(['/siswa/riwayat'], {
-      queryParams: {
-        from: 'quiz-result',
-        materialId: this.materialId,
-        score: this.quizResult.score,
-        timestamp: new Date().toISOString()
-      }
-    }).then(success => {
-      if (success) {
-        console.log('✅ Successfully navigated to learning history with context');
-      } else {
-        console.error('❌ Failed to navigate to learning history');
-      }
-    }).catch(error => {
-      console.error('❌ Error navigating to learning history:', error);
-    });
-  }
-
-  getPredikatTitle(): string {
-    const score = this.quizResult.score;
-    if (score < 75) return 'Pemula Literasi Digital';
-    if (score >= 75 && score < 90) return 'Sahabat Literasi Digital';
-    return 'Jagoan Literasi Digital';
-  }
-
+  // Unused legacy methods (dapat dihapus jika tidak digunakan)
   getPredikatDescription(): string {
     const score = this.quizResult.score;
     if (score < 75) return 'Terus berlatih dan jangan menyerah!';
     if (score >= 75 && score < 90) return 'Kamu sudah memahami materi ini!';
     return 'Luar biasa! Kamu adalah jagoan literasi digital!';
-  }
-
-  getPredikatIconPath(): string {
-    const score = this.quizResult.score;
-    if (score < 75) return 'assets/img/3rd-place.png';
-    if (score >= 75 && score < 90) return 'assets/img/2nd-place.png';
-    return 'assets/img/1st-place.png';
   }
 
   getPredikatClass(): string {
@@ -521,13 +572,6 @@ export class DetailHistoryQuizComponent implements OnInit {
     return this.quizResult.score;
   }
 
-  getAchievementHeaderClass(): string {
-    const score = this.quizResult.score;
-    if (score < 75) return 'achievement-low';
-    if (score < 90) return 'achievement-mid';
-    return 'achievement-high';
-  }
-
   getScoreRating(): string {
     const score = this.quizResult.score;
     if (score < 50) return 'Ayo semangat!';
@@ -539,8 +583,11 @@ export class DetailHistoryQuizComponent implements OnInit {
     return 'Sempurna!';
   }
 
-  // ✅ TAMBAH: Helper Methods
-  getCorrectCount(): number {
-    return this.quizResult.questions.filter(q => q.isCorrect === true).length;
+  shouldShowNeutralOption(question: QuizResultQuestion, optionIndex: number): boolean {
+    return !this.isUserSelectedOption(question, optionIndex);
+  }
+
+  hasOptionHtmlContent(option: string): boolean {
+    return this.hasHtmlContent(option);
   }
 }

@@ -1,3 +1,9 @@
+/* ✅ Container dengan padding konsisten seperti view-material */
+.view-detail-quiz-container {
+  padding: 24px;
+  min-height: 100vh;
+}
+
 .quiz-result-container {
   background-color: white;
   border-radius: 8px;
@@ -7,7 +13,9 @@
   flex-direction: column;
   position: relative;
   height: 100vh; 
-  margin-bottom: 32px;
+  margin: 0 auto;
+  max-width: 1300px;
+  word-wrap: break-word;
 }
 
 .result-header {
@@ -20,6 +28,7 @@
   align-items: center;
   padding: 16px 24px;
   flex-shrink: 0; 
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .header-left {
@@ -33,12 +42,18 @@
   margin-right: 16px;
   cursor: pointer;
   color: #333;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: #dc3545;
 }
 
 .result-title {
   font-size: 18px;
   font-weight: bold;
   margin: 0;
+  word-wrap: break-word;
 }
 
 .divider {
@@ -55,7 +70,7 @@
   display: flex;
   flex: 1 1 0; 
   overflow: hidden;
-  height: 0; /* ✅ Penting untuk memaksa flex child respect parent height */
+  height: 0;
 }
 
 .quiz-info-sidebar {
@@ -70,55 +85,166 @@
   background: linear-gradient(180deg, #f8f9ff 0%, #ffffff 100%);
   border-radius: 0 0 0 8px;
   overflow-y: auto;
-  flex-shrink: 0; 
+  flex-shrink: 0;
 }
 
-/* .quiz-info {
-  margin-bottom: 24px;
-} */
+.quiz-info {
+  order: 1;
+}
 
-.info-item {
-  /* margin-bottom: 12px; */
+.predikat-card {
+  order: 2;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-radius: 16px;
+  border: 2px solid;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.predikat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.predikat-card.pemula {
+  background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 60%, #e0a96d 100%);
+  border-color: #b97a56;
+}
+
+.predikat-card.sahabat {
+  background: linear-gradient(135deg, #f8fafc 0%, #e8f5e9 60%, #cfd8dc 100%);
+  border-color: #b0bec5;
+}
+
+.predikat-card.jagoan {
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 60%, #FFD700 100%);
+  border-color: #FF9800;
+}
+
+.predikat-icon-container {
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.predikat-icon {
+  width: 48px;
+  height: 48px;
+  animation: pulse 2s infinite;
+  display: block;
+  object-fit: contain;
+}
+
+.predikat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.predikat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.predikat-title {
   font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin: 4px 0;
+  line-height: 1.2;
 }
 
-.score-card {
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  padding: 24px;
+.predikat-description {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.achievement-header {
+  order: 3;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 16px;
+  border-radius: 16px;
+  border: 2px solid;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  margin-bottom: 8px;
+  transition: background 0.3s, border-color 0.3s;
 }
 
-.score-label {
+.achievement-header.achievement-low {
+  background: linear-gradient(135deg, #fff6f6 0%, #ffeaea 60%, #fff 100%);
+  border-color: #f8bcbc; 
+  color: #d32f2f; 
+}
+
+.achievement-header.achievement-high {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f8fafc 100%);
+  border-color: #a5d6a7;
+  color: #388e3c;
+}
+
+.achievement-header.achievement-mid {
+  background: linear-gradient(135deg, #fffbe5 0%, #ffe9b3 60%, #ffe066 100%);
+  border-color: #ffd700;
+  color: #b68600;
+}
+
+.achievement-header .score-label {
   font-size: 16px;
   font-weight: 500;
   margin-bottom: 12px;
-  color: #666;
+  color: inherit;
 }
 
-.score-value {
+.achievement-header .score-value {
   font-size: 48px;
   font-weight: bold;
-  color: #333;
+  color: inherit;
 }
 
-.btn-view {
-  background-color: #F9D349;
-  color: #6C613B;
+.btn-view-enhanced {
+  order: 4;
+  background: linear-gradient(135deg, #1BB6C1, #17a2b8);
+  color: white;
   border: none;
   border-radius: 12px;
-  padding: 8px 24px;
-  margin-top: 10px;
+  padding: 12px 20px;
   font-weight: 600;
-  transition: all 0.2s ease;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.btn-view:hover {
-  background-color: #f0c926;
+.btn-view-enhanced:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(27, 182, 193, 0.4);
+  background: linear-gradient(135deg, #17a2b8, #1BB6C1);
+}
+
+.info-item {
+  font-size: 14px;
+  margin-bottom: 12px;
+  word-wrap: break-word;
 }
 
 .questions-review {
+  margin-top: 2px;
   flex: 1 1 0;
   padding: 24px;
   overflow-y: auto;
@@ -130,6 +256,7 @@
   margin-bottom: 32px;
   padding-bottom: 24px;
   border-bottom: 1px solid #f0f0f0;
+  word-wrap: break-word;
 }
 
 .question-item:last-child {
@@ -163,6 +290,7 @@
   font-weight: 500;
   text-align: left !important;
   line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .question-text-html {
@@ -171,6 +299,7 @@
   margin-right: 0 !important;
   width: 100%;
   display: block;
+  word-wrap: break-word;
 }
 
 .question-text-container {
@@ -178,6 +307,7 @@
   flex-grow: 1;
   margin-right: 16px;
   line-height: 1.4;
+  word-wrap: break-word;
 }
 
 .score-badge {
@@ -223,6 +353,7 @@
   margin-bottom: 4px;
   border-radius: 8px;
   border: 1px solid #e9ecef;
+  word-wrap: break-word;
 }
 
 .option-item.correct-answer {
@@ -244,6 +375,7 @@
   justify-content: center;
   margin-right: 8px;
   font-size: 12px;
+  flex-shrink: 0;
 }
 
 .option-indicator.correct {
@@ -259,6 +391,98 @@
 .option-indicator.neutral {
   background-color: #e9ecef;
   border: 1px solid #ced4da;
+}
+
+.option-text-container {
+  flex: 1;
+  word-wrap: break-word;
+}
+
+.option-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.option-text-html {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.benar-salah-review {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.benar-salah-option {
+  flex: 1;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 600;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.benar-salah-option .option-text-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.text-benar {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.text-salah {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+.benar-salah-option.correct-answer {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  border: 2px solid #4caf50;
+}
+
+.benar-salah-option.user-incorrect {
+  background: linear-gradient(135deg, #ffebee, #ffcdd2);
+  border: 2px solid #f44336;
+}
+
+.benar-salah-option:not(.correct-answer):not(.user-incorrect) {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+}
+
+.benar-salah-option .option-indicator {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.benar-salah-option .option-indicator.correct {
+  background: #4caf50;
+  color: white;
+}
+
+.benar-salah-option .option-indicator.incorrect {
+  background: #f44336;
+  color: white;
+}
+
+.benar-salah-option .option-indicator.neutral {
+  background: #e9ecef;
+  color: #6c757d;
 }
 
 /* Short answer review */
@@ -279,6 +503,7 @@
   border: 1px solid #dee2e6;
   border-radius: 6px;
   min-height: 60px;
+  word-wrap: break-word;
 }
 
 .grading-note {
@@ -309,128 +534,6 @@
   margin: 0 auto;
 }
 
-.benar-salah-review {
-  display: flex;
-  gap: 16px;
-  margin-top: 16px;
-}
-
-.benar-salah-option {
-  flex: 1;
-  padding: 16px;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 600;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-
-.benar-salah-option .option-text-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-}
-
-/* Styling untuk text Benar */
-.text-benar {
-  color: #2e7d32;
-  font-weight: 700;
-}
-
-/* Styling untuk text Salah */
-.text-salah {
-  color: #d32f2f;
-  font-weight: 700;
-}
-
-/* Background colors untuk benar_salah options */
-.benar-salah-option.correct-answer {
-  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
-  border: 2px solid #4caf50;
-}
-
-.benar-salah-option.user-incorrect {
-  background: linear-gradient(135deg, #ffebee, #ffcdd2);
-  border: 2px solid #f44336;
-}
-
-.benar-salah-option:not(.correct-answer):not(.user-incorrect) {
-  background: #f8f9fa;
-  border: 2px solid #e9ecef;
-}
-
-/* Option indicator untuk benar_salah */
-.benar-salah-option .option-indicator {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.benar-salah-option .option-indicator.correct {
-  background: #4caf50;
-  color: white;
-}
-
-.benar-salah-option .option-indicator.incorrect {
-  background: #f44336;
-  color: white;
-}
-
-.benar-salah-option .option-indicator.neutral {
-  background: #e9ecef;
-  color: #6c757d;
-}
-
-.achievement-header {
-  text-align: center;
-  padding: 16px;
-  border-radius: 16px;
-  border: 2px solid;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  margin-bottom: 8px;
-  transition: background 0.3s, border-color 0.3s;
-}
-
-.achievement-header.achievement-low {
-  background: linear-gradient(135deg, #fff6f6 0%, #ffeaea 60%, #fff 100%);
-  border-color: #f8bcbc; 
-  color: #d32f2f; 
-}
-
-.achievement-header.achievement-high {
-  background: linear-gradient(135deg, #e8f5e9 0%, #f8fafc 100%);
-  border-color: #a5d6a7;
-  color: #388e3c;
-}
-
-.achievement-header.achievement-mid {
-  background: linear-gradient(135deg, #fffbe5 0%, #ffe9b3 60%, #ffe066 100%);
-  border-color: #ffd700;
-  color: #b68600;
-}
-
-.achievement-header .score-label {
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 12px;
-  color: inherit;
-}
-
-.achievement-header .score-value {
-  font-size: 48px;
-  font-weight: bold;
-  color: inherit;
-}
-
 .celebration-emoji {
   font-size: 32px;
   margin-bottom: 8px;
@@ -444,76 +547,6 @@
   margin: 0;
   text-shadow: 0 1px 2px rgba(255, 143, 0, 0.1);
 }
-
-/* Predikat Card */
-.predikat-card {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  border-radius: 16px;
-  border: 2px solid;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.predikat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-.predikat-card.pemula {
-  background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 60%, #e0a96d 100%);
-  border-color: #b97a56;
-}
-
-.predikat-card.sahabat {
-  background: linear-gradient(135deg, #f8fafc 0%, #e8f5e9 60%, #cfd8dc 100%);
-  border-color: #b0bec5;
-}
-
-.predikat-card.jagoan {
-  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 60%, #FFD700 100%);
-  border-color: #FF9800;
-}
-
-.predikat-icon-container {
-  margin-right: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.predikat-icon {
-  width: 48px;
-  height: 48px;
-  animation: pulse 2s infinite;
-}
-
-.predikat-content {
-  flex: 1;
-}
-
-.predikat-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.predikat-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #333;
-  margin: 4px 0;
-}
-
-.predikat-description {
-  font-size: 12px;
-  color: #666;
-  line-height: 1.3;
-}
-
 
 .new-badge {
   background: linear-gradient(135deg, #FFF8E1, #FFECB3);
@@ -549,162 +582,12 @@
   color: #FF6F00;
 }
 
-/* Enhanced Quiz Details */
-.quiz-details {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid #E0E0E0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.detail-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-  padding: 8px;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.detail-item:hover {
-  background-color: #F5F5F5;
-}
-
-.detail-item:last-child {
-  margin-bottom: 0;
-}
-
-.detail-icon {
-  font-size: 20px;
-  margin-right: 12px;
-  width: 24px;
-  text-align: center;
-}
-
-.detail-content {
-  flex: 1;
-}
-
-.detail-label {
-  font-size: 12px;
-  font-weight: 500;
-  color: #666;
-  margin-bottom: 2px;
-}
-
-.detail-value {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
-
-/* Enhanced Score Card */
-.enhanced-score-card {
-  border-radius: 16px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  position: relative;
-  overflow: hidden;
-}
-
-.enhanced-score-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-  animation: shine 3s infinite;
-}
-
-.enhanced-score-card.score-low {
-  background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-  border: 2px solid #2196F3;
-}
-
-.enhanced-score-card.score-medium {
-  background: linear-gradient(135deg, #E8F5E8, #C8E6C9);
-  border: 2px solid #4CAF50;
-}
-
-.enhanced-score-card.score-high {
-  background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
-  border: 2px solid #FF9800;
-}
-
-.score-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.score-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.score-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #666;
-}
-
-.score-value {
-  font-size: 48px;
-  font-weight: 800;
-  color: #333;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 8px;
-  animation: pulse 2s infinite;
-}
-
-.score-rating {
-  font-size: 14px;
-  font-weight: 600;
-  color: #555;
-}
-
-/* Enhanced Button */
-.btn-view-enhanced {
-  background: linear-gradient(135deg, #1BB6C1, #17a2b8);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 20px;
-  font-weight: 600;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(27, 182, 193, 0.3);
-}
-
-.btn-view-enhanced:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(27, 182, 193, 0.4);
-  background: linear-gradient(135deg, #17a2b8, #1BB6C1);
-}
-
 .btn-icon {
   font-size: 18px;
 }
 
 .btn-text {
   font-weight: 600;
-}
-
-.question-text-container,
-.question-text-html {
-  text-align: left !important;
-  justify-content: flex-start !important;
-  align-items: flex-start !important;
 }
 
 /* Animations */
@@ -735,15 +618,6 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
 @keyframes glow {
   0% {
     box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
@@ -762,67 +636,770 @@
   }
 }
 
-@keyframes shine {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Responsive design */
+/* ✅ CRITICAL: Mobile responsive design - ULTRA COMPACT VERSION */
 @media (max-width: 768px) {
+  /* ✅ Container mobile padding - SUPER COMPACT */
+  .view-detail-quiz-container {
+    padding: 8px !important; /* ✅ REDUCED: dari 16px ke 8px */
+    min-height: calc(100vh - 60px);
+  }
+  
+  /* ✅ Quiz result container mobile - FULL WIDTH */
+  .quiz-result-container {
+    margin: 0 !important;
+    border-radius: 6px !important; /* ✅ REDUCED: dari 8px */
+    height: calc(100vh - 16px) !important; /* ✅ REDUCED: dari 32px */
+    max-width: 100% !important;
+    width: 100% !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important; /* ✅ REDUCED: shadow */
+  }
+  
+  /* ✅ Header mobile - ULTRA COMPACT */
+  .result-header {
+    padding: 4px 8px !important; /* ✅ REDUCED: dari 8px 16px */
+    flex-wrap: wrap;
+    gap: 4px !important; /* ✅ REDUCED: dari 6px */
+  }
+  
+  .close-button {
+    font-size: 14px !important; /* ✅ REDUCED: dari 16px */
+    margin-right: 4px !important; /* ✅ REDUCED: dari 6px */
+    padding: 1px !important;
+  }
+  
+  .result-title {
+    font-size: 12px !important; /* ✅ REDUCED: dari 14px */
+    line-height: 1.2;
+    word-break: break-word;
+  }
+  
+  .divider {
+    top: 32px !important; /* ✅ REDUCED: dari 52px */
+  }
+  
+  /* ✅ Result content - stack vertically */
   .result-content {
-    flex-direction: column;
+    flex-direction: column !important;
+    height: auto !important;
   }
   
+  /* ✅ Quiz info sidebar - ULTRA COMPACT */
   .quiz-info-sidebar {
-    width: 100%;
-    min-width: 100%;
-    max-width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
-    border-radius: 0 0 8px 8px;
-    height: auto;
-    flex-shrink: 1;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    border-radius: 0 !important;
+    background: #f8f9fa !important;
+    height: auto !important;
+    flex-shrink: 0 !important;
+    padding: 6px !important; /* ✅ REDUCED: dari 12px ke 6px */
+    gap: 6px !important; /* ✅ REDUCED: dari 12px ke 6px */
+    box-sizing: border-box;
   }
   
+  /* ✅ Info items mobile - TINY */
+  .info-item {
+    font-size: 10px !important; /* ✅ REDUCED: dari 12px */
+    margin-bottom: 4px !important; /* ✅ REDUCED: dari 8px */
+    line-height: 1.2 !important;
+  }
+  
+  /* ✅ Achievement header mobile - TINY */
+  .achievement-header {
+    padding: 6px !important; /* ✅ REDUCED: dari 10px */
+    border-radius: 6px !important; /* ✅ REDUCED: dari 10px */
+    margin-bottom: 4px !important; /* ✅ REDUCED: dari 6px */
+  }
+  
+  .achievement-header .score-label {
+    font-size: 10px !important; /* ✅ REDUCED: dari 12px */
+    margin-bottom: 3px !important; /* ✅ REDUCED: dari 6px */
+  }
+  
+  .achievement-header .score-value {
+    font-size: 20px !important; /* ✅ REDUCED: dari 28px */
+  }
+  
+  /* ✅ Predikat card mobile - TINY */
+  .predikat-card {
+    padding: 6px !important; /* ✅ REDUCED: dari 10px */
+    border-radius: 6px !important; /* ✅ REDUCED: dari 10px */
+    border-width: 1px !important; /* ✅ REDUCED: dari 2px */
+  }
+  
+  .predikat-icon {
+    width: 24px !important; /* ✅ REDUCED: dari 32px */
+    height: 24px !important;
+  }
+  
+  .predikat-icon-container {
+    margin-right: 6px !important; /* ✅ REDUCED: dari 8px */
+  }
+  
+  .predikat-label {
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+    margin-bottom: 1px !important;
+  }
+  
+  .predikat-title {
+    font-size: 10px !important; /* ✅ REDUCED: dari 12px */
+    margin: 2px 0 !important;
+  }
+  
+  .predikat-description {
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+    line-height: 1.2 !important;
+  }
+  
+  /* ✅ Enhanced button mobile - TINY */
+  .btn-view-enhanced {
+    padding: 4px 8px !important; /* ✅ REDUCED: dari 8px 12px */
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
+    border-radius: 6px !important; /* ✅ REDUCED: dari 8px */
+    gap: 4px !important;
+  }
+  
+  /* ✅ Questions review mobile - ULTRA COMPACT with spacing */
   .questions-review {
-    height: auto;
-    padding: 16px;
+    height: auto !important;
+    padding: 4px 6px !important; /* ✅ REDUCED: dari 8px 12px */
+    margin-top: 8px !important; /* ✅ REDUCED: dari 16px untuk compact spacing */
   }
   
-  .quiz-info-sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
+  /* ✅ Question item mobile - TINY */
+  .question-item {
+    margin-bottom: 8px !important; /* ✅ REDUCED: dari 16px */
+    padding-bottom: 6px !important; /* ✅ REDUCED: dari 12px */
+    border-bottom-width: 1px !important;
   }
-
+  
+  /* ✅ Question header mobile - TINY */
+  .question-header {
+    margin-bottom: 4px !important; /* ✅ REDUCED: dari 8px */
+    gap: 4px !important; /* ✅ REDUCED: dari 6px */
+  }
+  
+  .question-number-circle {
+    min-width: 18px !important; /* ✅ REDUCED: dari 24px */
+    height: 18px !important;
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
+    border-radius: 4px !important;
+  }
+  
+  .question-text-container {
+    margin-right: 4px !important; /* ✅ REDUCED: dari 8px */
+  }
+  
+  .question-text {
+    font-size: 10px !important; /* ✅ REDUCED: dari 12px */
+    line-height: 1.2 !important;
+  }
+  
+  .question-text-html {
+    font-size: 10px !important; /* ✅ REDUCED: dari 12px */
+    line-height: 1.2 !important;
+  }
+  
+  /* ✅ Score badge mobile - TINY */
+  .score-badge {
+    width: 18px !important; /* ✅ REDUCED: dari 24px */
+    height: 18px !important;
+    font-size: 9px !important; /* ✅ REDUCED: dari 12px */
+  }
+  
+  .score-badge i {
+    font-size: 7px !important; /* ✅ REDUCED: dari 10px */
+  }
+  
+  /* ✅ Options review mobile - TINY */
+  .options-review {
+    gap: 3px !important; /* ✅ REDUCED: dari 6px */
+  }
+  
+  .option-item {
+    padding: 2px 4px !important; /* ✅ REDUCED: dari 4px 6px */
+    margin-bottom: 1px !important; /* ✅ REDUCED: dari 2px */
+    border-radius: 3px !important;
+    border-width: 1px !important;
+  }
+  
+  .option-indicator {
+    width: 12px !important; /* ✅ REDUCED: dari 16px */
+    height: 12px !important;
+    margin-right: 4px !important; /* ✅ REDUCED: dari 6px */
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+  }
+  
+  .option-text {
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
+    line-height: 1.1 !important;
+  }
+  
+  .option-text-html {
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
+    line-height: 1.1 !important;
+  }
+  
+  /* ✅ Benar/Salah mobile - TINY & vertical */
   .benar-salah-review {
-    flex-direction: column;
-    gap: 12px;
+    flex-direction: column !important;
+    gap: 4px !important; /* ✅ REDUCED: dari 8px */
+    margin-top: 4px !important; /* ✅ REDUCED: dari 8px */
   }
   
   .benar-salah-option {
-    min-height: 50px;
-    padding: 12px;
+    min-height: 24px !important; /* ✅ REDUCED: dari 36px */
+    padding: 4px !important; /* ✅ REDUCED: dari 8px */
+    gap: 3px !important; /* ✅ REDUCED: dari 6px */
+    border-radius: 4px !important;
+    border-width: 1px !important;
   }
-
-  .predikat-icon {
-    width: 40px;
-    height: 40px;
+  
+  .benar-salah-option .option-indicator {
+    width: 12px !important; /* ✅ REDUCED: dari 16px */
+    height: 12px !important;
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
   }
-
-  .score-value {
-    font-size: 36px;
+  
+  .text-benar,
+  .text-salah {
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
   }
-
+  
+  /* ✅ Short answer mobile - TINY */
+  .short-answer-review {
+    padding: 4px !important; /* ✅ REDUCED: dari 8px */
+    border-radius: 3px !important;
+  }
+  
+  .user-answer {
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
+  }
+  
+  .answer-text {
+    padding: 4px !important; /* ✅ REDUCED: dari 6px */
+    min-height: 28px !important; /* ✅ REDUCED: dari 40px */
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
+    border-radius: 3px !important;
+  }
+  
+  .grading-note {
+    padding: 3px !important; /* ✅ REDUCED: dari 4px */
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+    border-radius: 2px !important;
+  }
+  
+  /* ✅ Loading and error mobile - COMPACT */
+  .loading-container {
+    padding: 12px !important; /* ✅ REDUCED: dari 20px */
+  }
+  
+  .loading-container .spinner-border {
+    width: 1.5rem !important; /* ✅ REDUCED: dari 2rem */
+    height: 1.5rem !important;
+  }
+  
+  .error-container {
+    padding: 12px !important; /* ✅ REDUCED: dari 20px */
+  }
+  
+  .error-container .alert {
+    padding: 8px !important; /* ✅ REDUCED: dari 12px */
+    font-size: 10px !important; /* ✅ REDUCED: dari 12px */
+    border-radius: 4px !important;
+  }
+  
+  /* ✅ Celebration elements mobile - TINY */
   .celebration-emoji {
-    font-size: 24px;
+    font-size: 16px !important; /* ✅ REDUCED: dari 20px */
   }
-
+  
   .congratulations-text {
-    font-size: 14px;
+    font-size: 10px !important; /* ✅ REDUCED: dari 12px */
+  }
+  
+  /* ✅ Badge elements mobile - TINY */
+  .badge-emoji {
+    font-size: 12px !important; /* ✅ REDUCED: dari 14px */
+  }
+  
+  .badge-title {
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+  }
+  
+  .badge-name {
+    font-size: 9px !important; /* ✅ REDUCED: dari 11px */
+  }
+  
+  .new-badge {
+    padding: 6px !important; /* ✅ REDUCED: dari default */
+    border-radius: 6px !important;
+  }
+}
+
+/* ✅ Small mobile adjustments - EXTREME COMPACT */
+@media (max-width: 576px) {
+  .view-detail-quiz-container {
+    padding: 4px !important; /* ✅ REDUCED: dari 8px ke 4px */
+  }
+  
+  .quiz-result-container {
+    border-radius: 4px !important;
+    height: calc(100vh - 8px) !important;
+  }
+  
+  .result-header {
+    padding: 2px 4px !important; /* ✅ REDUCED: dari 4px 8px */
+    gap: 2px !important;
+  }
+  
+  .close-button {
+    font-size: 12px !important;
+  }
+  
+  .result-title {
+    font-size: 10px !important;
+  }
+  
+  .divider {
+    top: 24px !important; /* ✅ REDUCED: dari 36px */
+  }
+  
+  .quiz-info-sidebar {
+    padding: 4px !important; /* ✅ REDUCED: dari 6px */
+    gap: 4px !important;
+  }
+  
+  .info-item {
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+    margin-bottom: 2px !important;
+  }
+  
+  .achievement-header .score-value {
+    font-size: 16px !important; /* ✅ REDUCED: dari 20px */
+  }
+  
+  .predikat-icon {
+    width: 20px !important; /* ✅ REDUCED: dari 24px */
+    height: 20px !important;
+  }
+  
+  .predikat-card {
+    padding: 4px !important; /* ✅ REDUCED: dari 6px */
+  }
+  
+  .predikat-title {
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+  }
+  
+  .predikat-description {
+    font-size: 7px !important; /* ✅ REDUCED: dari 8px */
+  }
+  
+  /* ✅ Questions review small mobile - MINIMAL spacing */
+  .questions-review {
+    padding: 2px 4px !important; /* ✅ REDUCED: dari 4px 6px */
+    margin-top: 6px !important; /* ✅ REDUCED: dari 20px */
+  }
+  
+  .question-item {
+    margin-bottom: 6px !important; /* ✅ REDUCED: dari 10px */
+    padding-bottom: 4px !important;
+  }
+  
+  .question-number-circle {
+    min-width: 16px !important; /* ✅ REDUCED: dari 20px */
+    height: 16px !important;
+    font-size: 8px !important;
+  }
+  
+  .question-text,
+  .question-text-html {
+    font-size: 8px !important; /* ✅ REDUCED: dari 10px */
+  }
+  
+  .score-badge {
+    width: 16px !important; /* ✅ REDUCED: dari 20px */
+    height: 16px !important;
+    font-size: 8px !important;
+  }
+  
+  .score-badge i {
+    font-size: 6px !important; /* ✅ REDUCED: dari 8px */
+  }
+  
+  .option-item {
+    padding: 1px 2px !important; /* ✅ REDUCED: dari 3px 4px */
+  }
+  
+  .option-indicator {
+    width: 10px !important; /* ✅ REDUCED: dari 12px */
+    height: 10px !important;
+    font-size: 7px !important;
+    margin-right: 3px !important;
+  }
+  
+  .option-text,
+  .option-text-html {
+    font-size: 8px !important; /* ✅ REDUCED: dari 9px */
+  }
+  
+  .benar-salah-option {
+    min-height: 20px !important; /* ✅ REDUCED: dari 28px */
+    padding: 3px !important;
+  }
+  
+  .benar-salah-option .option-indicator {
+    width: 10px !important;
+    height: 10px !important;
+  }
+  
+  .text-benar,
+  .text-salah {
+    font-size: 8px !important;
+  }
+}
+
+/* ✅ Very small mobile - MINIMAL */
+@media (max-width: 480px) {
+  .view-detail-quiz-container {
+    padding: 2px !important; /* ✅ REDUCED: dari 4px ke 2px */
+  }
+  
+  .quiz-result-container {
+    height: calc(100vh - 4px) !important;
+    border-radius: 2px !important;
+  }
+  
+  .quiz-info-sidebar {
+    padding: 2px !important; /* ✅ REDUCED: dari 4px */
+  }
+  
+  /* ✅ Questions review very small mobile - ABSOLUTE MINIMAL */
+  .questions-review {
+    padding: 1px 2px !important; /* ✅ REDUCED: dari 2px 4px */
+    margin-top: 4px !important; /* ✅ REDUCED: dari 24px */
+  }
+  
+  .achievement-header .score-value {
+    font-size: 14px !important; /* ✅ REDUCED: dari 16px */
+  }
+  
+  .predikat-icon {
+    width: 16px !important; /* ✅ REDUCED: dari 20px */
+    height: 16px !important;
+  }
+  
+  .question-item {
+    margin-bottom: 4px !important;
+    padding-bottom: 2px !important;
+  }
+  
+  .question-number-circle {
+    min-width: 14px !important;
+    height: 14px !important;
+    font-size: 7px !important;
+  }
+  
+  .question-text,
+  .question-text-html {
+    font-size: 7px !important;
+  }
+  
+  .score-badge {
+    width: 14px !important;
+    height: 14px !important;
+    font-size: 7px !important;
+  }
+  
+  .option-text,
+  .option-text-html {
+    font-size: 7px !important;
+  }
+}
+
+/* ✅ Small mobile adjustments */
+@media (max-width: 576px) {
+  .view-detail-quiz-container {
+    padding: 8px !important;
+  }
+  
+  .quiz-result-container {
+    border-radius: 6px;
+    height: calc(100vh - 16px);
+  }
+  
+  .result-header {
+    padding: 4px 8px !important;
+    gap: 3px;
+  }
+  
+  .close-button {
+    font-size: 14px !important;
+  }
+  
+  .result-title {
+    font-size: 12px !important;
+  }
+  
+  .divider {
+    top: 36px !important;
+  }
+  
+  .quiz-info-sidebar {
+    padding: 6px !important;
+    gap: 6px !important;
+  }
+  
+  .info-item {
+    font-size: 10px !important;
+    margin-bottom: 4px !important;
+  }
+  
+  .achievement-header .score-value {
+    font-size: 20px !important;
+  }
+  
+  .predikat-icon {
+    width: 24px !important;
+    height: 24px !important;
+  }
+  
+  /* ✅ Questions review small mobile - INCREASED margin-top */
+  .questions-review {
+    padding: 4px 6px !important;
+    margin-top: 20px !important; /* ✅ INCREASED: Lebih banyak jarak di layar kecil */
+  }
+  
+  .question-item {
+    margin-bottom: 10px !important;
+    padding-bottom: 6px !important;
+  }
+  
+  .question-number-circle {
+    min-width: 20px !important;
+    height: 20px !important;
+    font-size: 9px !important;
+  }
+  
+  .question-text,
+  .question-text-html {
+    font-size: 10px !important;
+  }
+  
+  .score-badge {
+    width: 20px !important;
+    height: 20px !important;
+    font-size: 10px !important;
+  }
+  
+  .score-badge i {
+    font-size: 8px !important;
+  }
+  
+  .option-item {
+    padding: 3px 4px !important;
+  }
+  
+  .option-indicator {
+    width: 12px !important;
+    height: 12px !important;
+    font-size: 8px !important;
+    margin-right: 4px !important;
+  }
+  
+  .option-text,
+  .option-text-html {
+    font-size: 9px !important;
+  }
+  
+  .benar-salah-option {
+    min-height: 28px !important;
+    padding: 4px !important;
+  }
+  
+  .benar-salah-option .option-indicator {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  
+  .text-benar,
+  .text-salah {
+    font-size: 9px !important;
+  }
+}
+
+/* ✅ Very small mobile */
+@media (max-width: 480px) {
+  .view-detail-quiz-container {
+    padding: 4px !important;
+  }
+  
+  .quiz-result-container {
+    height: calc(100vh - 8px);
+  }
+  
+  .quiz-info-sidebar {
+    padding: 4px !important;
+  }
+  
+  /* ✅ Questions review very small mobile - MAXIMUM margin-top */
+  .questions-review {
+    padding: 2px 4px !important;
+    margin-top: 24px !important; /* ✅ MAXIMUM: Jarak terbesar untuk layar sangat kecil */
+  }
+  
+  .achievement-header .score-value {
+    font-size: 16px !important;
+  }
+  
+  .predikat-icon {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+/* ✅ Desktop behavior */
+@media (min-width: 769px) {
+  .view-detail-quiz-container {
+    padding: 24px;
+  }
+  
+  .quiz-result-container {
+    margin: 0 auto;
+    max-width: 1300px;
+    height: 100vh;
+  }
+  
+  .result-content {
+    flex-direction: row !important;
+  }
+  
+  .quiz-info-sidebar {
+    width: 320px;
+    min-width: 320px;
+    max-width: 320px;
+    border-right: 1px solid #e0e0e0;
+    border-bottom: none;
+    border-radius: 0 0 0 8px;
+    padding: 20px;
+    gap: 20px;
+  }
+  
+  .predikat-card {
+    padding: 16px !important;
+    border-radius: 16px !important;
+    width: 100% !important;
+  }
+  
+  .predikat-icon-container {
+    margin-right: 12px !important;
+  }
+  
+  .predikat-icon {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  
+  .predikat-label {
+    font-size: 12px !important;
+  }
+  
+  .predikat-title {
+    font-size: 14px !important;
+  }
+  
+  .predikat-description {
+    font-size: 12px !important;
+  }
+  
+  .achievement-header {
+    padding: 16px !important;
+    border-radius: 16px !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .achievement-header .score-label {
+    font-size: 16px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .achievement-header .score-value {
+    font-size: 48px !important;
+  }
+  
+  .btn-view-enhanced {
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+  }
+  
+  .benar-salah-review {
+    flex-direction: row !important;
+  }
+  
+  .benar-salah-option {
+    flex: 1;
+  }
+  
+  /* ✅ Questions review desktop - back to normal margin */
+  .questions-review {
+    margin-top: 2px;
+    padding: 24px;
+  }
+}
+
+/* ✅ Large desktop */
+@media (min-width: 1200px) {
+  .quiz-info-sidebar {
+    width: 350px;
+    min-width: 350px;
+    max-width: 350px;
+    padding: 24px;
+    gap: 24px;
+  }
+  
+  .predikat-card {
+    padding: 20px !important;
+  }
+  
+  .predikat-icon {
+    width: 52px !important;
+    height: 52px !important;
+  }
+  
+  .predikat-title {
+    font-size: 15px !important;
+  }
+  
+  .predikat-description {
+    font-size: 13px !important;
+  }
+}
+
+/* ✅ Enhanced touch interactions for mobile */
+@media (max-width: 768px) {
+  .close-button,
+  .btn-view-enhanced,
+  .option-item,
+  .benar-salah-option {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  .close-button:active {
+    transform: scale(0.95);
+  }
+  
+  .btn-view-enhanced:active {
+    transform: scale(0.98);
+  }
+  
+  .option-item:active {
+    transform: scale(0.98);
   }
 }

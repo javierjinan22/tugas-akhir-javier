@@ -57,7 +57,6 @@
   opacity: 0.6;
 }
 
-/* ✅ TAMBAH: Status badge dengan warna sesuai gambar */
 .status-badge {
   background-color: #E8F4FD;
   color: #1976D2;
@@ -68,7 +67,6 @@
   display: inline-block;
 }
 
-/* ✅ TAMBAH: Progress bar dengan warna cyan sesuai gambar */
 .progress {
   background-color: #f5f5f5;
   border-radius: 10px;
@@ -77,11 +75,10 @@
 }
 
 .progress-bar {
-  background-color: #00BCD4; /* Cyan color sesuai gambar */
+  background-color: #00BCD4;
   transition: width 0.3s ease;
 }
 
-/* ✅ TAMBAH: Material info styling */
 .material-info {
   flex: 1;
   margin-right: 1rem;
@@ -92,7 +89,6 @@
   margin-bottom: 12px;
 }
 
-/* ✅ TAMBAH: Empty state styling */
 .empty-state {
   color: #757575;
   font-style: italic;
@@ -121,47 +117,6 @@
   font-size: 0.9rem;
 }
 
-/* ✅ TAMBAH: Responsive design */
-@media (max-width: 768px) {
-  .material-item {
-    padding: 12px 0;
-  }
-  
-  .material-info {
-    margin-right: 0.5rem;
-  }
-  
-  .button-group {
-    flex-direction: column;
-    gap: 6px;
-  }
-  
-  .btn-view {
-    font-size: 14px;
-    padding: 6px 16px;
-  }
-  
-  .btn-download {
-    width: 35px;
-    height: 35px;
-    font-size: 12px;
-  }
-  
-  .empty-state {
-    padding: 2rem 1rem !important;
-    margin: 1rem 0;
-  }
-  
-  .empty-state i.fa-check-circle {
-    font-size: 2rem !important;
-  }
-  
-  .empty-state h5 {
-    font-size: 1.1rem;
-  }
-}
-
-/* ✅ TAMBAH: Styling untuk completed status */
 .status-badge.completed {
   background-color: #d4edda;
   color: #155724;
@@ -172,12 +127,10 @@
   font-weight: 500;
 }
 
-/* ✅ SUCCESS BADGE untuk quiz score */
 .badge.bg-success {
   font-size: 0.75rem;
 }
 
-/* ✅ Pastikan CSS category sudah ada (copy dari material-studied) */
 .category-view {
   margin-top: 1rem;
 }
@@ -191,7 +144,7 @@
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 1rem;
-  border-left: 4px solid #28a745; /* Hijau untuk completed */
+  border-left: 4px solid #28a745;
 }
 
 .category-icon {
@@ -235,4 +188,248 @@
 .category-view .material-item:hover {
   border-color: #28a745;
   box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
+}
+
+/* ✅ CRITICAL: Mobile responsive design */
+@media (max-width: 768px) {
+  /* ✅ Container adjustments */
+  .materials-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 12px 16px;
+    background-color: white;
+  }
+  
+  /* ✅ Material item mobile layout */
+  .material-item {
+    padding: 12px 0;
+  }
+  
+  /* ✅ Flex layout untuk mobile - stack vertically */
+  .material-item .d-flex {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .material-info {
+    margin-right: 0 !important;
+    margin-bottom: 12px;
+    flex: 1;
+  }
+  
+  .material-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  
+  .material-meta {
+    margin-top: 6px;
+    margin-bottom: 8px;
+  }
+  
+  /* ✅ Button group mobile layout */
+  .button-group {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .btn-view {
+    background-color: #F9D349;
+    color: #6C613B;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    font-size: 14px;
+    min-height: 40px;
+    flex: 1;
+    max-width: 140px;
+  }
+  
+  .btn-download {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* ✅ Category view mobile adjustments */
+  .materials-in-category {
+    padding-left: 0.5rem;
+    margin-left: 10px;
+    border-left: 2px solid #e9ecef;
+  }
+  
+  .category-header {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  .category-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .category-title {
+    font-size: 15px;
+  }
+  
+  .category-view .material-item {
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+  
+  /* ✅ Status badges mobile */
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 8px;
+  }
+  
+  .status-badge.completed {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  
+  .badge.bg-success {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  
+  /* ✅ Empty state mobile */
+  .empty-state {
+    padding: 2rem 1rem !important;
+    text-align: center;
+    margin: 1rem 0;
+  }
+  
+  .empty-state i.fa-check-circle {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .empty-state h5 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-state p {
+    font-size: 0.9rem;
+  }
+}
+
+/* ✅ Small mobile adjustments */
+@media (max-width: 576px) {
+  .materials-container {
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  
+  .material-item {
+    padding: 10px 0;
+  }
+  
+  .material-title {
+    font-size: 15px;
+  }
+  
+  .btn-view {
+    padding: 8px 16px;
+    font-size: 13px;
+    min-height: 36px;
+  }
+  
+  .btn-download {
+    min-width: 36px;
+    min-height: 36px;
+    padding: 6px;
+  }
+  
+  .category-header {
+    padding: 10px;
+  }
+  
+  .category-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .materials-in-category {
+    padding-left: 0.25rem;
+    margin-left: 8px;
+  }
+  
+  .empty-state {
+    padding: 1.5rem 0.5rem !important;
+  }
+}
+
+/* ✅ Very small mobile */
+@media (max-width: 480px) {
+  .materials-container {
+    padding: 6px 8px;
+  }
+  
+  .material-item {
+    padding: 8px 0;
+  }
+  
+  .material-title {
+    font-size: 14px;
+    line-height: 1.3;
+  }
+  
+  .btn-view {
+    font-size: 12px;
+    padding: 6px 12px;
+    min-height: 32px;
+  }
+  
+  .btn-download {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 12px;
+  }
+  
+  .material-info {
+    margin-bottom: 8px;
+  }
+}
+
+/* ✅ Desktop behavior - ensure normal display */
+@media (min-width: 769px) {
+  .material-item .d-flex {
+    flex-direction: row !important;
+    align-items: start !important;
+  }
+  
+  .material-info {
+    margin-right: 1rem !important;
+    margin-bottom: 0 !important;
+  }
+  
+  .button-group {
+    justify-content: flex-end;
+    width: auto;
+  }
+  
+  .btn-view {
+    flex: none;
+    max-width: none;
+  }
 }

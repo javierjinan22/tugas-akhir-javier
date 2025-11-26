@@ -1058,3 +1058,119 @@
     font-size: 0.85rem;
   }
 }
+
+.education-infobox {
+  background: linear-gradient(135deg, #e3f2fd 0%, #f0f8f0 100%);
+  border: 1px solid #15b2c4;
+  border-radius: 12px;
+  padding: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(21, 178, 196, 0.08);
+}
+
+.education-infobox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #15b2c4 0%, #128a9b 100%);
+}
+
+.infobox-content {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 20px;
+  gap: 14px;
+  margin-left: 4px; /* Offset untuk border kiri */
+}
+
+.infobox-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  box-shadow: 0 3px 8px rgba(255, 152, 0, 0.3);
+  margin-top: 2px; /* Slight adjustment for alignment */
+}
+
+.infobox-icon i {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.infobox-text {
+  flex: 1;
+  color: #2c3e50;
+  line-height: 1.5;
+}
+
+.infobox-text strong {
+  color: #15b2c4;
+  font-weight: 600;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.infobox-text p {
+  font-size: 14px;
+  color: #546e7a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .infobox-content {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  
+  .infobox-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  
+  .infobox-text strong {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  
+  .infobox-text p {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 576px) {
+  .education-infobox {
+    border-radius: 8px;
+  }
+  
+  .infobox-content {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  
+  .infobox-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .infobox-text strong {
+    font-size: 14px;
+  }
+  
+  .infobox-text p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+}

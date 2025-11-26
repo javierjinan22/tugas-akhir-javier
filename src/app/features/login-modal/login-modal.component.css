@@ -1,103 +1,38 @@
-/* Pakai font Poppins untuk keseluruhan modal */
+/* ✅ Base styling untuk modal dan form */
 .modal-header,
 .modal-body,
-.modal-title-custom,
-.form-label-custom,
-.btn-login,
-.link-daftar {
+.modal-title,
+label,
+.btn-primary-custom,
+.link-daftar,
+p {
   font-family: 'Poppins', sans-serif;
 }
 
-/* Ukuran teks title Login */
-.modal-title-custom {
+/* ✅ Modal title styling */
+.modal-title {
   font-size: 16px;
   font-weight: 600;
 }
 
-/* Ukuran label form */
-.form-label-custom {
-  font-size: 14px;
-}
-
-/* Button custom */
-.btn-login {
-  display: block;    
-  margin: 0 auto; 
-  background-color: #1BB6C1;
-  border-color: #1BB6C1;
-  border-radius: 15px;
-  font-size: 16px;
-  font-weight: 500;
-  max-width: 200px;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.btn-login:hover {
-  background-color: #0891b2;
-  border-color: #0891b2;
-}
-
-/* Link Daftar */
-.link-daftar {
-  color: #1BB6C1;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.link-daftar:hover {
-  text-decoration: underline;
-}
-
-.form-control:focus {
-  box-shadow: none;
-  border-color: #1BB6C1;
-}
-
-.modal-body {
-  position: relative; /* Ensure proper positioning for toast */
-}
-
-/* ✅ Loading button state */
-.btn-login:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.btn-login .fa-spinner {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ✅ Hide error alert when toast is showing */
-.alert-danger {
-  transition: opacity 0.3s ease;
-}
-
-/* ✅ SELARASKAN: Font Poppins dan ukuran font sesuai dengan registration */
-.modal-header .modal-title {
-  font-family: 'Poppins', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-}
-
+/* ✅ Label styling */
 label {
   font-size: 14px;
-  font-family: 'Poppins', sans-serif;
   margin-bottom: 0.5rem;
   display: block;
+  font-weight: 500;
 }
 
-/* ✅ SELARASKAN: Input form control style */
+/* ✅ SIMPLIFIED: Form control styling */
 .form-control {
   border-radius: 8px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
-  padding: 0.5rem;
+  padding: 0.75rem;
+  border: 1px solid #ced4da;
+  width: 100%;
+  background-color: #fff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
 .form-control::placeholder {
@@ -106,27 +41,75 @@ label {
 }
 
 .form-control:focus {
-  box-shadow: none;
   border-color: #1BB6C1;
+  box-shadow: 0 0 0 0.2rem rgba(27, 182, 193, 0.25);
+  outline: 0;
 }
 
-/* ✅ SELARASKAN: Button primary custom */
+/* ✅ SIMPLIFIED: Password input styling */
+.password-input {
+  padding-right: 45px !important;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  padding: 0.75rem;
+  padding-right: 45px !important;
+  border: 1px solid #ced4da;
+  width: 100%;
+  background-color: #fff;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.password-input:focus {
+  border-color: #1BB6C1;
+  box-shadow: 0 0 0 0.2rem rgba(27, 182, 193, 0.25);
+  outline: 0;
+}
+
+/* ✅ SIMPLIFIED: Password toggle icon */
+.toggle-password-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  cursor: pointer;
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.toggle-password-icon:hover {
+  color: #1BB6C1;
+}
+
+/* ✅ Position relative container */
+.position-relative {
+  position: relative;
+}
+
+/* ✅ Button styling */
 .btn-primary-custom {
   background-color: #1BB6C1;
   color: #fff;
   border: none;
   border-radius: 15px;
-  font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  cursor: pointer;
 }
 
-.btn-primary-custom:hover {
+.btn-primary-custom:hover:not(:disabled) {
   background-color: #17a2b8;
 }
 
-/* ✅ SELARASKAN: Button disabled state */
 .btn-primary-custom:disabled {
   background-color: #6c757d;
   border-color: #6c757d;
@@ -134,12 +117,7 @@ label {
   cursor: not-allowed;
 }
 
-.btn-primary-custom:disabled:hover {
-  background-color: #6c757d;
-  border-color: #6c757d;
-}
-
-/* ✅ SELARASKAN: Modal body styling */
+/* ✅ Modal body styling */
 .modal-body form {
   display: flex;
   flex-direction: column;
@@ -149,60 +127,20 @@ label {
   margin-bottom: 1rem;
 }
 
-/* ✅ SELARASKAN: Link daftar */
+/* ✅ Link styling */
 .link-daftar {
   color: #1BB6C1;
   text-decoration: none;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .link-daftar:hover {
   text-decoration: underline;
+  color: #17a2b8;
 }
 
-/* ✅ TAMBAH: Password container untuk proper positioning */
-.position-relative {
-  position: relative;
-}
-
-/* ✅ TAMBAH: Password input dengan proper padding */
-.password-input {
-  border-radius: 8px;
-  padding-right: 45px !important; /* Space for eye icon */
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  height: calc(1.5em + 0.75rem + 2px); /* Standard Bootstrap input height */
-  line-height: 1.5;
-}
-
-.password-input:focus {
-  border-color: #1BB6C1;
-  box-shadow: 0 0 0 0.2rem rgba(27, 182, 193, 0.25);
-}
-
-/* ✅ TAMBAH: Password toggle icon positioning yang tepat */
-.toggle-password-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6c757d;
-  cursor: pointer;
-  font-size: 16px;
-  transition: color 0.2s ease;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  margin-top: 0;
-}
-
-.toggle-password-icon:hover {
-  color: #1BB6C1;
-}
-
-/* ✅ SELARASKAN: Styling untuk error messages yang consistent */
+/* ✅ Text styling */
 .text-danger {
   color: #dc3545 !important;
   font-size: 0.875rem;
@@ -215,15 +153,10 @@ label {
   font-weight: 500;
 }
 
-.text-muted {
-  color: #6c757d !important;
-  font-size: 0.875rem;
-}
-
-/* ✅ SELARASKAN: Custom styling untuk valid inputs TANPA checkmark */
+/* ✅ Validation styling WITHOUT checkmarks */
 .form-control.is-valid {
   border-color: #28a745;
-  /* No background-image checkmark */
+  background-image: none !important;
 }
 
 .form-control.is-valid:focus {
@@ -231,111 +164,43 @@ label {
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
 }
 
-/* ✅ SELARASKAN: Password input valid tanpa checkmark dan padding normal */
+.form-control.is-invalid {
+  border-color: #dc3545;
+  background-image: none !important;
+}
+
+.form-control.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+/* ✅ Password input valid state */
 .password-input.is-valid {
-  padding-right: 45px !important; /* Kembali ke padding normal untuk eye icon saja */
-}
-
-/* ✅ SELARASKAN: Override untuk menghilangkan semua checkmark dari Bootstrap */
-.form-control.is-valid,
-.was-validated .form-control:valid {
-  background-image: none !important;
-  background-repeat: no-repeat;
-  background-position: right calc(0.375em + 0.1875rem) center;
-  background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.form-control.is-valid:focus,
-.was-validated .form-control:valid:focus {
+  padding-right: 45px !important;
   background-image: none !important;
 }
 
-input.form-control.is-valid,
-textarea.form-control.is-valid,
-select.form-control.is-valid {
-  background-image: none !important;
-  padding-right: 0.75rem; /* Default Bootstrap padding */
+/* ✅ Alert styling */
+.alert {
+  border-radius: 8px;
+  font-size: 14px;
 }
 
-/* ✅ TAMBAH: Khusus untuk password input, tetap gunakan padding untuk eye icon */
-input.password-input.is-valid {
-  padding-right: 45px !important; /* Space untuk eye icon */
+.alert-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  border-color: #28a745;
+  color: #155724;
 }
 
-/* ✅ SELARASKAN: Responsive styling */
-@media (max-width: 768px) {
-  .toggle-password-icon {
-    right: 12px;
-    font-size: 14px;
-    width: 18px;
-    height: 18px;
-  }
-  
-  .password-input {
-    padding-right: 40px !important;
-  }
-  
-  .password-input.is-valid {
-    padding-right: 40px !important;
-  }
-  
-  .text-danger,
-  .text-success,
-  .text-muted {
-    font-size: 0.8rem;
-  }
+.alert-danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
+  color: #721c24;
 }
 
-/* ✅ SELARASKAN: Loading state styling */
-.fa-spinner.fa-spin {
-  color: #1BB6C1;
-}
-
-/* ✅ SELARASKAN: Icon coloring yang selaras */
-.fas.fa-check-circle {
-  color: #28a745;
-}
-
-.fas.fa-exclamation-circle {
-  color: #dc3545;
-}
-
-.fas.fa-info-circle {
-  color: #17a2b8;
-}
-
-.fas.fa-exclamation-triangle {
-  color: #ffc107;
-}
-
-.fas.fa-lightbulb {
-  color: #1BB6C1;
-}
-
-/* ✅ SELARASKAN: Ensure proper spacing dalam password container */
-.mb-3 label {
-  position: relative;
-  z-index: 1;
-}
-
-.mb-3 .form-control {
-  position: relative;
-  z-index: 2;
-}
-
-.mb-3 .toggle-password-icon {
-  position: absolute;
-  z-index: 3;
-}
-
-/* ✅ SELARASKAN: Form validation styling consistency */
-.mb-3 {
-  margin-bottom: 1rem !important;
-}
-
-/* ✅ SELARASKAN: Toast styling */
+/* ✅ Toast styling */
 .toast-container {
-  z-index: 1061;
+  z-index: 1070 !important;
 }
 
 .toast-success {
@@ -355,36 +220,7 @@ input.password-input.is-valid {
   color: #212529;
 }
 
-.toast.show {
-  display: block;
-  opacity: 1;
-}
-
-.toast.hide {
-  display: none;
-  opacity: 0;
-}
-
-/* ✅ SELARASKAN: Alert styling */
-.alert {
-  border-radius: 8px;
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
-}
-
-.alert-success {
-  background-color: rgba(40, 167, 69, 0.1);
-  border-color: #28a745;
-  color: #155724;
-}
-
-.alert-danger {
-  background-color: rgba(220, 53, 69, 0.1);
-  border-color: #dc3545;
-  color: #721c24;
-}
-
-/* ✅ TAMBAH: Spinner animation */
+/* ✅ Spinner animation */
 .fa-spinner {
   animation: spin 1s linear infinite;
 }
@@ -394,11 +230,100 @@ input.password-input.is-valid {
   100% { transform: rotate(360deg); }
 }
 
-/* ✅ SELARASKAN: Text alignment */
-p {
-  font-family: 'Poppins', sans-serif;
-  font-size: 14px;
+/* ✅ Icon colors */
+.fas.fa-check-circle {
+  color: #28a745;
 }
 
-/* ✅ Remove old classes yang tidak digunakan lagi */
-/* Hapus: .modal-title-custom, .form-label-custom, .btn-login */
+.fas.fa-exclamation-circle {
+  color: #dc3545;
+}
+
+.fas.fa-eye,
+.fas.fa-eye-slash {
+  color: #6c757d;
+}
+
+/* ✅ Paragraph styling */
+p {
+  font-size: 14px;
+  margin-bottom: 1rem;
+}
+
+/* ================================
+   MOBILE OPTIMIZATION
+   ================================ */
+
+@media (max-width: 768px) {
+  /* ✅ Form controls mobile optimization */
+  .form-control,
+  .password-input {
+    font-size: 16px !important; /* Prevent iOS zoom */
+    padding: 12px !important;
+    min-height: 48px !important;
+    border-radius: 8px !important;
+  }
+  
+  /* ✅ Password input mobile */
+  .password-input {
+    padding-right: 55px !important;
+  }
+  
+  .password-input.is-valid {
+    padding-right: 55px !important;
+  }
+  
+  /* ✅ Password icon mobile */
+  .toggle-password-icon {
+    right: 15px !important;
+    font-size: 20px !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+  
+  /* ✅ Button mobile */
+  .btn-primary-custom {
+    font-size: 16px !important;
+    padding: 14px !important;
+    min-height: 48px !important;
+    border-radius: 12px !important;
+  }
+  
+  /* ✅ Link mobile */
+  .link-daftar {
+    font-size: 16px !important;
+    min-height: 48px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 8px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .form-control,
+  .password-input {
+    font-size: 16px !important;
+    padding: 14px !important;
+    min-height: 50px !important;
+  }
+  
+  .password-input {
+    padding-right: 60px !important;
+  }
+  
+  .toggle-password-icon {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    font-size: 22px !important;
+  }
+  
+  .btn-primary-custom {
+    padding: 16px !important;
+    min-height: 52px !important;
+    font-size: 18px !important;
+  }
+}
