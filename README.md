@@ -1,4 +1,7 @@
-# JavierAngular
+## Literadoo
+<img width="1440" height="900" alt="Screenshot 2025-10-09 at 20 46 21" src="https://github.com/user-attachments/assets/798e5fe8-a134-4bda-9e8b-e468b3ae0d98" />
+
+## Javier Angular
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.11.
 
